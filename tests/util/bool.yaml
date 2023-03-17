@@ -1,0 +1,9 @@
+# Copyright 2023 Robert Bosch GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+---
+foo: true
+bar: Y
+a: on
+b: false

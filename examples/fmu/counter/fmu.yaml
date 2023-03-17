@@ -1,0 +1,24 @@
+# Copyright 2023 Robert Bosch GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+---
+kind: Fmu
+metadata:
+  name: Counter
+  annotations:
+    reference: https://github.com/boschglobal/dse.clib.git
+    license: BIOSLv4
+spec:
+  description: Counter increments on each call to do_step().
+  guid: fb480c6b-0058-4628-abd3-36ba2f2ecb5f
+  version: 1.0.0
+  modes:
+    cosim:
+      stepsize: 0.005
+      modelIdentifier: counter
+  variables:
+    count:
+      ref: 42
+      type: int32
+  parameters: []
