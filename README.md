@@ -63,7 +63,7 @@ Please refer to the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
 
 ## License
 
-DSE Schemas is open-sourced under the Apache-2.0 license.
+DSE C Library is open-sourced under the Apache-2.0 license.
 See the [LICENSE](LICENSE) and [NOTICE](./NOTICE) files for details.
 
 
