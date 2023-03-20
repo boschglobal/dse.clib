@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 # DSE C Library
 
 [![CI](https://github.com/boschglobal/dse.clib/actions/workflows/ci.yaml/badge.svg)](https://github.com/boschglobal/dse.clib/actions/workflows/ci.yaml)
-[![Super Linter](https://github.com/boschglobal/dse.clib/actions/workflows/super-linter.yaml/badge.svg)](https://github.com/boschglobal/dse.clib/actions/workflows/super-linter.yaml)
+[![Super Linter](https://github.com/boschglobal/dse.clib/actions/workflows/super_linter.yaml/badge.svg)](https://github.com/boschglobal/dse.clib/actions/workflows/super_linter.yaml)
 ![GitHub](https://img.shields.io/github/license/boschglobal/dse.clib)
 
 
