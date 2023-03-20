@@ -26,18 +26,19 @@ used by this project.
 ### Using ClangFormat
 
 ```bash
-# Build the ClangFormat docker container:
+# Build the ClangFormat docker container (optional).
 $ make docker
 ...
 $ docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 clang-format        latest              1383c4b9a6ff        4 minutes ago       422MB
-
-# Setup a command alias:
 $ export DSE_CLANG_FORMAT_IMAGE=clang-format:latest
+
+# Setup a command alias (using ghcr.io image).
+$ export DSE_CLANG_FORMAT_IMAGE=ghcr.io/boschglobal/dse.clib-clang-format:main
 $ alias dse-clang-format='docker run --rm -it --volume $(pwd):/tmp/code ${DSE_CLANG_FORMAT_IMAGE}'
 
-# Run ClangFormat:
+# Run ClangFormat.
 $ dse-clang-format dse/clib/util/strings.c
 Target is dse/clib/util/strings.c (file).
 Using DSE Clang Format rules file.
