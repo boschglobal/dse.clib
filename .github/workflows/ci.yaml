@@ -53,6 +53,7 @@ jobs:
             type=semver,pattern={{version}}
 
       - name: Get package version
+        if: startsWith(github.ref, 'refs/tags/')
         id: package
         run: |
           echo "PACKAGE_VERSION=${{ fromJSON(steps.package_meta.outputs.json).labels['org.opencontainers.image.version'] }}" >> $GITHUB_ENV
