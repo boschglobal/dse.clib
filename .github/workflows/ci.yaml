@@ -1,6 +1,6 @@
 ---
 name: CI
-on:
+on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
   push:
     branches: [main]
@@ -63,11 +63,11 @@ jobs:
           PACKAGE_ARCH: ${{ matrix.package.arch }}
         run: |
           make
-          
+
       - name: Test
         if: ${{ env.test_make_target != '' }}
         env:
           PACKAGE_ARCH: ${{ matrix.package.arch }}
         run: |
           make ${{ env.test_make_target }}
-         
+          
