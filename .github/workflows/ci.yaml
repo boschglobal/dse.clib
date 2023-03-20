@@ -70,4 +70,3 @@ jobs:
           PACKAGE_ARCH: ${{ matrix.package.arch }}
         run: |
           make ${{ env.test_make_target }}
-          
