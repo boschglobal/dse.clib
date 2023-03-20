@@ -15,6 +15,7 @@ jobs:
       matrix:
         image:
           - gcc-builder
+          - python-builder
           - clang-format
     steps:
       - name: Checkout
