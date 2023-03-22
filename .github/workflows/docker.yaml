@@ -6,7 +6,7 @@ on:  # yamllint disable-line rule:truthy
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BASE_NAME: ${{ github.repository }}
+  IMAGE_BASE_NAME: ${{ github.repository_owner }}/dse
 
 jobs:
   container:
