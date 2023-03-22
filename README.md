@@ -43,7 +43,9 @@ $ make docker
 $ docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 clang-format        latest              1383c4b9a6ff        4 minutes ago       422MB
+flatc-builder       latest              ae386cde1022        4 days ago          588MB
 gcc-builder         latest              3654f9a45978        4 minutes ago       1.81GB
+python-builder      latest              1ab91b4bef07        4 weeks ago         1.21GB
 
 # Build (downloads dependencies needed for running tests).
 $ make

@@ -5,7 +5,7 @@
 ###############
 ## Docker Images.
 GCC_BUILDER_IMAGE ?= gcc-builder:latest
-DOCKER_DIRS = gcc-builder python-builder clang-format
+DOCKER_DIRS = flatc-builder gcc-builder python-builder clang-format
 
 
 ###############
