@@ -32,7 +32,7 @@ L- tests        Unit and integration tests.
 
 ### Toolchains
 
-The C Library is built using containerised toolchains which can be
+The C Library is built using containerised toolchains. These can be
 built as follows:
 
 ```bash
