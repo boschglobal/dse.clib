@@ -35,7 +35,7 @@ clang-format        latest              1383c4b9a6ff        4 minutes ago       
 $ export DSE_CLANG_FORMAT_IMAGE=clang-format:latest
 
 # Setup a command alias (using ghcr.io image).
-$ export DSE_CLANG_FORMAT_IMAGE=ghcr.io/boschglobal/dse.clib-clang-format:main
+$ export DSE_CLANG_FORMAT_IMAGE=ghcr.io/boschglobal/dse-clang-format:main
 $ alias dse-clang-format='docker run --rm -it --volume $(pwd):/tmp/code ${DSE_CLANG_FORMAT_IMAGE}'
 
 # Run ClangFormat.
