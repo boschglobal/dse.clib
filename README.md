@@ -30,14 +30,14 @@ L- tests        Unit and integration tests.
 
 ## Usage
 
-### Build
+### Toolchains
+
+The C Library is built using containerised toolchains which can be
+built as follows:
 
 ```bash
-# Get the repo
 $ git clone https://github.com/boschglobal/dse.clib.git
 $ cd dse.clib
-
-# Build the toolchains (optional, builder containers are published on ghcr.io).
 $ make docker
 ...
 $ docker images
@@ -46,6 +46,25 @@ clang-format        latest              1383c4b9a6ff        4 minutes ago       
 flatc-builder       latest              ae386cde1022        4 days ago          588MB
 gcc-builder         latest              3654f9a45978        4 minutes ago       1.81GB
 python-builder      latest              1ab91b4bef07        4 weeks ago         1.21GB
+```
+
+Alternatively, the latest Docker Images are available on ghcr.io and can be
+used as follows:
+
+```bash
+$ export GCC_BUILDER_IMAGE=ghcr.io/boschglobal/dse-gcc-builder:main
+```
+
+
+### Build
+
+```bash
+# Get the repo
+$ git clone https://github.com/boschglobal/dse.clib.git
+$ cd dse.clib
+
+# Optionally set builder images.
+$ export GCC_BUILDER_IMAGE=ghcr.io/boschglobal/dse-gcc-builder:main
 
 # Build (downloads dependencies needed for running tests).
 $ make
