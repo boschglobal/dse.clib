@@ -17,6 +17,7 @@ jobs:
           - gcc-builder
           - python-builder
           - clang-format
+          - flatc-builder
     steps:
       - name: Checkout
         uses: actions/checkout@v3
