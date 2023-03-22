@@ -11,7 +11,7 @@ on:  # yamllint disable-line rule:truthy
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BASE_NAME: ${{ github.repository }}
+  IMAGE_BASE_NAME: ${{ github.repository_owner }}/dse
   PACKAGE_VERSION: 0.0.2
   package_name: CLib
   package_arch_list: linux-amd64  # Comma separated list.
