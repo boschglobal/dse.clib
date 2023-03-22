@@ -4,7 +4,7 @@ Copyright 2023 Robert Bosch GmbH
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# DSE C Library
+# Dynamic Simulation Environment - C Library
 
 [![CI](https://github.com/boschglobal/dse.clib/actions/workflows/ci.yaml/badge.svg)](https://github.com/boschglobal/dse.clib/actions/workflows/ci.yaml)
 [![Super Linter](https://github.com/boschglobal/dse.clib/actions/workflows/super_linter.yaml/badge.svg)](https://github.com/boschglobal/dse.clib/actions/workflows/super_linter.yaml)
