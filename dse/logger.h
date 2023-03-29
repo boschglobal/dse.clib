@@ -72,7 +72,8 @@ static inline void __log2console(
         /* Timestamp the log. */
         struct timeval t;
         gettimeofday(&t, NULL);
-        printf("[%02" PRId64 ".%06" PRId64 "] ", t.tv_sec % 100, t.tv_usec);
+        printf("[%02" PRId64 ".%06" PRId64 "] ", (int64_t)t.tv_sec % 100,
+            (int64_t)t.tv_usec);
     }
     va_start(args, format);
     vprintf(format, args);

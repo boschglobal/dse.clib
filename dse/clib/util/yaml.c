@@ -332,7 +332,7 @@ DLL_PUBLIC int dse_yaml_get_double(
 {
     const char* _scalar = dse_yaml_get_scalar(node, name);
     if (_scalar == NULL) return EINVAL;
-    for (uint i = 0; i < strlen(_scalar); i++) {
+    for (unsigned int i = 0; i < strlen(_scalar); i++) {
         double val = atof(_scalar);
         if (((_scalar[i] >= '0' && _scalar[i] <= '9') || _scalar[i] == '.')) {
             *value = val;
