@@ -3,7 +3,7 @@ name: Super Linter
 on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, devel]
   pull_request:
     types: [assigned, opened, edited, synchronize, reopened]
   pull_request_target:
@@ -12,6 +12,9 @@ jobs:
   build:
     name: Lint Code Base
     runs-on: [ubuntu-latest]
+    container:
+      image: debian:bullseye-slim
+      options: --user root
     steps:
       - uses: actions/checkout@v3
         with:
