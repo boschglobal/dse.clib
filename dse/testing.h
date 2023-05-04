@@ -9,7 +9,9 @@
 #ifdef UNIT_TESTING
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <stdint.h>
+#include <float.h>
 #include <setjmp.h>
 #include <cmocka.h>
 #endif  // UNIT_TESTING
