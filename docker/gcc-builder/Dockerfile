@@ -20,12 +20,12 @@ RUN apt-get -y update; \
         curl \
         gcc \
         gcc-multilib \
+        gdb \
         g++ \
         g++-multilib \
         git \
         jq \
         less \
-        libcmocka-dev \
         libtool \
         make \
         mingw-w64 \
@@ -41,6 +41,14 @@ RUN curl -fSL https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3
     && chmod u+x /tmp/cmake-install.sh \
     && /tmp/cmake-install.sh --skip-license --prefix=/usr/local \
     && rm /tmp/cmake-install.sh
+    
+RUN curl -fSL https://git.cryptomilk.org/projects/cmocka.git/snapshot/cmocka-1.1.7.tar.gz \
+        -o /tmp/cmocka-1.1.7.tar.gz \
+    && cd /tmp; tar xzf /tmp/cmocka-1.1.7.tar.gz \
+    && cd /tmp/cmocka-1.1.7 \
+    && mkdir build; cd build; cmake -DCMAKE_INSTALL_PREFIX=/usr .. \
+    && make; make install \
+    && cd /tmp; rm -rf cmocka-1.1.7; rm /tmp/cmocka-1.1.7.tar.gz
 
 
 FROM base AS ccache
