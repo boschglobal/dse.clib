@@ -2,15 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <setjmp.h>
-#include <cmocka.h>
-#include <dse/clib/util/yaml.h>
 #include <yaml.h>
+#include <dse/testing.h>
+#include <dse/clib/util/yaml.h>
 #include <dse/logger.h>
 
 #define FILENAME      "util/test.yaml"

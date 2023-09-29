@@ -48,6 +48,7 @@ extern "C" {
 
 typedef uint64_t (*hashmap_hash_function)(const char* key);
 typedef int (*HashMapIterateFunc)(void* map_item, void* additional_data);
+typedef void (*HashMapDestroyItemCallback)(void* map_item, void* data);
 
 /*******************************************************************************
 ***    Data structures
@@ -78,6 +79,8 @@ static __inline__ int hashmap_init(HashMap* h)
 /*  frees all memory allocated by the hashmap library
     NOTE: If the value is malloc'd memory, it is up to the user to free it */
 DLL_PUBLIC void hashmap_destroy(HashMap* h);
+DLL_PUBLIC void hashmap_destroy_ext(
+    HashMap* h, HashMapDestroyItemCallback cb, void* data);
 
 /* clear the hashmap for reuse */
 DLL_PUBLIC void hashmap_clear(HashMap* h);
@@ -131,6 +134,10 @@ DLL_PUBLIC double* hashmap_set_double(
 /*  Easily add a string, this will malloc everything for the user and will
    signal to de-allocate the memory on destruction */
 DLL_PUBLIC char* hashmap_set_string(HashMap* h, const char* key, char* value);
+
+/*  Easily add a reference, this will malloc everything for the user and will
+   signal to de-allocate the memory on destruction */
+DLL_PUBLIC void* hashmap_set_ref(HashMap* h, const char* key, void* value);
 
 /* Return the fullness of the hashmap */
 DLL_PUBLIC float hashmap_get_fullness(HashMap* h);

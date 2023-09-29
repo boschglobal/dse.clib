@@ -9,13 +9,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <yaml.h>
-
-#ifdef UNIT_TESTING
-#include <stdarg.h>
-#include <setjmp.h>
-#include <cmocka.h>
-#endif
-
+#include <dse/testing.h>
 #include <dse/clib/util/yaml.h>
 #include <dse/logger.h>
 

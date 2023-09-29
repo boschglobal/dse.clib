@@ -14,13 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-#ifdef UNIT_TESTING
-#include <stdarg.h>
-#include <setjmp.h>
-#include <cmocka.h>
-#endif
-
+#include <dse/testing.h>
 #include <dse/clib/collections/hashmap.h>
 
 #define MAX_FULLNESS_PERCENT 0.25 /* arbitrary */
@@ -213,6 +207,12 @@ double* hashmap_set_double(HashMap* h, const char* key, double value)
     return (double*)__hashmap_set(h, key, ptr, 0);
 }
 
+void* hashmap_set_ref(HashMap* h, const char* key, void* value)
+{
+    void** ptr = (void*)calloc(1, sizeof(void*));
+    *ptr = value;
+    return (void*)__hashmap_set(h, key, (void*)ptr, 0);
+}
 
 int hashmap_iterator(HashMap* map, HashMapIterateFunc iter_func,
     bool continue_on_error, void* additional_data)
@@ -231,6 +231,27 @@ int hashmap_iterator(HashMap* map, HashMapIterateFunc iter_func,
         free(_keys[_]);
     free(_keys);
     return rc;
+}
+
+void hashmap_destroy_ext(HashMap* h, HashMapDestroyItemCallback cb, void* data)
+{
+    uint64_t i;
+    for (i = 0; i < h->number_nodes; ++i) {
+        if (h->nodes[i] != NULL) {
+            if (cb) {
+                /* The callback will free any associated memory, but not the
+                 * value itself which will be free'd here.
+                 */
+                cb(h->nodes[i]->value, data);
+            }
+            if (h->nodes[i]->mallocd != 0) {
+                /* Free the value. When mallocd == 0 the call to hashmap_destroy
+                 * will free the value. */
+                free(h->nodes[i]->value);
+            }
+        }
+    }
+    hashmap_destroy(h);
 }
 
 

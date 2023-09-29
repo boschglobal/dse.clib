@@ -18,6 +18,7 @@ RUN apt-get -y update; \
         ca-certificates \
         extra-cmake-modules \
         curl \
+        gdb \
         gcc \
         gcc-multilib \
         gdb \

@@ -13,13 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-#ifdef UNIT_TESTING
-#include <stdarg.h>
-#include <setjmp.h>
-#include <cmocka.h>
-#endif
-
+#include <dse/testing.h>
 #include <dse/clib/collections/set.h>
 
 

@@ -6,9 +6,9 @@ cmake_minimum_required(VERSION 3.21)
 
 set(VERSION "$ENV{PACKAGE_VERSION}")
 
-project(dse-clib-fmi-models
+project(dse-clib-importer
     VERSION ${VERSION}
-    DESCRIPTION "DSE C Lib FMI Models."
+    DESCRIPTION "DSE C Lib FMI Importer."
     HOMEPAGE_URL "${PROJECT_URL}"
 )
 
@@ -43,7 +43,7 @@ add_compile_definitions(DLL_BUILD)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 
-# External Project - yaml (used py process list)
+# External Project - yaml
 # -----------------------
 set(YAML_SOURCE_DIR "$ENV{EXTERNAL_BUILD_DIR}/yaml")
 set(YAML_BINARY_DIR "$ENV{EXTERNAL_BUILD_DIR}/yaml")
@@ -65,16 +65,20 @@ set_target_properties(yaml
 
 # DSE C Lib
 # ---------
-set(DSE_CLIB_SOURCE_DIR ../../../../dse/clib)
+set(DSE_CLIB_SOURCE_DIR ../../../../../dse/clib)
 set(DSE_CLIB_SOURCE_FILES
-    ${DSE_CLIB_SOURCE_DIR}/process/process.c
-    ${DSE_CLIB_SOURCE_DIR}/process/process_list.c
     ${DSE_CLIB_SOURCE_DIR}/collections/hashmap.c
+    ${DSE_CLIB_SOURCE_DIR}/util/binary.c
+    ${DSE_CLIB_SOURCE_DIR}/util/strings.c
     ${DSE_CLIB_SOURCE_DIR}/util/yaml.c
 
     ${DSE_CLIB_SOURCE_DIR}/fmi/fmu.c
+    ${DSE_CLIB_SOURCE_DIR}/fmi/importer.c
     ${DSE_CLIB_SOURCE_DIR}/fmi/storage.c
-    ${DSE_CLIB_SOURCE_DIR}/fmi/fmi2/fmi2api.c
+    ${DSE_CLIB_SOURCE_DIR}/fmi/strategy.c
+
+ #   ${DSE_CLIB_SOURCE_DIR}/fmi/fmi2/fmi2fmu.c
+    ${DSE_CLIB_SOURCE_DIR}/fmi/fmi2/fmi2importer.c
 )
 set(DSE_CLIB_INCLUDE_DIR "${DSE_CLIB_SOURCE_DIR}/../..")
 set(FMI2_INCLUDE_DIR "${DSE_CLIB_SOURCE_DIR}/fmi/fmi2/headers")
@@ -84,41 +88,24 @@ set(FMI2_INCLUDE_DIR "${DSE_CLIB_SOURCE_DIR}/fmi/fmi2/headers")
 # Targets
 # =======
 
-# Model Process List
-# ------------------
-add_library(model-process-list SHARED
-    process-list.c
+# Importer
+# --------
+add_executable(importer
+    importer.c
     ${DSE_CLIB_SOURCE_FILES}
 )
-target_include_directories(model-process-list
+target_include_directories(importer
     PRIVATE
         ${FMI2_INCLUDE_DIR}
         ${YAML_SOURCE_DIR}/include
         ${DSE_CLIB_INCLUDE_DIR}
 )
-target_link_libraries(model-process-list
+target_link_libraries(importer
     PRIVATE
         yaml
+        dl
 )
-install(TARGETS model-process-list)
-
-# Model NOP with Weak Definition
-# ------------------------------
-add_library(model-nop-weak SHARED
-    nop_weak.c
-    ${DSE_CLIB_SOURCE_FILES}
-)
-target_include_directories(model-nop-weak
-    PRIVATE
-        ${FMI2_INCLUDE_DIR}
-        ${YAML_SOURCE_DIR}/include
-        ${DSE_CLIB_INCLUDE_DIR}
-)
-target_link_libraries(model-nop-weak
-    PRIVATE
-        yaml
-)
-install(TARGETS model-nop-weak)
+install(TARGETS importer)
 
 
 

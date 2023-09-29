@@ -2,14 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdio.h>
 #include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <setjmp.h>
-#include <cmocka.h>
+#include <dse/testing.h>
 #include <dse/clib/collections/hashmap.h>
 
 
@@ -26,24 +20,21 @@ static int hash_iterator_func(void* map_item, void* additional_data)
 }
 
 
-typedef int (*HashMapIterateFunc)(void* map_item, void* additional_data);
-
-
 void test_hash_iterator(void** state)
 {
     UNUSED(state);
 
     HashMap h;
     hashmap_init(&h);
-    hashmap_set(&h, "foo", strdup("foo hello"));
-    hashmap_set(&h, "bar", strdup("bar hello"));
+    hashmap_set(&h, "foo", (void*)"foo hello");
+    hashmap_set(&h, "bar", (void*)"bar hello");
     assert_int_equal(hashmap_number_keys(h), 2);
 
     /* validation hash */
     HashMap vh;
     hashmap_init(&vh);
-    hashmap_set(&vh, "foo hello", strdup("foo"));
-    hashmap_set(&vh, "bar hello", strdup("bar"));
+    hashmap_set(&vh, "foo hello", (void*)"foo");
+    hashmap_set(&vh, "bar hello", (void*)"bar");
     assert_int_equal(hashmap_number_keys(vh), 2);
 
     /* call iterator */
@@ -54,4 +45,61 @@ void test_hash_iterator(void** state)
     assert_int_equal(hashmap_number_keys((vh)), 0);
     hashmap_destroy(&h);
     hashmap_destroy(&vh);
+}
+
+
+void test_hash_destroy_ext_mallocd_0(void** state)
+{
+    UNUSED(state);
+
+    HashMap h;
+    hashmap_init(&h);
+    hashmap_set_string(&h, "foo", (char*)"hello foo");
+    hashmap_set_string(&h, "bar", (char*)"hello bar");
+    assert_int_equal(hashmap_number_keys(h), 2);
+
+    hashmap_destroy_ext(&h, NULL, NULL);
+}
+
+
+void test_hash_destroy_ext_mallocd_1(void** state)
+{
+    UNUSED(state);
+
+    HashMap h;
+    hashmap_init(&h);
+    hashmap_set(&h, "foo", (void*)strdup("hello foo"));
+    hashmap_set(&h, "bar", (void*)strdup("hello bar"));
+    assert_int_equal(hashmap_number_keys(h), 2);
+
+    hashmap_destroy_ext(&h, NULL, NULL);
+}
+
+
+static void _destroy_cb(void* map_item, void* data)
+{
+    HashMap* h = data;
+    hashmap_set_string(h, (const char*)map_item, (char*)map_item);
+}
+
+
+void test_hash_destroy_ext_with_callback(void** state)
+{
+    UNUSED(state);
+
+    /* For tracking the callback. */
+    HashMap cb_tracker;
+    hashmap_init(&cb_tracker);
+
+    HashMap h;
+    hashmap_init(&h);
+    hashmap_set(&h, "foo", (void*)strdup("hello foo"));
+    hashmap_set(&h, "bar", (void*)strdup("hello bar"));
+    assert_int_equal(hashmap_number_keys(h), 2);
+
+    hashmap_destroy_ext(&h, _destroy_cb, (void*)&cb_tracker);
+    assert_int_equal(hashmap_number_keys(cb_tracker), 2);
+    assert_non_null(hashmap_get(&cb_tracker, "hello foo"));
+    assert_non_null(hashmap_get(&cb_tracker, "hello bar"));
+    hashmap_destroy(&cb_tracker);
 }

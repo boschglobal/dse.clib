@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <dse/testing.h>
 #include <dse/clib/util/strings.h>
 
 
