@@ -5,8 +5,8 @@
 #ifndef DSE_TESTING_H_
 #define DSE_TESTING_H_
 
-#ifdef UNIT_TESTING
 
+#if defined(UNIT_TESTING) || defined(CMOCKA_TESTING)
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -17,6 +17,8 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+
+#if defined(UNIT_TESTING)  // Enables memory checks in CMocka includes.
 
 /* Wrapping strdup() to get memory checking does not work with libyaml (and
  * perhaps other libs too). Therefore, rather than wrapping we can use the
@@ -32,7 +34,8 @@ static inline char *dse_strdup_swap(const char *s)
 }
 #define strdup dse_strdup_swap
 
-
 #endif  // UNIT_TESTING
+
+#endif  // UNIT_TESTING || CMOCKA_TESTING
 
 #endif  // DSE_TESTING_H_
