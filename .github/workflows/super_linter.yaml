@@ -21,7 +21,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Super-Linter
-        uses: github/super-linter/slim@v4
+        uses: github/super-linter/slim@v5
         env:
           VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: main
@@ -29,5 +29,4 @@ jobs:
           FILTER_REGEX_EXCLUDE: (dse/clib/fmi/fmi2/headers/.*|dse/clib/fmi/fmi3/headers/.*)
           VALIDATE_CPP: true
           VALIDATE_DOCKERFILE: true
-          # VALIDATE_MARKDOWN: true
           VALIDATE_YAML: true
