@@ -18,13 +18,6 @@
 
 #define UNUSED(x) ((void)x)
 
-#if defined _WIN32
-#define FILE_URI_SCHEME "file:///"
-#else
-#define FILE_URI_SCHEME "file://"
-#endif
-#define FILE_URI_SHORT_SCHEME "file:"
-
 
 typedef void** buffer_ref;
 
