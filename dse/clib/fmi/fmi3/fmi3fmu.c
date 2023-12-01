@@ -30,10 +30,10 @@ typedef void** buffer_ref;
 
 typedef struct Fmu3InstanceData {
     /* FMI Instance Data. */
-    const char*                  instance_name;
-    const char*                  resource_location;
-    const char*                  guid;
-    bool                         log_enabled;
+    const char* instance_name;
+    const char* resource_location;
+    const char* guid;
+    bool        log_enabled;
 } Fmu3InstanceData;
 
 
@@ -44,8 +44,8 @@ const char* fmi3GetVersion()
     return fmi3Version;
 }
 
-fmi3Status fmi3SetDebugLogging(fmi3Instance instance,
-    fmi3Boolean loggingOn, size_t nCategories, const fmi3String categories[])
+fmi3Status fmi3SetDebugLogging(fmi3Instance instance, fmi3Boolean loggingOn,
+    size_t nCategories, const fmi3String categories[])
 {
     assert(instance);
     UNUSED(loggingOn);
@@ -93,14 +93,13 @@ fmi3Instance fmi3InstantiateCoSimulation(fmi3String instanceName,
     UNUSED(intermediateUpdate);
 
     /* Create the FMU Model Instance Data. */
-    Fmu3InstanceData* fmu_inst =
-        calloc(1, sizeof(Fmu3InstanceData));
+    Fmu3InstanceData* fmu_inst = calloc(1, sizeof(Fmu3InstanceData));
     fmu_inst->instance_name = instanceName;
     fmu_inst->resource_location = resourcePath;
     fmu_inst->guid = instantiationToken;
     fmu_inst->log_enabled = loggingOn;
 
-    /**
+    /*
      *  Set the working dir of the FMU to the parent directory of the
      *  resource location. The resource location may take the forms:
      *
@@ -121,16 +120,14 @@ fmi3Instance fmi3InstantiateCoSimulation(fmi3String instanceName,
     free(working_dir);
 
     /* Create the Model. */
-    FmuModelDesc* model_desc = model_create(
-        fmu_inst, calloc, free);
+    FmuModelDesc* model_desc = model_create(fmu_inst, calloc, free);
 
     return (fmi3Instance)model_desc;
 }
 
-fmi3Instance fmi3InstantiateScheduledExecution(
-    fmi3String instanceName, fmi3String instantiationToken,
-    fmi3String resourcePath, fmi3Boolean visible, fmi3Boolean loggingOn,
-    fmi3InstanceEnvironment instanceEnvironment,
+fmi3Instance fmi3InstantiateScheduledExecution(fmi3String instanceName,
+    fmi3String instantiationToken, fmi3String resourcePath, fmi3Boolean visible,
+    fmi3Boolean loggingOn, fmi3InstanceEnvironment instanceEnvironment,
     fmi3LogMessageCallback logMessage, fmi3ClockUpdateCallback clockUpdate,
     fmi3LockPreemptionCallback   lockPreemption,
     fmi3UnlockPreemptionCallback unlockPreemption)
@@ -231,7 +228,8 @@ fmi3Status fmi3GetFloat64(fmi3Instance instance,
     UNUSED(nValues);
 
     for (size_t i = 0; i < nValueReferences; i++) {
-        double* value_ref = storage_ref(instance, valueReferences[i], STORAGE_DOUBLE);
+        double* value_ref =
+            storage_ref(instance, valueReferences[i], STORAGE_DOUBLE);
         if (value_ref) values[i] = *value_ref;
     }
 
@@ -364,7 +362,8 @@ fmi3Status fmi3GetString(fmi3Instance instance,
     UNUSED(nValues);
 
     for (size_t i = 0; i < nValueReferences; i++) {
-        const char** value_ref = storage_ref(instance, valueReferences[i], STORAGE_STRING);
+        const char** value_ref =
+            storage_ref(instance, valueReferences[i], STORAGE_STRING);
         if (value_ref) {
             values[i] = strdup(*value_ref);
         }
@@ -380,9 +379,10 @@ fmi3Status fmi3GetBinary(fmi3Instance instance,
     UNUSED(nValues);
 
     for (size_t i = 0; i < nValueReferences; i++) {
-        buffer_ref* value_ref =
-            (buffer_ref*)storage_ref(instance, valueReferences[i], STORAGE_BINARY);
-        uint32_t* size_ref = storage_ref(instance, valueReferences[i], STORAGE_BINARY_SIZE);
+        buffer_ref* value_ref = (buffer_ref*)storage_ref(
+            instance, valueReferences[i], STORAGE_BINARY);
+        uint32_t* size_ref =
+            storage_ref(instance, valueReferences[i], STORAGE_BINARY_SIZE);
 
         if (value_ref == NULL || **value_ref == NULL || size_ref == NULL) {
             values[i] = NULL;
@@ -431,7 +431,8 @@ fmi3Status fmi3SetFloat64(fmi3Instance instance,
     UNUSED(nValues);
 
     for (size_t i = 0; i < nValueReferences; i++) {
-        double* value_ref = storage_ref(instance, valueReferences[i], STORAGE_DOUBLE);
+        double* value_ref =
+            storage_ref(instance, valueReferences[i], STORAGE_DOUBLE);
         if (value_ref) *value_ref = values[i];
     }
 
@@ -560,7 +561,8 @@ fmi3Status fmi3SetString(fmi3Instance instance,
     UNUSED(nValues);
 
     for (size_t i = 0; i < nValueReferences; i++) {
-        char** value_ref = storage_ref(instance, valueReferences[i], STORAGE_STRING);
+        char** value_ref =
+            storage_ref(instance, valueReferences[i], STORAGE_STRING);
         if (value_ref) {
             if (*value_ref) free(*value_ref);
             *value_ref = strdup(values[i]);
@@ -577,11 +579,12 @@ fmi3Status fmi3SetBinary(fmi3Instance instance,
     UNUSED(nValues);
 
     for (size_t i = 0; i < nValueReferences; i++) {
-        buffer_ref* value_ref =
-            (buffer_ref*)storage_ref(instance, valueReferences[i], STORAGE_BINARY);
-        uint32_t* size_ref = storage_ref(instance, valueReferences[i], STORAGE_BINARY_SIZE);
-        uint32_t* buffer_size_ref =
-            storage_ref(instance, valueReferences[i], STORAGE_BINARY_BUFFER_LENGTH);
+        buffer_ref* value_ref = (buffer_ref*)storage_ref(
+            instance, valueReferences[i], STORAGE_BINARY);
+        uint32_t* size_ref =
+            storage_ref(instance, valueReferences[i], STORAGE_BINARY_SIZE);
+        uint32_t* buffer_size_ref = storage_ref(
+            instance, valueReferences[i], STORAGE_BINARY_BUFFER_LENGTH);
         if (value_ref == NULL) continue;
         if (size_ref == NULL) continue;
         if (buffer_size_ref == NULL) continue;
@@ -607,9 +610,8 @@ fmi3Status fmi3SetClock(fmi3Instance instance,
 
 /* Getting Variable Dependency Information */
 
-fmi3Status fmi3GetNumberOfVariableDependencies(
-    fmi3Instance instance, fmi3ValueReference valueReference,
-    size_t* nDependencies)
+fmi3Status fmi3GetNumberOfVariableDependencies(fmi3Instance instance,
+    fmi3ValueReference valueReference, size_t* nDependencies)
 {
     assert(instance);
     UNUSED(valueReference);
@@ -636,8 +638,7 @@ fmi3Status fmi3GetVariableDependencies(fmi3Instance instance,
 
 /* Getting and setting the internal FMU state */
 
-fmi3Status fmi3GetFMUState(
-    fmi3Instance instance, fmi3FMUState* FMUState)
+fmi3Status fmi3GetFMUState(fmi3Instance instance, fmi3FMUState* FMUState)
 {
     assert(instance);
     UNUSED(FMUState);
@@ -645,8 +646,7 @@ fmi3Status fmi3GetFMUState(
     return fmi3OK;
 }
 
-fmi3Status fmi3SetFMUState(
-    fmi3Instance instance, fmi3FMUState FMUState)
+fmi3Status fmi3SetFMUState(fmi3Instance instance, fmi3FMUState FMUState)
 {
     assert(instance);
     UNUSED(FMUState);
@@ -654,8 +654,7 @@ fmi3Status fmi3SetFMUState(
     return fmi3OK;
 }
 
-fmi3Status fmi3FreeFMUState(
-    fmi3Instance instance, fmi3FMUState* FMUState)
+fmi3Status fmi3FreeFMUState(fmi3Instance instance, fmi3FMUState* FMUState)
 {
     assert(instance);
     UNUSED(FMUState);
@@ -673,8 +672,8 @@ fmi3Status fmi3SerializedFMUStateSize(
     return fmi3OK;
 }
 
-fmi3Status fmi3SerializeFMUState(fmi3Instance instance,
-    fmi3FMUState FMUState, fmi3Byte serializedState[], size_t size)
+fmi3Status fmi3SerializeFMUState(fmi3Instance instance, fmi3FMUState FMUState,
+    fmi3Byte serializedState[], size_t size)
 {
     assert(instance);
     UNUSED(FMUState);
@@ -876,10 +875,6 @@ fmi3Status fmi3UpdateDiscreteStates(fmi3Instance instance,
     return fmi3OK;
 }
 
-/***************************************************
-Types for Functions for Model Exchange
-****************************************************/
-
 fmi3Status fmi3EnterContinuousTimeMode(fmi3Instance instance)
 {
     assert(instance);
@@ -979,10 +974,6 @@ fmi3Status fmi3GetNumberOfContinuousStates(
     return fmi3OK;
 }
 
-/***************************************************
-Types for Functions for Co-Simulation
-****************************************************/
-
 /* Simulating the FMU */
 
 fmi3Status fmi3EnterStepMode(fmi3Instance instance)
@@ -1017,16 +1008,13 @@ fmi3Status fmi3DoStep(fmi3Instance instance,
     UNUSED(terminateSimulation);
     UNUSED(earlyReturn);
     UNUSED(lastSuccessfulTime);
-    
-    int rc = model_step(instance, currentCommunicationPoint, communicationStepSize);
+
+    int rc =
+        model_step(instance, currentCommunicationPoint, communicationStepSize);
     return (rc == 0 ? fmi3OK : fmi3Error);
 
     return fmi3OK;
 }
-
-/***************************************************
-Types for Functions for Scheduled Execution
-****************************************************/
 
 fmi3Status fmi3ActivateModelPartition(fmi3Instance instance,
     fmi3ValueReference clockReference, fmi3Float64 activationTime)

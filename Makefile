@@ -116,6 +116,10 @@ do-cleanall: do-clean
 do-oss:
 	$(MAKE) -C extra/external oss
 
+.PHONY: generate
+generate:
+	$(MAKE) -C doc generate
+
 super-linter:
 	docker run --rm --volume $$(pwd):/tmp/lint \
 		--env RUN_LOCAL=true \

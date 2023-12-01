@@ -11,28 +11,84 @@
 
 
 /**
- * FMU Model Interface
- * ===================
- *
- * Simplified Model interface for implementing FMUs.
- *
- * Details (Example FMI2)
- * ----------------------
- * fmi2/fmi2fmu.c
- *      - contains implementation of FMI2 API
- *      - calls this FMU Model Interface
- *      - uses storage.c
- *
- * Importer loads FMU, calls the FMI API, which calls the FMU Model Interface.
- *
- * Linking
- * -------
- * When building an FMU, link the following files:
- *      - fmu.c : generic implementation parts
- *      - storage.c : storage mechanism
- *      - fmi2/fmi2fmu.c : version specific parts
- *      - <model.c> : model specific parts
- */
+FMU Model API
+=============
+
+The FMU Model API (a part of the DSE C Lib) provides a simplified interface for
+developing Models which adhere to the Modelica Association FMI Standard. It has
+the following notable capabilities:
+
+* Models are compatible with either FMI 2 or FMI 3 (selected via linker).
+* Simple model lifecycle:
+  * `model_init()`
+  * `model_step()` - only function needed for a minimal FMU implementation!
+  * ...
+* Storage system with fast hash based index for all FMI Variable types, including binary data.
+* Integration with [DSE Network Codec API](https://github.com/boschglobal/dse.standards/tree/main/dse/ncodec)
+  which provides a MIMEtype selected (and configured) CAN Virtual Buses. The Network Codec has a simple
+  to use programming interface:
+  * `ncodec_write()` / `ncodec_flush()` - to send CAN frames
+  * `ncodec_read()` - to receive CAN frames.
+
+
+Component Diagram
+-----------------
+<div hidden>
+
+```
+@startuml fmu-model
+
+title DSE C Lib - FMU Model
+
+interface "FMI" as FmiIf
+package "FMU" {
+    interface "Model IF" as ModelIf
+    component "Model" as Model
+
+    component "FMI Adapter" as FmiFmu
+    component "Storage" as Storage
+}
+component "Importer" as Importer
+
+FmiIf -left- FmiFmu
+FmiIf )-right- Importer
+
+Model -right- ModelIf
+ModelIf )-right- FmiFmu
+
+Model .down.> Storage : use
+FmiFmu .down.> Storage : use
+
+
+center footer Dynamic Simulation Environment
+
+@enduml
+```
+
+</div>
+
+![](fmu-model.png)
+
+
+Example
+-------
+
+The following example shows a minimal model implementation which simply
+increments a counter.
+
+{{< readfile file="../examples/counter.c" code="true" lang="c" >}}
+
+
+Linking
+-------
+When building an FMU, link the following files:
+
+- fmu.c : generic implementation parts
+- storage.c : storage mechanism
+- fmi2/fmi2fmu.c : version specific parts
+- model.c : model specific parts
+
+*/
 
 typedef void* (*FmuMemAllocFunc)(size_t number, size_t size);
 typedef void (*FmuMemFreeFunc)(void* obj);
@@ -69,7 +125,7 @@ typedef struct storage_bucket {
 
 
 /* fmu.c */
-DLL_PRIVATE FmuModelDesc* model_create(
+DLL_PRIVATE void* model_create(
     void* fmu_inst, FmuMemAllocFunc mem_alloc, FmuMemFreeFunc mem_free);
 DLL_PRIVATE void model_finalize(FmuModelDesc* model_desc);
 /* Model API (implemented by the Model). */
@@ -82,7 +138,7 @@ DLL_PRIVATE void model_destroy(FmuModelDesc* model_desc);
 
 /* storage.c */
 DLL_PRIVATE int             storage_init(FmuModelDesc* model_desc);
-DLL_PRIVATE storage_bucket* storage_get_bucket(
+DLL_PRIVATE void* storage_get_bucket(
     FmuModelDesc* model_desc, storage_type type);
 DLL_PRIVATE void* storage_ref(
     FmuModelDesc* model_desc, unsigned int vr, storage_type type);
@@ -90,23 +146,6 @@ DLL_PRIVATE void storage_set_string(
     FmuModelDesc* model_desc, unsigned int vr, char* source);
 DLL_PRIVATE int storage_destroy(FmuModelDesc* model_desc);
 
-
-/**
- * FMU Importer Interface
- * ======================
- *
- * Loads an FMU and calls its FMI API.
- *
- * Details (Example FMI2)
- * ----------------------
- * fmi2/fmi2importer.c
- *      - Loads the FMU interface (i.e. the FMI API).
- *      - Implements importer interface (load, init, step, unload).
- * importer.c
- *      - Implements generalised importer interface.
- * strategy.c
- *      - Defines execution strategy.
- */
 
 /* Value Types supported by the FMI Importer (related to storage types). */
 typedef enum {
@@ -187,10 +226,9 @@ typedef struct FmuAdapterDesc {
 
 /* Instance - represents an imported instance of an FMU. */
 typedef struct FmuInstDesc {
-    const char* name;
-    const char* path;
-    void* model_doc;  // FIXME parse from XML? or add callback. // TODO ...
-                      // strategy to handle this, and its type?
+    const char*      name;
+    const char*      path;
+    void*            model_doc;
     /* Importer specific data. */
     FmuAdapterDesc*  adapter;
     FmuStrategyDesc* strategy;

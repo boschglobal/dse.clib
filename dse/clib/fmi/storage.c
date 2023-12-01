@@ -26,20 +26,24 @@ static inline void _set_vr_index(unsigned int vr)
 
 
 /**
- *  storage_init
- *
- *  Initialise the storage.
- *
- *  Parameters
- *  ----------
- *  model_desc : FmuModelDesc
- *      Model Descriptor, references various runtime functions and data.
- *
- *  Returns
- *  -------
- *      0 : success.
- *      +ve : failure, inspect errno for the failing condition.
- */
+storage_init
+============
+
+Initialise the storage subsystem for an FMU.
+
+Parameters
+----------
+model_desc (FmuModelDesc*)
+: Model Descriptor.
+
+Returns
+-------
+0 (int)
+: Success.
+
++ve (int)
+: Failure, inspect errno for the failing condition.
+*/
 int storage_init(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
@@ -54,20 +58,27 @@ int storage_init(FmuModelDesc* model_desc)
 
 
 /**
- *  storage_get_bucket
- *
- *  Returns a reference/pointer to the requested storage bucket.
- *
- *  Parameters
- *  ----------
- *  type : storage_type
- *      Indicate the storage type bucket which should be retrieved.
- *
- *  Returns
- *  -------
- *      storage_bucket* : Reference to the requested storage bucket.
- *      NULL : The specified storage bucket is not provisioned.
- */
+storage_get_bucket
+==================
+
+Returns a reference/pointer to the requested storage bucket.
+
+Parameters
+----------
+model_desc (FmuModelDesc*)
+: Model Descriptor.
+
+type (storage_type)
+: Indicate the storage type bucket which should be retrieved.
+
+Returns
+-------
+storage_bucket*
+: Reference to the requested storage bucket.
+
+NULL
+: The specified storage bucket is not provisioned.
+*/
 storage_bucket* storage_get_bucket(FmuModelDesc* model_desc, storage_type type)
 {
     UNUSED(model_desc);
@@ -78,41 +89,50 @@ storage_bucket* storage_get_bucket(FmuModelDesc* model_desc, storage_type type)
 
 
 /**
- *  storage_ref
- *
- *  Get a reference (pointer to) the specified storage value. The returned
- *  reference must be cast to the provided storage_type by the caller before
- *  accessing the storage value.
- *
- *  Parameters
- *  ----------
- *  model_desc : FmuModelDesc
- *      Model Descriptor, references various runtime functions and data.
- *  vr : unsigned int
- *      FMU Variable Reference.
- *  type : storage_type
- *      Indicate the storage type bucket from which the storage reference should
- *      be retrieved.
- *
- *  Returns
- *  -------
- *      void* : Reference to a storage value (caller must cast to storage_type).
- *      NULL : A reference to the storage value could not be retrieved.
- *
- *  Example
- *  -------
- *  #include <dse/fmi/fmu.h>
- *
- *  static FmuModelDesc* model_desc;  // Initialised elsewhere.
- *
- *  int set_int_value(unsigned int vr, int value)
- *  {
- *      int *ref = (int*)storage_ref(model_desc, vr, STORAGE_INT);
- *      if (ref == NULL) return 1;
- *      *ref = value;
- *      return 0;
- *  }
- */
+storage_ref
+===========
+
+Get a reference (pointer to) the specified storage value. The returned
+reference must be cast to the provided storage_type by the caller before
+accessing the storage value.
+
+Parameters
+----------
+model_desc (FmuModelDesc*)
+: Model Descriptor.
+
+vr (unsigned int)
+: FMU Variable Reference.
+
+type (storage_type)
+: Indicate the storage type bucket from which the storage reference should
+  be retrieved.
+
+Returns
+-------
+void*
+: Reference to a storage value (caller must cast to storage_type).
+
+NULL
+: A reference to the storage value could not be retrieved.
+
+Example
+-------
+
+```c
+#include <dse/fmi/fmu.h>
+
+static FmuModelDesc* model_desc;
+
+int set_int_value(unsigned int vr, int value)
+{
+    int *ref = (int*)storage_ref(model_desc, vr, STORAGE_INT);
+    if (ref == NULL) return 1;
+    *ref = value;
+    return 0;
+}
+```
+*/
 inline void* storage_ref(
     FmuModelDesc* model_desc, unsigned int vr, storage_type type)
 {
@@ -138,20 +158,24 @@ void _free_ref(void* map_item, void* data)
 
 
 /**
- *  storage_destroy
- *
- *  Destroy any allocated storage.
- *
- *  Parameters
- *  ----------
- *  model_desc : FmuModelDesc
- *      Model Descriptor, references various runtime functions and data.
- *
- *  Returns
- *  -------
- *      0 : success.
- *      +ve : failure, inspect errno for the failing condition.
- */
+storage_destroy
+===============
+
+Destroy any allocated storage.
+
+Parameters
+----------
+model_desc (FmuModelDesc*)
+: Model Descriptor.
+
+Returns
+-------
+0 (int)
+: Success.
+
++ve (int)
+: Failure, inspect errno for the failing condition.
+*/
 int storage_destroy(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);

@@ -10,6 +10,30 @@
 #include <dse/platform.h>
 
 
+/**
+fmi2_cosim_execute
+==================
+
+Applies an action (load, init, step etc) from an FMI2 CoSim execution strategy
+to the specified FMU instance. The strategy action will call FMU methods
+according to the FMI Standard.
+
+Parameters
+----------
+inst (FmuInstDesc*)
+: Model Descriptor, references various runtime functions and data.
+
+action (FmuStrategyAction)
+: The action which should be executed by the strategy.
+
+Returns
+-------
+0
+: Success, an equivalent status is passed to the FMU Importer.
+
+!0
+: Failure, an equivalent status is passed to the FMU Importer.
+*/
 int fmi2_cosim_execute(FmuInstDesc* inst, FmuStrategyAction action)
 {
     int models_active;
@@ -97,7 +121,7 @@ int fmi2_cosim_execute(FmuInstDesc* inst, FmuStrategyAction action)
         if ((inst->adapter) && (inst->adapter->unload_func)) {
             /* Call the FMU Adapter Unload method. */
             inst->adapter->unload_func(inst);
-            /* Call the Strategy Destroy method. FIXME ?? here */
+            /* Call the Strategy Destroy method. */
             if (inst->strategy->map_destroy_func)
                 inst->strategy->map_destroy_func(inst);
         }
@@ -106,7 +130,6 @@ int fmi2_cosim_execute(FmuInstDesc* inst, FmuStrategyAction action)
     case FMU_STRATEGY_ACTION_MARSHALL_OUT:
         if (inst->strategy->marshal_to_var_func)
             inst->strategy->marshal_to_var_func(inst);
-        // FIXME marshal from var to FMU? Adapter function.
         break;
 
     case FMU_STRATEGY_ACTION_MARSHALL_IN:

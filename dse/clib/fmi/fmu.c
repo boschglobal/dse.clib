@@ -96,7 +96,8 @@ static void _load_storage_spec(
                 storage_get_bucket(model_desc, STORAGE_BINARY_SIZE);
             storage_bucket* length_bucket =
                 storage_get_bucket(model_desc, STORAGE_BINARY_BUFFER_LENGTH);
-            hashmap_set_ref(&bucket->index, _vr_index, calloc(1, sizeof(void*)));
+            hashmap_set_ref(
+                &bucket->index, _vr_index, calloc(1, sizeof(void*)));
             hashmap_set_long(&size_bucket->index, _vr_index, 0);
             hashmap_set_long(&length_bucket->index, _vr_index, 0);
         } break;
@@ -123,26 +124,34 @@ static int storage_index_on_fmu(FmuModelDesc* model_desc, const char* file)
 
 
 /**
- *  model_create
- *
- *  Creates an FMU Model Descriptor object and performs any necessary
- *  initialisation of the FMU Model.
- *
- *  Parameters
- *  ----------
- *  fmu_inst : void (pointer to)
- *      FMU provided instance data.
- *  mem_alloc : FmuMemAllocFunc
- *      Function pointer for the memory allocation function which the Model
- *      should use. Recommend using calloc().
- *  mem_free : FmuMemFreeFunc
- *      Function pointer for the memory free function which the Model
- *      should use. Typically free().
- *
- *  Returns
- *  -------
- *      FmuModelDesc (pointer to) : A new FMU Model Descriptor object.
- */
+model_create
+============
+
+Creates an FMU Model Descriptor object and performs any necessary
+initialisation of the FMU Model.
+
+Called by `fmi2Instantiate()`.
+
+Called by `fmi3InstantiateCoSimulation()`.
+
+Parameters
+----------
+fmu_inst (void*)
+: FMU provided instance data.
+
+mem_alloc (FmuMemAllocFunc)
+: Function pointer for the memory allocation function which the Model should
+  use. Recommend using calloc().
+
+mem_free (FmuMemFreeFunc)
+: Function pointer for the memory free function which the Model should use.
+  Typically free().
+
+Returns
+-------
+FmuModelDesc*
+: A new FMU Model Descriptor object.
+*/
 __attribute__((weak)) FmuModelDesc* model_create(
     void* fmu_inst, FmuMemAllocFunc mem_alloc, FmuMemFreeFunc mem_free)
 {
@@ -165,17 +174,26 @@ __attribute__((weak)) FmuModelDesc* model_create(
 
 
 /**
- *  model_init
- *
- *  Parameters
- *  ----------
- *  model_desc : FmuModelDesc
- *      Model Descriptor, references various runtime functions and data.
- *
- *  Returns
- *  -------
- *      0 : success.
- */
+model_init
+==========
+
+Called by `fmi2ExitInitializationMode()` as the FMU exits initialisation mode.
+
+Called by `fmi3ExitInitializationMode()` as the FMU exits initialisation mode.
+
+Parameters
+----------
+model_desc (FmuModelDesc*)
+: Model Descriptor, references various runtime functions and data.
+
+Returns
+-------
+0
+: Success, an equivalent status is passed to the FMU Importer.
+
+!0
+: Failure, an equivalent status is passed to the FMU Importer.
+*/
 __attribute__((weak)) int model_init(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
@@ -185,17 +203,26 @@ __attribute__((weak)) int model_init(FmuModelDesc* model_desc)
 
 
 /**
- *  model_step
- *
- *  Parameters
- *  ----------
- *  model_desc : FmuModelDesc
- *      Model Descriptor, references various runtime functions and data.
- *
- *  Returns
- *  -------
- *      0 : success.
- */
+model_step
+==========
+
+Called by `fmi2DoStep()`.
+
+Called by `fmi3DoStep()`.
+
+Parameters
+----------
+model_desc (FmuModelDesc*)
+: Model Descriptor, references various runtime functions and data.
+
+Returns
+-------
+0
+: Success, an equivalent status is passed to the FMU Importer.
+
+!0
+: Failure, an equivalent status is passed to the FMU Importer.
+*/
 __attribute__((weak)) int model_step(
     FmuModelDesc* model_desc, double model_time, double stop_time)
 {
@@ -208,17 +235,26 @@ __attribute__((weak)) int model_step(
 
 
 /**
- *  model_terminate
- *
- *  Parameters
- *  ----------
- *  model_desc : FmuModelDesc
- *      Model Descriptor, references various runtime functions and data.
- *
- *  Returns
- *  -------
- *      0 : success.
- */
+model_terminate
+===============
+
+Called by `fmi2Terminate()`.
+
+Called by `fmi3Terminate()`.
+
+Parameters
+----------
+model_desc (FmuModelDesc*)
+: Model Descriptor, references various runtime functions and data.
+
+Returns
+-------
+0
+: Success, an equivalent status is passed to the FMU Importer.
+
+!0
+: Failure, an equivalent status is passed to the FMU Importer.
+*/
 __attribute__((weak)) int model_terminate(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
@@ -228,15 +264,26 @@ __attribute__((weak)) int model_terminate(FmuModelDesc* model_desc)
 
 
 /**
- *  model_destroy
- *
- *  Free the loaded process list.
- *
- *  Parameters
- *  ----------
- *  model_desc : FmuModelDesc
- *      Model Descriptor, references various runtime functions and data.
- */
+model_destroy
+=============
+
+Called by `fmi2FreeInstance()`.
+
+Called by `fmi3FreeInstance()`.
+
+Parameters
+----------
+model_desc (FmuModelDesc*)
+: Model Descriptor, references various runtime functions and data.
+
+Returns
+-------
+0
+: Success, an equivalent status is passed to the FMU Importer.
+
+!0
+: Failure, an equivalent status is passed to the FMU Importer.
+*/
 __attribute__((weak)) void model_destroy(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
@@ -244,16 +291,21 @@ __attribute__((weak)) void model_destroy(FmuModelDesc* model_desc)
 
 
 /**
- *  model_finalize
- *
- *  Finalize any data objects which are outside the scope of the FMU Model.
- *
- *  Parameters
- *  ----------
- *  model_desc : FmuModelDesc
- *      Model Descriptor, references various runtime functions and data.
- */
-void model_finalize(FmuModelDesc* model_desc)
+model_finalize
+==============
+
+Releases the resources created by `model_create()`.
+
+Called by `fmi2FreeInstance()`.
+
+Called by `fmi3FreeInstance()`.
+
+Parameters
+----------
+model_desc (FmuModelDesc*)
+: Model Descriptor, references various runtime functions and data.
+*/
+__attribute__((weak)) void model_finalize(FmuModelDesc* model_desc)
 {
     storage_destroy(model_desc);
     model_desc->mem_free(model_desc->instance_data);

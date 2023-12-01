@@ -13,7 +13,7 @@
 #define UNUSED(x)     ((void)x)
 
 
-/**
+/*
  * FMU Importer - Strategy Interface
  * =================================
  */
@@ -62,7 +62,7 @@ int fmu_unload(FmuInstDesc* inst)
 }
 
 
-/**
+/*
  * FMU Importer - Scalar Variable Map
  * ==================================
  */
