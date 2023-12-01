@@ -43,6 +43,8 @@ int fmu_step(FmuInstDesc* inst, double* model_time, double stop_time)
     assert(inst);
     assert(inst->strategy);
     assert(inst->strategy->exec_func);
+    UNUSED(model_time);
+    UNUSED(stop_time);
 
     // TODO set model time, stop time.
 
@@ -87,6 +89,8 @@ void fmu_map_variables(FmuInstDesc* inst, FmiValueType value_type, char** names,
     void** values, size_t count)
 {
     assert(inst);
+    UNUSED(value_type);
+
     if (count == 0) return;
     if (inst->inst_data == NULL) {
         inst->inst_data = calloc(1, sizeof(SignalMap));

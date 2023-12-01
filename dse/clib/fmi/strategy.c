@@ -36,8 +36,6 @@ Returns
 */
 int fmi2_cosim_execute(FmuInstDesc* inst, FmuStrategyAction action)
 {
-    int models_active;
-
     switch (action) {
     case FMU_STRATEGY_ACTION_LOAD:
         /* Call the FMU Adapter Load method. */

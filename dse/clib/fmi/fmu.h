@@ -125,7 +125,7 @@ typedef struct storage_bucket {
 
 
 /* fmu.c */
-DLL_PRIVATE void* model_create(
+DLL_PRIVATE FmuModelDesc* model_create(
     void* fmu_inst, FmuMemAllocFunc mem_alloc, FmuMemFreeFunc mem_free);
 DLL_PRIVATE void model_finalize(FmuModelDesc* model_desc);
 /* Model API (implemented by the Model). */
@@ -138,7 +138,7 @@ DLL_PRIVATE void model_destroy(FmuModelDesc* model_desc);
 
 /* storage.c */
 DLL_PRIVATE int             storage_init(FmuModelDesc* model_desc);
-DLL_PRIVATE void* storage_get_bucket(
+DLL_PRIVATE storage_bucket* storage_get_bucket(
     FmuModelDesc* model_desc, storage_type type);
 DLL_PRIVATE void* storage_ref(
     FmuModelDesc* model_desc, unsigned int vr, storage_type type);
