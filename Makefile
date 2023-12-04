@@ -52,8 +52,8 @@ default: build
 docker:
 	for d in $(DOCKER_DIRS) ;\
 	do \
-		docker build -f docker/$$d/Dockerfile \
-				--tag $$d:latest ./docker/$$d ;\
+		docker build -f extra/docker/$$d/Dockerfile \
+				--tag $$d:latest ./extra/docker/$$d ;\
 	done;
 
 build:
