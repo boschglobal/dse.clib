@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 3.21)
 
-# set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 project(test_clib)
 
@@ -28,7 +28,7 @@ add_compile_options(${C_CXX_WARNING_FLAGS})
 
 # Enable CMocka
 # =============
-add_definitions(-DUNIT_TESTING)
+add_definitions(-DCMOCKA_TESTING)
 
 
 # Set the project paths
@@ -37,7 +37,31 @@ set(DSE_CLIB_SOURCE_DIR ../../dse/clib)
 set(DSE_CLIB_INCLUDE_DIR "${DSE_CLIB_SOURCE_DIR}/../..")
 
 
-# Test Groups
-# ===========
+
+# External Project - yaml
+# -----------------------
+set(YAML_SOURCE_DIR "$ENV{EXTERNAL_BUILD_DIR}/yaml")
+set(YAML_BINARY_DIR "$ENV{EXTERNAL_BUILD_DIR}/yaml")
+find_library(YAML_LIB
+    NAMES
+        libyaml.a
+    PATHS
+        ${YAML_BINARY_DIR}
+    REQUIRED
+    NO_DEFAULT_PATH
+)
+add_library(yaml STATIC IMPORTED GLOBAL)
+set_target_properties(yaml
+    PROPERTIES
+        IMPORTED_LOCATION "${YAML_LIB}"
+        INTERFACE_INCLUDE_DIRECTORIES "${YAML_BINARY_DIR}"
+)
+
+
+
+# Targets
+# =======
+
 add_subdirectory(collections)
+add_subdirectory(functional)
 add_subdirectory(util)

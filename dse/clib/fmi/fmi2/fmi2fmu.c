@@ -94,7 +94,7 @@ fmi2Component fmi2Instantiate(fmi2String instance_name, fmi2Type fmu_type,
 
     /* Create the Model. */
     FmuModelDesc* model_desc = model_create(
-        fmu_inst, functions->allocateMemory, functions->freeMemory, 
+        fmu_inst, functions->allocateMemory, functions->freeMemory,
         fmu_resource_location + resource_path_offset);
 
     return (fmi2Component)model_desc;

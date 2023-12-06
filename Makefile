@@ -4,7 +4,7 @@
 
 ###############
 ## Docker Images.
-GCC_BUILDER_IMAGE ?= gcc-builder:latest
+GCC_BUILDER_IMAGE ?= ghcr.io/boschglobal/dse-gcc-builder:main
 DOCKER_DIRS = flatc-builder gcc-builder python-builder clang-format
 
 

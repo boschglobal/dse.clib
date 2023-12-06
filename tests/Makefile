@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 export EXTERNAL_BUILD_DIR ?= /tmp/dse.clib
-
+GDB_CMD ?= valgrind -q --leak-check=full --track-origins=yes --error-exitcode=808
+#GDB_CMD ?= gdb -q -ex='set confirm on' -ex=run -ex=quit
 
 default: build
 
@@ -26,8 +27,9 @@ build: external
 	@find build/_out/ -type f -name '*' -exec ls -sh --color=auto {} \;
 
 run:
-	build/_out/bin/test_collections
-	build/_out/bin/test_util
+	$(GDB_CMD) build/_out/bin/test_collections
+	$(GDB_CMD) build/_out/bin/test_util
+	cd build/_out; $(GDB_CMD) bin/test_functional
 
 clean:
 	rm -rf build

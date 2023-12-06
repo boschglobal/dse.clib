@@ -8,25 +8,6 @@ set(YAML_OUTDIR "tests/clib/util")
 
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
-# External Project - yaml
-# -----------------------
-set(YAML_SOURCE_DIR "$ENV{EXTERNAL_BUILD_DIR}/yaml")
-set(YAML_BINARY_DIR "$ENV{EXTERNAL_BUILD_DIR}/yaml")
-find_library(YAML_LIB
-    NAMES
-        libyaml.a
-    PATHS
-        ${YAML_BINARY_DIR}
-    REQUIRED
-    NO_DEFAULT_PATH
-)
-add_library(yaml STATIC IMPORTED GLOBAL)
-set_target_properties(yaml
-    PROPERTIES
-        IMPORTED_LOCATION "${YAML_LIB}"
-        INTERFACE_INCLUDE_DIRECTORIES "${YAML_BINARY_DIR}"
-)
-
 
 # Targets
 # =======
