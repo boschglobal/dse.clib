@@ -16,6 +16,7 @@ env:
   package_name: CLib
   build_dir: null  # Disables package generation (code only repo).
   test_make_target: test
+  CCACHE_SECONDARY_STORAGE: ${{ secrets.CCACHE_SECONDARY_STORAGE }}
 
 jobs:
   build:
