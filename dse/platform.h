@@ -26,6 +26,8 @@
 #define FILE_URI_SCHEME "file:///"
 #define FILE_URI_SHORT_SCHEME "file:"
 
+/* Clocks. */
+#define CLOCK_SOURCE CLOCK_MONOTONIC
 
 
 #else // Linux
@@ -41,6 +43,8 @@
 #define FILE_URI_SCHEME "file://"
 #define FILE_URI_SHORT_SCHEME "file:"
 
+/* Clocks. */
+#define CLOCK_SOURCE CLOCK_MONOTONIC_RAW
 
 
 
