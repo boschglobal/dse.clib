@@ -92,28 +92,24 @@ fmi3Instance fmi3InstantiateCoSimulation(fmi3String instanceName,
     fmu_inst->guid = instantiationToken;
     fmu_inst->log_enabled = loggingOn;
 
-    /*
-     *  Set the working dir of the FMU to the parent directory of the
-     *  resource location. The resource location may take the forms:
+    /**
+     *  Calculate the offset needed to trim/correct the resource location.
+     *  The resource location may take the forms:
      *
      *      file:///tmp/MyFMU/resources
      *      file:/tmp/MyFMU/resources
      *      /tmp/MyFMU/resources
      */
     int   resource_path_offset = 0;
-    char* working_dir = NULL;
     if (strstr(resourcePath, FILE_URI_SCHEME)) {
         resource_path_offset = strlen(FILE_URI_SCHEME);
     } else if (strstr(resourcePath, FILE_URI_SHORT_SCHEME)) {
         resource_path_offset = strlen(FILE_URI_SHORT_SCHEME);
     }
-    working_dir = dirname(strdup(resourcePath + resource_path_offset));
-    log_info("Working dir is:  %s", working_dir);
-    chdir(working_dir);
-    free(working_dir);
 
     /* Create the Model. */
-    FmuModelDesc* model_desc = model_create(fmu_inst, calloc, free);
+    FmuModelDesc* model_desc = model_create(fmu_inst, calloc, free,
+    resourcePath + resource_path_offset);
 
     return (fmi3Instance)model_desc;
 }

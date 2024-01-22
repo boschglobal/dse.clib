@@ -98,6 +98,8 @@ typedef struct FmuModelDesc {
     /* Callback functions. */
     FmuMemAllocFunc mem_alloc;
     FmuMemFreeFunc  mem_free;
+    /* Resource Location (corrected for OS URI Schema). */
+    const char*     resource_location;
     /* FMU Instance Data (indirect, from importer). */
     void*           instance_data;
     void*           private;
@@ -126,7 +128,8 @@ typedef struct storage_bucket {
 
 /* fmu.c */
 DLL_PRIVATE FmuModelDesc* model_create(
-    void* fmu_inst, FmuMemAllocFunc mem_alloc, FmuMemFreeFunc mem_free);
+    void* fmu_inst, FmuMemAllocFunc mem_alloc, FmuMemFreeFunc mem_free,
+    const char *working_dir);
 DLL_PRIVATE void model_finalize(FmuModelDesc* model_desc);
 /* Model API (implemented by the Model). */
 DLL_PRIVATE int  model_init(FmuModelDesc* model_desc);

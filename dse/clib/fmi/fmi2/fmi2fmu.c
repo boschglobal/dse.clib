@@ -78,28 +78,24 @@ fmi2Component fmi2Instantiate(fmi2String instance_name, fmi2Type fmu_type,
     fmu_inst->callbacks = functions;
 
     /**
-     *  Set the working dir of the FMU to the parent directory of the
-     *  resource location. The resource location may take the forms:
+     *  Calculate the offset needed to trim/correct the resource location.
+     *  The resource location may take the forms:
      *
      *      file:///tmp/MyFMU/resources
      *      file:/tmp/MyFMU/resources
      *      /tmp/MyFMU/resources
      */
     int   resource_path_offset = 0;
-    char* working_dir = NULL;
     if (strstr(fmu_resource_location, FILE_URI_SCHEME)) {
         resource_path_offset = strlen(FILE_URI_SCHEME);
     } else if (strstr(fmu_resource_location, FILE_URI_SHORT_SCHEME)) {
         resource_path_offset = strlen(FILE_URI_SHORT_SCHEME);
     }
-    working_dir = dirname(strdup(fmu_resource_location + resource_path_offset));
-    log_info("Working dir is:  %s", working_dir);
-    chdir(working_dir);
-    free(working_dir);
 
     /* Create the Model. */
     FmuModelDesc* model_desc = model_create(
-        fmu_inst, functions->allocateMemory, functions->freeMemory);
+        fmu_inst, functions->allocateMemory, functions->freeMemory, 
+        fmu_resource_location + resource_path_offset);
 
     return (fmi2Component)model_desc;
 }

@@ -146,6 +146,9 @@ mem_alloc (FmuMemAllocFunc)
 mem_free (FmuMemFreeFunc)
 : Function pointer for the memory free function which the Model should use.
   Typically free().
+  
+resource_location (const char*)
+: A string referencing the path to the resource directory.
 
 Returns
 -------
@@ -153,7 +156,8 @@ FmuModelDesc*
 : A new FMU Model Descriptor object.
 */
 __attribute__((weak)) FmuModelDesc* model_create(
-    void* fmu_inst, FmuMemAllocFunc mem_alloc, FmuMemFreeFunc mem_free)
+    void* fmu_inst, FmuMemAllocFunc mem_alloc, FmuMemFreeFunc mem_free,
+    const char* resource_location)
 {
     assert(mem_alloc);
     assert(mem_free);
@@ -164,6 +168,7 @@ __attribute__((weak)) FmuModelDesc* model_create(
     model_desc->mem_alloc = mem_alloc;
     model_desc->mem_free = mem_free;
     model_desc->external_binary_free = false;
+    model_desc->resource_location = resource_location;
 
     /* Configure the Model: storage/variables. */
     storage_init(model_desc);
