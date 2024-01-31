@@ -75,4 +75,18 @@ ExternalProject_Add(fmi3
 # OSS Target
 # ==========
 add_custom_target(oss)
-add_dependencies(oss yaml-download fmi2-download fmi3-download)
+function(oss_copy src dst)
+    add_custom_command(TARGET oss PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${src}"
+            "../../../dse/__oss__/${dst}"
+    )
+endfunction()
+add_dependencies(oss
+    fmi2-download
+    fmi3-download
+    yaml-download
+)
+oss_copy($ENV{EXTERNAL_BUILD_DIR}/fmi2 fmi2)
+oss_copy($ENV{EXTERNAL_BUILD_DIR}/fmi3 fmi3)
+oss_copy($ENV{EXTERNAL_BUILD_DIR}/yaml yaml)

@@ -82,8 +82,6 @@ cleanall:
 
 oss:
 	@${DOCKER_BUILDER_CMD} $(MAKE) do-oss
-	mkdir -p $(OSS_DIR)
-	cp -r $(EXTERNAL_BUILD_DIR)/* $(OSS_DIR)
 	cd $(OSS_DIR)/fmi2; rm -r $$(ls -A | grep -v headers)
 	cd $(OSS_DIR)/fmi3; rm -r $$(ls -A | grep -v headers)
 
