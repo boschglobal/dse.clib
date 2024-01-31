@@ -78,3 +78,14 @@ void test_buffer_append__extended(void** state)
     /* Cleanup */
     free(buffer);
 }
+
+
+int run_binary_tests(void)
+{
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_buffer_append__general),
+        cmocka_unit_test(test_buffer_append__extended),
+    };
+
+    return cmocka_run_group_tests_name("BINARY", tests, NULL, NULL);
+}

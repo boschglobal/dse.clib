@@ -7,11 +7,12 @@
 #include <dse/clib/util/yaml.h>
 #include <dse/logger.h>
 
-#define FILENAME      "util/test.yaml"
-#define FILE          "util/values.yaml"
-#define EMPTY_FILE    "util/empty_doc.yaml"
-#define UINT_FILE     "util/uint.yaml"
-#define BOOL_FILE     "util/bool.yaml"
+#define FILENAME      "util/data/test.yaml"
+#define FILE          "util/data/values.yaml"
+#define EMPTY_FILE    "util/data/empty_doc.yaml"
+#define UINT_FILE     "util/data/uint.yaml"
+#define BOOL_FILE     "util/data/bool.yaml"
+#define DICT_DUP_FILE "util/data/dict_dup.yaml"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 #define UNUSED(x)     ((void)x)
@@ -358,4 +359,47 @@ void test_yaml_find_node_seq(void** state)
     assert_string_equal("20.2", scalar);
 
     dse_yaml_destroy_node(doc);
+}
+
+
+void test_yaml_duplicated_dict_entry(void** state)
+{
+    /*
+    Checking that this does not memory leak.
+          annotations:
+            struct_member_name: temperature
+            struct_member_offset: 2
+            struct_member_primitive_type: int16_t
+            init_value: foo
+            init_value: bar    ****** duplicate ******
+    */
+    UNUSED(state);
+
+    YamlNode* doc = dse_yaml_load_single_doc(DICT_DUP_FILE);
+    assert_non_null(doc);
+    const char* s = dse_yaml_get_scalar(doc, "annotations/init_value");
+    assert_string_equal("bar", s);
+    dse_yaml_destroy_node(doc);
+}
+
+
+int run_yaml_tests(void)
+{
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_yaml_load_single_doc),
+        cmocka_unit_test(test_yaml_load_file),
+        cmocka_unit_test(test_yaml_find_doc_doclist),
+        cmocka_unit_test(test_yaml_find_node_doclist),
+        cmocka_unit_test(test_yaml_find_node_seq_doclist),
+        cmocka_unit_test(test_yaml_find_node_seq),
+        cmocka_unit_test(test_yaml_get_uint),
+        cmocka_unit_test(test_yaml_get_int),
+        cmocka_unit_test(test_yaml_get_double),
+        cmocka_unit_test(test_yaml_get_bool),
+        cmocka_unit_test(test_yaml_get_string),
+        cmocka_unit_test(test_yaml_get_parser),
+        cmocka_unit_test(test_yaml_duplicated_dict_entry),
+    };
+
+    return cmocka_run_group_tests_name("YAML", tests, NULL, NULL);
 }

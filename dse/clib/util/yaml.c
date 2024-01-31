@@ -594,7 +594,12 @@ static YamlNode* _create_node(char* name, YamlNode* parent)
     if (parent) {
         if (parent->node_type == YAML_MAPPING_NODE) {
             assert(node->name);
-            if (node->name) hashmap_set(&parent->mapping, node->name, node);
+            if (node->name) {
+                /* Prevent duplicate dict keys, last wins. */
+                void* o = hashmap_remove(&parent->mapping, node->name);
+                if (o) _destroy_node(o);
+                hashmap_set(&parent->mapping, node->name, node);
+            }
         } else if (parent->node_type == YAML_SEQUENCE_NODE) {
             hashlist_append(&parent->sequence, node);
         }

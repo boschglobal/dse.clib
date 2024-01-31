@@ -1,0 +1,6 @@
+annotations:
+  struct_member_name: temperature
+  struct_member_offset: 2
+  struct_member_primitive_type: int16_t
+  init_value: foo
+  init_value: bar

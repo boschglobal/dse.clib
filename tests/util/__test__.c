@@ -9,20 +9,19 @@
 uint8_t __log_level__ = LOG_ERROR; /* LOG_ERROR LOG_INFO LOG_DEBUG LOG_TRACE */
 
 
-void test_buffer_append__general(void** state);
-void test_buffer_append__extended(void** state);
-void test_yaml_load_single_doc(void** state);
-void test_yaml_load_file(void** state);
-void test_yaml_find_doc_doclist(void** state);
-void test_yaml_find_node_doclist(void** state);
-void test_yaml_find_node_seq_doclist(void** state);
-void test_yaml_find_node_seq(void** state);
-void test_yaml_get_uint(void** state);
-void test_yaml_get_int(void** state);
-void test_yaml_get_double(void** state);
-void test_yaml_get_bool(void** state);
-void test_yaml_get_string(void** state);
-void test_yaml_get_parser(void** state);
+extern int run_binary_tests(void);
+extern int run_yaml_tests(void);
+
+
+int main()
+{
+    __log_level__ = LOG_QUIET;//LOG_DEBUG;//LOG_QUIET;
+
+    int rc = 0;
+    rc |= run_binary_tests();
+    rc |= run_yaml_tests();
+    return rc;
+}
 
 
 /* This wrap is not compatable with LibYAML for some reason. You get
@@ -35,27 +34,4 @@ char* __wrap_strdup(const char* s)
     size_t len = strlen(s) + 1;
     void*  dup = malloc(len);
     return (char*)memcpy(dup, s, len);
-}
-
-
-int main()
-{
-    const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_buffer_append__general),
-        cmocka_unit_test(test_buffer_append__extended),
-        cmocka_unit_test(test_yaml_load_single_doc),
-        cmocka_unit_test(test_yaml_load_file),
-        cmocka_unit_test(test_yaml_find_doc_doclist),
-        cmocka_unit_test(test_yaml_find_node_doclist),
-        cmocka_unit_test(test_yaml_find_node_seq_doclist),
-        cmocka_unit_test(test_yaml_find_node_seq),
-        cmocka_unit_test(test_yaml_get_uint),
-        cmocka_unit_test(test_yaml_get_int),
-        cmocka_unit_test(test_yaml_get_double),
-        cmocka_unit_test(test_yaml_get_bool),
-        cmocka_unit_test(test_yaml_get_string),
-        cmocka_unit_test(test_yaml_get_parser),
-    };
-
-    return cmocka_run_group_tests(tests, NULL, NULL);
 }
