@@ -182,14 +182,13 @@ DLL_PUBLIC const char** dse_yaml_get_array(
 DLL_PUBLIC int dse_yaml_get_bool(YamlNode* node, const char* name, bool* value)
 {
     if (node == NULL && name == NULL && value == NULL) return EINVAL;
-    if (node->node_type != YAML_SCALAR_NODE) return EINVAL;
     const char* _scalar = dse_yaml_get_scalar(node, name);
     if (_scalar == NULL) return EINVAL;
     /* True? */
     const char* bool_true[] = { "y", "Y", "yes", "Yes", "YES", "true", "True",
         "TRUE", "on", "On", "ON", NULL };
     for (const char** p = bool_true; *p; p++) {
-        if (strcmp(*p, node->scalar)) continue;
+        if (strcmp(*p, _scalar)) continue;
         *value = true;
         return 0;
     }
@@ -197,7 +196,7 @@ DLL_PUBLIC int dse_yaml_get_bool(YamlNode* node, const char* name, bool* value)
     const char* bool_false[] = { "n", "N", "no", "No", "NO", "false", "False",
         "FALSE", "off", "Off", "OFF", NULL };
     for (const char** p = bool_false; *p; p++) {
-        if (strcmp(*p, node->scalar)) continue;
+        if (strcmp(*p, _scalar)) continue;
         *value = false;
         return 0;
     }
@@ -267,8 +266,8 @@ DLL_PUBLIC int dse_yaml_get_int(YamlNode* node, const char* name, int* value)
     /* Fallback to bool? */
     bool _bool;
     if (dse_yaml_get_bool(node, name, &_bool) == 0) {
-        value = NULL;
-        return EINVAL;
+        *value = _bool;
+        return 0;
     }
     return EINVAL;
 }

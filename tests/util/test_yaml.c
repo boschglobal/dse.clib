@@ -11,7 +11,6 @@
 #define FILE          "util/data/values.yaml"
 #define EMPTY_FILE    "util/data/empty_doc.yaml"
 #define UINT_FILE     "util/data/uint.yaml"
-#define BOOL_FILE     "util/data/bool.yaml"
 #define DICT_DUP_FILE "util/data/dict_dup.yaml"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
@@ -46,8 +45,8 @@ void test_yaml_get_uint(void** state)
         /* Boolean cases. */
         { .node = "bools/numeric_true", .ev_uint = 1, .ex_rc = 0 },
         { .node = "bools/numeric_false", .ev_uint = 0, .ex_rc = 0 },
-        { .node = "bools/lc_true", .ev_uint = 0, .ex_rc = 22 },
-        { .node = "bools/lc_false", .ev_uint = 0, .ex_rc = 22 },
+        { .node = "bools/lc_true", .ev_uint = 1, .ex_rc = 0 },
+        { .node = "bools/lc_false", .ev_uint = 0, .ex_rc = 0 },
     };
 
     const char* a = FILE;
@@ -82,8 +81,8 @@ void test_yaml_get_int(void** state)
         /* Boolean cases. */
         { .node = "bools/numeric_true", .ev_int = 1, .ex_rc = 0 },
         { .node = "bools/numeric_false", .ev_int = 0, .ex_rc = 0 },
-        { .node = "bools/lc_true", .ev_int = 0, .ex_rc = 22 },
-        { .node = "bools/lc_false", .ev_int = 0, .ex_rc = 22 },
+        { .node = "bools/lc_true", .ev_int = 1, .ex_rc = 0 },
+        { .node = "bools/lc_false", .ev_int = 0, .ex_rc = 0 },
     };
 
     const char* a = FILE;
@@ -181,11 +180,11 @@ void test_yaml_get_bool(void** state)
 
     test_case tc[] = {
         /* Good cases. */
-        { .node = "lc_true", .ev_bool = 1, .ex_rc = 0 },
-        { .node = "lc_false", .ev_bool = 0, .ex_rc = 0 },
+        { .node = "bools/lc_true", .ev_bool = 1, .ex_rc = 0 },
+        { .node = "bools/lc_false", .ev_bool = 0, .ex_rc = 0 },
         /* Boolean Negative cases. */
-        { .node = "numeric_true", .ev_bool = 0, .ex_rc = 22 },
-        { .node = "numeric_false", .ev_bool = 0, .ex_rc = 22 },
+        { .node = "bools/numeric_true", .ev_bool = 0, .ex_rc = 22 },
+        { .node = "bools/numeric_false", .ev_bool = 0, .ex_rc = 22 },
         /* Negative cases. */
         { .node = "integers/positive", .ev_bool = 0, .ex_rc = 22 },
         { .node = "integers/zero", .ev_bool = 0, .ex_rc = 22 },
@@ -202,8 +201,8 @@ void test_yaml_get_bool(void** state)
         bool value;
 
         log_debug("Testing node: %s", tc[i].node);
-        YamlNode* node = dse_yaml_find_node(doc, tc[i].node);
-        rc = dse_yaml_get_bool(node, tc[i].node, &value);
+       // YamlNode* node = dse_yaml_find_node(doc, tc[i].node);
+        rc = dse_yaml_get_bool(doc, tc[i].node, &value);
         assert_int_equal(rc, tc[i].ex_rc);
         assert_int_equal(value, tc[i].ev_bool);
     }

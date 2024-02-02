@@ -35,10 +35,11 @@ target_link_libraries(test_util
 #        -Wl,--wrap=strdup
 )
 set(YAML_EXAMPLE_RESOURCE_FILES
-    data/bool.yaml
-    data/uint.yaml
-    data/test.yaml
+    data/dict_dup.yaml
     data/empty_doc.yaml
+    data/test.yaml
+    data/uint.yaml
+    data/values.yaml
 )
 install(TARGETS test_util)
 install(
