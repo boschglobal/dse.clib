@@ -221,10 +221,8 @@ DLL_PUBLIC int dse_yaml_get_uint(
     if (node == NULL || name == NULL || value == NULL) return EINVAL;
     const char* _scalar = dse_yaml_get_scalar(node, name);
     if (_scalar == NULL) return EINVAL;
-    errno = 0;
-    for (uint32_t i = 0; i < strlen(_scalar); i++)
-        if (isdigit(_scalar[i]) == false) errno = 1;
     /* Integer? */
+    errno = 0;
     unsigned int _uint = strtol(_scalar, NULL, 10);
     if (errno == 0) {
         *value = _uint;
@@ -257,9 +255,9 @@ DLL_PUBLIC int dse_yaml_get_int(YamlNode* node, const char* name, int* value)
     if (node == NULL || name == NULL || value == NULL || _scalar == NULL)
         return EINVAL;
     /* Integer? */
-    char* ptr;
-    int   _int = strtol(_scalar, &ptr, 10);
-    if (!*ptr) {
+    errno = 0;
+    int _int = strtol(_scalar, NULL, 10);
+    if (errno == 0) {
         *value = _int;
         return 0;
     }
