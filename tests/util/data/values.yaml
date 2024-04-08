@@ -12,6 +12,7 @@ integers:
   zero: 0
   negative: -10
   quotes: "42"
+  hex: 0x23
 doubles:
   positive: 10.02
   negative: -10.04
@@ -22,7 +23,3 @@ bools:
   numeric_false: 0
   lc_true: true
   lc_false: false
-numeric_true: 1
-numeric_false: 0
-lc_true: true
-lc_false: false

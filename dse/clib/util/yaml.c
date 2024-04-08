@@ -224,7 +224,7 @@ DLL_PUBLIC int dse_yaml_get_uint(
     /* Integer? */
     errno = 0;
     char* endptr = NULL;
-    int _int = strtol(_scalar, &endptr, 10);
+    int _int = strtol(_scalar, &endptr, 0);
     if (errno == 0 && _scalar != endptr && *endptr == '\0' && _int >= 0) {
         *value = (unsigned int)_int;
         return 0;
@@ -258,7 +258,7 @@ DLL_PUBLIC int dse_yaml_get_int(YamlNode* node, const char* name, int* value)
     /* Integer? */
     errno = 0;
     char* endptr = NULL;
-    int _int = strtol(_scalar, &endptr, 10);
+    int _int = strtol(_scalar, &endptr, 0);
     if (errno == 0 && _scalar != endptr && *endptr == '\0') {
         *value = _int;
         return 0;

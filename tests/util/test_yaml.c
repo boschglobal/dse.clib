@@ -39,6 +39,7 @@ void test_yaml_get_uint(void** state)
         { .node = "integers/positive", .ev_uint = 23, .ex_rc = 0 },
         { .node = "integers/zero", .ev_uint = 0, .ex_rc = 0 },
         { .node = "integers/quotes", .ev_uint = 42, .ex_rc = 0 },
+        { .node = "integers/hex", .ev_uint = 35, .ex_rc = 0 },
         /* Negative cases. */
         { .node = "integers/negative", .ev_uint = 0, .ex_rc = 22 },
         { .node = "doubles/positive", .ev_uint = 0, .ex_rc = 22 },
@@ -75,6 +76,7 @@ void test_yaml_get_int(void** state)
         { .node = "integers/zero", .ev_int = 0, .ex_rc = 0 },
         { .node = "integers/negative", .ev_int = -10, .ex_rc = 0 },
         { .node = "integers/quotes", .ev_int = 42, .ex_rc = 0 },
+        { .node = "integers/hex", .ev_int = 35, .ex_rc = 0 },
         /* Negative cases. */
         { .node = "strings/simple", .ev_int = 0, .ex_rc = 22 },
         { .node = "doubles/positive", .ev_int = 0, .ex_rc = 22 },
