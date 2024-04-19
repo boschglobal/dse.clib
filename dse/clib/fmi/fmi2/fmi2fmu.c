@@ -93,7 +93,7 @@ fmi2Component fmi2Instantiate(fmi2String instance_name, fmi2Type fmu_type,
     }
 
     /* Create the Model. */
-    FmuModelDesc* model_desc = model_create(
+    FmuModelDesc* model_desc = fmu_model_create(
         fmu_inst, functions->allocateMemory, functions->freeMemory,
         fmu_resource_location + resource_path_offset);
 
@@ -125,7 +125,7 @@ fmi2Status fmi2EnterInitializationMode(fmi2Component c)
 
 fmi2Status fmi2ExitInitializationMode(fmi2Component c)
 {
-    int rc = model_init(c);
+    int rc = fmu_model_init(c);
     return (rc == 0 ? fmi2OK : fmi2Error);
 }
 
@@ -368,7 +368,7 @@ fmi2Status fmi2DoStep(fmi2Component c, fmi2Real currentCommunicationPoint,
 {
     UNUSED(noSetFMUStatePriorToCurrentPoint);
 
-    int rc = model_step(c, currentCommunicationPoint, communicationStepSize);
+    int rc = fmu_model_step(c, currentCommunicationPoint, communicationStepSize);
     return (rc == 0 ? fmi2OK : fmi2Error);
 }
 
@@ -457,12 +457,12 @@ fmi2Status fmi2Reset(fmi2Component c)
 
 fmi2Status fmi2Terminate(fmi2Component c)
 {
-    int rc = model_terminate(c);
+    int rc = fmu_model_terminate(c);
     return (rc == 0 ? fmi2OK : fmi2Error);
 }
 
 void fmi2FreeInstance(fmi2Component c)
 {
-    model_destroy(c);
-    model_finalize(c);
+    fmu_model_destroy(c);
+    fmu_model_finalize(c);
 }

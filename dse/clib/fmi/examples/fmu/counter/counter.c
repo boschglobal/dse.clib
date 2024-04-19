@@ -9,7 +9,7 @@
 #define VR_COUNT  42
 
 
-int model_step(FmuModelDesc* model_desc, double model_time, double stop_time)
+int fmu_model_step(FmuModelDesc* model_desc, double model_time, double stop_time)
 {
     UNUSED(model_time);
     UNUSED(stop_time);

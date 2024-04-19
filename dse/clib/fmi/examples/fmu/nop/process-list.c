@@ -41,7 +41,7 @@ static void _set_envvar(
 
 
 /**
- *  model_init
+ *  fmu_model_init
  *
  *  Load the process list and start all configured processes.
  *
@@ -55,7 +55,7 @@ static void _set_envvar(
  *      0 : success.
  *      +ve : failure, inspect errno for the failing condition.
  */
-int model_init(FmuModelDesc* model_desc)
+int fmu_model_init(FmuModelDesc* model_desc)
 {
     process_list = dse_process_load_process_list(PROCESS_LIST_FILENAME);
 
@@ -89,7 +89,7 @@ int model_init(FmuModelDesc* model_desc)
 
 
 /**
- *  model_step
+ *  fmu_model_step
  *
  *  (Not used - required to complete the FMU Model API)
  *
@@ -102,7 +102,7 @@ int model_init(FmuModelDesc* model_desc)
  *  -------
  *      0 : success.
  */
-int model_step(FmuModelDesc* model_desc, double model_time, double stop_time)
+int fmu_model_step(FmuModelDesc* model_desc, double model_time, double stop_time)
 {
     UNUSED(model_desc);
     UNUSED(model_time);
@@ -113,7 +113,7 @@ int model_step(FmuModelDesc* model_desc, double model_time, double stop_time)
 
 
 /**
- *  model_terminate
+ *  fmu_model_terminate
  *
  *  Stop all running processes in the process list.
  *
@@ -127,7 +127,7 @@ int model_step(FmuModelDesc* model_desc, double model_time, double stop_time)
  *      0 : success.
  *      +ve : failure, inspect errno for the failing condition.
  */
-int model_terminate(FmuModelDesc* model_desc)
+int fmu_model_terminate(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
 
@@ -139,7 +139,7 @@ int model_terminate(FmuModelDesc* model_desc)
 
 
 /**
- *  model_destroy
+ *  fmu_model_destroy
  *
  *  Free the loaded process list.
  *
@@ -148,7 +148,7 @@ int model_terminate(FmuModelDesc* model_desc)
  *  model_desc : FmuModelDesc
  *      Model Descriptor, references various runtime functions and data.
  */
-void model_destroy(FmuModelDesc* model_desc)
+void fmu_model_destroy(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
 

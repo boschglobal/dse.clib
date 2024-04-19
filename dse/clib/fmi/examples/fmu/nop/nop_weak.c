@@ -9,7 +9,7 @@
 
 
 /**
- *  model_init
+ *  fmu_model_init
  *
  *  Parameters
  *  ----------
@@ -20,7 +20,7 @@
  *  -------
  *      0 : success.
  */
-__attribute__((weak)) int model_init(FmuModelDesc* model_desc)
+__attribute__((weak)) int fmu_model_init(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
 
@@ -29,7 +29,7 @@ __attribute__((weak)) int model_init(FmuModelDesc* model_desc)
 
 
 /**
- *  model_step
+ *  fmu_model_step
  *
  *  Parameters
  *  ----------
@@ -40,7 +40,7 @@ __attribute__((weak)) int model_init(FmuModelDesc* model_desc)
  *  -------
  *      0 : success.
  */
-__attribute__((weak)) int model_step(
+__attribute__((weak)) int fmu_model_step(
     FmuModelDesc* model_desc, double model_time, double stop_time)
 {
     UNUSED(model_desc);
@@ -52,7 +52,7 @@ __attribute__((weak)) int model_step(
 
 
 /**
- *  model_terminate
+ *  fmu_model_terminate
  *
  *  Parameters
  *  ----------
@@ -63,7 +63,7 @@ __attribute__((weak)) int model_step(
  *  -------
  *      0 : success.
  */
-__attribute__((weak)) int model_terminate(FmuModelDesc* model_desc)
+__attribute__((weak)) int fmu_model_terminate(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
 
@@ -72,7 +72,7 @@ __attribute__((weak)) int model_terminate(FmuModelDesc* model_desc)
 
 
 /**
- *  model_destroy
+ *  fmu_model_destroy
  *
  *  Free the loaded process list.
  *
@@ -81,7 +81,7 @@ __attribute__((weak)) int model_terminate(FmuModelDesc* model_desc)
  *  model_desc : FmuModelDesc
  *      Model Descriptor, references various runtime functions and data.
  */
-__attribute__((weak)) void model_destroy(FmuModelDesc* model_desc)
+__attribute__((weak)) void fmu_model_destroy(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
 }

@@ -108,7 +108,7 @@ fmi3Instance fmi3InstantiateCoSimulation(fmi3String instanceName,
     }
 
     /* Create the Model. */
-    FmuModelDesc* model_desc = model_create(fmu_inst, calloc, free,
+    FmuModelDesc* model_desc = fmu_model_create(fmu_inst, calloc, free,
     resourcePath + resource_path_offset);
 
     return (fmi3Instance)model_desc;
@@ -138,8 +138,8 @@ fmi3Instance fmi3InstantiateScheduledExecution(fmi3String instanceName,
 void fmi3FreeInstance(fmi3Instance instance)
 {
     assert(instance);
-    model_destroy(instance);
-    model_finalize(instance);
+    fmu_model_destroy(instance);
+    fmu_model_finalize(instance);
 }
 
 /* Enter and exit initialization mode, enter event mode, terminate and reset */
@@ -161,7 +161,7 @@ fmi3Status fmi3EnterInitializationMode(fmi3Instance instance,
 fmi3Status fmi3ExitInitializationMode(fmi3Instance instance)
 {
     assert(instance);
-    int rc = model_init(instance);
+    int rc = fmu_model_init(instance);
     return (rc == 0 ? fmi3OK : fmi3Error);
 }
 
@@ -184,7 +184,7 @@ fmi3Status fmi3Terminate(fmi3Instance instance)
 {
     assert(instance);
 
-    int rc = model_terminate(instance);
+    int rc = fmu_model_terminate(instance);
     return (rc == 0 ? fmi3OK : fmi3Error);
 }
 
@@ -999,7 +999,7 @@ fmi3Status fmi3DoStep(fmi3Instance instance,
     UNUSED(lastSuccessfulTime);
 
     int rc =
-        model_step(instance, currentCommunicationPoint, communicationStepSize);
+        fmu_model_step(instance, currentCommunicationPoint, communicationStepSize);
     return (rc == 0 ? fmi3OK : fmi3Error);
 
     return fmi3OK;

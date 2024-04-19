@@ -124,7 +124,7 @@ static int storage_index_on_fmu(FmuModelDesc* model_desc, const char* file)
 
 
 /**
-model_create
+fmu_model_create
 ============
 
 Creates an FMU Model Descriptor object and performs any necessary
@@ -155,7 +155,7 @@ Returns
 FmuModelDesc*
 : A new FMU Model Descriptor object.
 */
-__attribute__((weak)) FmuModelDesc* model_create(
+__attribute__((weak)) FmuModelDesc* fmu_model_create(
     void* fmu_inst, FmuMemAllocFunc mem_alloc, FmuMemFreeFunc mem_free,
     const char* resource_location)
 {
@@ -179,7 +179,7 @@ __attribute__((weak)) FmuModelDesc* model_create(
 
 
 /**
-model_init
+fmu_model_init
 ==========
 
 Called by `fmi2ExitInitializationMode()` as the FMU exits initialisation mode.
@@ -199,7 +199,7 @@ Returns
 !0
 : Failure, an equivalent status is passed to the FMU Importer.
 */
-__attribute__((weak)) int model_init(FmuModelDesc* model_desc)
+__attribute__((weak)) int fmu_model_init(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
 
@@ -208,7 +208,7 @@ __attribute__((weak)) int model_init(FmuModelDesc* model_desc)
 
 
 /**
-model_step
+fmu_model_step
 ==========
 
 Called by `fmi2DoStep()`.
@@ -228,7 +228,7 @@ Returns
 !0
 : Failure, an equivalent status is passed to the FMU Importer.
 */
-__attribute__((weak)) int model_step(
+__attribute__((weak)) int fmu_model_step(
     FmuModelDesc* model_desc, double model_time, double stop_time)
 {
     UNUSED(model_desc);
@@ -240,7 +240,7 @@ __attribute__((weak)) int model_step(
 
 
 /**
-model_terminate
+fmu_model_terminate
 ===============
 
 Called by `fmi2Terminate()`.
@@ -260,7 +260,7 @@ Returns
 !0
 : Failure, an equivalent status is passed to the FMU Importer.
 */
-__attribute__((weak)) int model_terminate(FmuModelDesc* model_desc)
+__attribute__((weak)) int fmu_model_terminate(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
 
@@ -269,7 +269,7 @@ __attribute__((weak)) int model_terminate(FmuModelDesc* model_desc)
 
 
 /**
-model_destroy
+fmu_model_destroy
 =============
 
 Called by `fmi2FreeInstance()`.
@@ -289,17 +289,17 @@ Returns
 !0
 : Failure, an equivalent status is passed to the FMU Importer.
 */
-__attribute__((weak)) void model_destroy(FmuModelDesc* model_desc)
+__attribute__((weak)) void fmu_model_destroy(FmuModelDesc* model_desc)
 {
     UNUSED(model_desc);
 }
 
 
 /**
-model_finalize
+fmu_model_finalize
 ==============
 
-Releases the resources created by `model_create()`.
+Releases the resources created by `fmu_model_create()`.
 
 Called by `fmi2FreeInstance()`.
 
@@ -310,7 +310,7 @@ Parameters
 model_desc (FmuModelDesc*)
 : Model Descriptor, references various runtime functions and data.
 */
-__attribute__((weak)) void model_finalize(FmuModelDesc* model_desc)
+__attribute__((weak)) void fmu_model_finalize(FmuModelDesc* model_desc)
 {
     storage_destroy(model_desc);
     model_desc->mem_free(model_desc->instance_data);

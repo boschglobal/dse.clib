@@ -11,8 +11,8 @@ the following notable capabilities:
 
 * Models are compatible with either FMI 2 or FMI 3 (selected via linker).
 * Simple model lifecycle:
-  * `model_init()`
-  * `model_step()` - only function needed for a minimal FMU implementation!
+  * `fmu_model_init()`
+  * `fmu_model_step()` - only function needed for a minimal FMU implementation!
   * ...
 * Storage system with fast hash based index for all FMI Variable types, including binary data.
 * Integration with [DSE Network Codec API](https://github.com/boschglobal/dse.standards/tree/main/dse/ncodec)
@@ -176,7 +176,7 @@ action (FmuStrategyAction)
 
 
 
-### model_create
+### fmu_model_create
 
 Creates an FMU Model Descriptor object and performs any necessary
 initialisation of the FMU Model.
@@ -205,7 +205,7 @@ FmuModelDesc*
 
 
 
-### model_destroy
+### fmu_model_destroy
 
 Called by `fmi2FreeInstance()`.
 
@@ -226,9 +226,9 @@ model_desc (FmuModelDesc*)
 
 
 
-### model_finalize
+### fmu_model_finalize
 
-Releases the resources created by `model_create()`.
+Releases the resources created by `fmu_model_create()`.
 
 Called by `fmi2FreeInstance()`.
 
@@ -241,7 +241,7 @@ model_desc (FmuModelDesc*)
 
 
 
-### model_init
+### fmu_model_init
 
 Called by `fmi2ExitInitializationMode()` as the FMU exits initialisation mode.
 
@@ -262,7 +262,7 @@ model_desc (FmuModelDesc*)
 
 
 
-### model_step
+### fmu_model_step
 
 Called by `fmi2DoStep()`.
 
@@ -283,7 +283,7 @@ model_desc (FmuModelDesc*)
 
 
 
-### model_terminate
+### fmu_model_terminate
 
 Called by `fmi2Terminate()`.
 

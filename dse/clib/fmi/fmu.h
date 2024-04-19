@@ -20,8 +20,8 @@ the following notable capabilities:
 
 * Models are compatible with either FMI 2 or FMI 3 (selected via linker).
 * Simple model lifecycle:
-  * `model_init()`
-  * `model_step()` - only function needed for a minimal FMU implementation!
+  * `fmu_model_init()`
+  * `fmu_model_step()` - only function needed for a minimal FMU implementation!
   * ...
 * Storage system with fast hash based index for all FMI Variable types, including binary data.
 * Integration with [DSE Network Codec API](https://github.com/boschglobal/dse.standards/tree/main/dse/ncodec)
@@ -127,16 +127,16 @@ typedef struct storage_bucket {
 
 
 /* fmu.c */
-DLL_PRIVATE FmuModelDesc* model_create(
+DLL_PRIVATE FmuModelDesc* fmu_model_create(
     void* fmu_inst, FmuMemAllocFunc mem_alloc, FmuMemFreeFunc mem_free,
     const char *working_dir);
-DLL_PRIVATE void model_finalize(FmuModelDesc* model_desc);
+DLL_PRIVATE void fmu_model_finalize(FmuModelDesc* model_desc);
 /* Model API (implemented by the Model). */
-DLL_PRIVATE int  model_init(FmuModelDesc* model_desc);
-DLL_PRIVATE int  model_step(
+DLL_PRIVATE int  fmu_model_init(FmuModelDesc* model_desc);
+DLL_PRIVATE int  fmu_model_step(
      FmuModelDesc* model_desc, double model_time, double stop_time);
-DLL_PRIVATE int  model_terminate(FmuModelDesc* model_desc);
-DLL_PRIVATE void model_destroy(FmuModelDesc* model_desc);
+DLL_PRIVATE int  fmu_model_terminate(FmuModelDesc* model_desc);
+DLL_PRIVATE void fmu_model_destroy(FmuModelDesc* model_desc);
 
 
 /* storage.c */
