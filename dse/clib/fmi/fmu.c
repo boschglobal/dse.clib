@@ -125,7 +125,7 @@ static int storage_index_on_fmu(FmuModelDesc* model_desc, const char* file)
 
 /**
 fmu_model_create
-============
+================
 
 Creates an FMU Model Descriptor object and performs any necessary
 initialisation of the FMU Model.
@@ -146,7 +146,7 @@ mem_alloc (FmuMemAllocFunc)
 mem_free (FmuMemFreeFunc)
 : Function pointer for the memory free function which the Model should use.
   Typically free().
-  
+
 resource_location (const char*)
 : A string referencing the path to the resource directory.
 
@@ -180,7 +180,7 @@ __attribute__((weak)) FmuModelDesc* fmu_model_create(
 
 /**
 fmu_model_init
-==========
+==============
 
 Called by `fmi2ExitInitializationMode()` as the FMU exits initialisation mode.
 
@@ -209,7 +209,7 @@ __attribute__((weak)) int fmu_model_init(FmuModelDesc* model_desc)
 
 /**
 fmu_model_step
-==========
+==============
 
 Called by `fmi2DoStep()`.
 
@@ -241,7 +241,7 @@ __attribute__((weak)) int fmu_model_step(
 
 /**
 fmu_model_terminate
-===============
+===================
 
 Called by `fmi2Terminate()`.
 
@@ -270,7 +270,7 @@ __attribute__((weak)) int fmu_model_terminate(FmuModelDesc* model_desc)
 
 /**
 fmu_model_destroy
-=============
+=================
 
 Called by `fmi2FreeInstance()`.
 
@@ -297,7 +297,7 @@ __attribute__((weak)) void fmu_model_destroy(FmuModelDesc* model_desc)
 
 /**
 fmu_model_finalize
-==============
+==================
 
 Releases the resources created by `fmu_model_create()`.
 
