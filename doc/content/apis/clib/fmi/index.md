@@ -2,6 +2,29 @@
 title: FMI API Reference
 linkTitle: FMI
 ---
+## storage_get_bucket
+
+
+Returns a reference/pointer to the requested storage bucket.
+
+### Parameters
+
+model_desc (FmuModelDesc*)
+: Model Descriptor.
+
+type (storage_type)
+: Indicate the storage type bucket which should be retrieved.
+
+### Returns
+
+storage_bucket*
+: Reference to the requested storage bucket.
+
+NULL
+: The specified storage bucket is not provisioned.
+
+
+
 ## FMU Model API
 
 
@@ -82,13 +105,46 @@ When building an FMU, link the following files:
 
 
 
+## fmu_model_create
+
+
+Creates an FMU Model Descriptor object and performs any necessary
+initialisation of the FMU Model.
+
+Called by `fmi2Instantiate()`.
+
+Called by `fmi3InstantiateCoSimulation()`.
+
+### Parameters
+
+fmu_inst (void*)
+: FMU provided instance data.
+
+mem_alloc (FmuMemAllocFunc)
+: Function pointer for the memory allocation function which the Model should
+  use. Recommend using calloc().
+
+mem_free (FmuMemFreeFunc)
+: Function pointer for the memory free function which the Model should use.
+  Typically free().
+
+resource_location (const char*)
+: A string referencing the path to the resource directory.
+
+### Returns
+
+FmuModelDesc*
+: A new FMU Model Descriptor object.
+
+
+
 ## Typedefs
 
 ### FmuAdapterDesc
 
 ```c
 typedef struct FmuAdapterDesc {
-    const char * name;
+    const char* name;
     FmuLoadHandler load_func;
     FmuInitHandler init_func;
     FmuStepHandler step_func;
@@ -102,13 +158,13 @@ typedef struct FmuAdapterDesc {
 
 ```c
 typedef struct FmuInstDesc {
-    const char * name;
-    const char * path;
-    void * model_doc;
-    FmuAdapterDesc * adapter;
-    FmuStrategyDesc * strategy;
-    void * inst_data;
-    void * model_desc;
+    const char* name;
+    const char* path;
+    void* model_doc;
+    FmuAdapterDesc* adapter;
+    FmuStrategyDesc* strategy;
+    void* inst_data;
+    void* model_desc;
 }
 ```
 
@@ -118,8 +174,9 @@ typedef struct FmuInstDesc {
 typedef struct FmuModelDesc {
     FmuMemAllocFunc mem_alloc;
     FmuMemFreeFunc mem_free;
-    void * instance_data;
-    void * private;
+    const char* resource_location;
+    void* instance_data;
+    void* private;
     int external_binary_free;
 }
 ```
@@ -128,7 +185,7 @@ typedef struct FmuModelDesc {
 
 ```c
 typedef struct FmuStrategyDesc {
-    const char * name;
+    const char* name;
     FmuStrategyExecuteFunc exec_func;
     FmuStrategyMapVariables map_func;
     FmuStrategyToVariables marshal_to_var_func;
@@ -173,35 +230,6 @@ action (FmuStrategyAction)
 
 !0
 : Failure, an equivalent status is passed to the FMU Importer.
-
-
-
-### fmu_model_create
-
-Creates an FMU Model Descriptor object and performs any necessary
-initialisation of the FMU Model.
-
-Called by `fmi2Instantiate()`.
-
-Called by `fmi3InstantiateCoSimulation()`.
-
-#### Parameters
-
-fmu_inst (void*)
-: FMU provided instance data.
-
-mem_alloc (FmuMemAllocFunc)
-: Function pointer for the memory allocation function which the Model should
-  use. Recommend using calloc().
-
-mem_free (FmuMemFreeFunc)
-: Function pointer for the memory free function which the Model should use.
-  Typically free().
-
-#### Returns
-
-FmuModelDesc*
-: A new FMU Model Descriptor object.
 
 
 
@@ -320,28 +348,6 @@ model_desc (FmuModelDesc*)
 
 +ve (int)
 : Failure, inspect errno for the failing condition.
-
-
-
-### storage_get_bucket
-
-Returns a reference/pointer to the requested storage bucket.
-
-#### Parameters
-
-model_desc (FmuModelDesc*)
-: Model Descriptor.
-
-type (storage_type)
-: Indicate the storage type bucket which should be retrieved.
-
-#### Returns
-
-storage_bucket*
-: Reference to the requested storage bucket.
-
-NULL
-: The specified storage bucket is not provisioned.
 
 
 

@@ -63,5 +63,6 @@ set_target_properties(yaml
 # =======
 
 add_subdirectory(collections)
+add_subdirectory(data)
 add_subdirectory(functional)
 add_subdirectory(util)

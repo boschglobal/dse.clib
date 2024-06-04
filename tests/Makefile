@@ -28,8 +28,9 @@ build: external
 
 run:
 	$(GDB_CMD) build/_out/bin/test_collections
-	$(GDB_CMD) build/_out/bin/test_util
+	cd build/_out; $(GDB_CMD) bin/test_data
 	cd build/_out; $(GDB_CMD) bin/test_functional
+	$(GDB_CMD) build/_out/bin/test_util
 
 clean:
 	rm -rf build

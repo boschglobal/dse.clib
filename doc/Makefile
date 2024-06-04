@@ -32,9 +32,15 @@ DOC_OUTPUT_fmi := doc/content/apis/clib/fmi/index.md
 DOC_LINKTITLE_fmi := FMI
 DOC_TITLE_fmi := "FMI API Reference"
 
+# Module "marshal"
+DOC_INPUT_marshal := dse/clib/data/marshal.h
+DOC_CDIR_marshal := dse/clib/data/marshal.c
+DOC_OUTPUT_marshal := doc/content/apis/clib/marshal/index.md
+DOC_LINKTITLE_marshal := Marshal
+DOC_TITLE_marshal := "Marshal API Reference"
 
 # Targets
-DOC_C_MODULES := fmi
+DOC_C_MODULES := fmi marshal
 
 
 .PHONY: examples
