@@ -367,7 +367,7 @@ void test_marshal__signalmap_generate(void** state)
             },
             .expect = {
                 .is_null = true,
-                ._errno = -ENOTUNIQ,
+                ._errno = -EINVAL,
             }
         },
         {

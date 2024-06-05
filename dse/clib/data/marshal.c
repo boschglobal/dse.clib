@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <string.h>
 #include <assert.h>
+#include <errno.h>
+#include <string.h>
 #include <dse/testing.h>
 #include <dse/platform.h>
 #include <dse/logger.h>
@@ -252,7 +253,7 @@ MarshalSignalMap* marshal_generate_signalmap(MarshalMapSpec signal,
                 /* Match. */
                 if (set_contains(ex_signals, signal.signal[i]) == SET_TRUE) {
                     /* Signal already mapped. */
-                    errno = -ENOTUNIQ;
+                    errno = -EINVAL;
                     for (uint32_t i = 0; i < hashlist_length(&index_list);
                          i++) {
                         free(hashlist_at(&index_list, i));
