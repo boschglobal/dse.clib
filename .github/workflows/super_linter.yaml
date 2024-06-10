@@ -1,27 +1,26 @@
 ---
 name: Super Linter
+
 on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
   push:
-    branches: [main, devel]
   pull_request:
     types: [assigned, opened, edited, synchronize, reopened]
   pull_request_target:
     types: [assigned, opened, edited, synchronize, reopened]
+
 jobs:
   build:
     name: Lint Code Base
     runs-on: [ubuntu-latest]
-    container:
-      image: debian:bullseye-slim
-      options: --user root
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
 
       - name: Super-Linter
-        uses: github/super-linter/slim@v5
+        uses: github/super-linter/slim@v6
         env:
           VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: main
