@@ -37,12 +37,31 @@ RUN apt-get -y update; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
 
+# Install Docker.
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+    && \
+    echo\
+        "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+        https://download.docker.com/linux/debian \
+        $(lsb_release -cs) stable" \
+        | tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN set -eux; \
+	apt-get -y update; \
+	apt-get -y upgrade; \
+    apt-get -y install --no-install-recommends \
+        docker-ce-cli \
+    && \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*;
+
+# Install CMake.
 RUN curl -fSL https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.sh \
         -o /tmp/cmake-install.sh \
     && chmod u+x /tmp/cmake-install.sh \
     && /tmp/cmake-install.sh --skip-license --prefix=/usr/local \
     && rm /tmp/cmake-install.sh
-    
+
+# Install CMocka.
 RUN curl -fSL https://git.cryptomilk.org/projects/cmocka.git/snapshot/cmocka-1.1.7.tar.gz \
         -o /tmp/cmocka-1.1.7.tar.gz \
     && cd /tmp; tar xzf /tmp/cmocka-1.1.7.tar.gz \
