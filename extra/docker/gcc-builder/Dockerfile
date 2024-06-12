@@ -29,6 +29,7 @@ RUN apt-get -y update; \
         jq \
         less \
         libtool \
+	lsb-release \
         make \
         mingw-w64 \
         redis \
