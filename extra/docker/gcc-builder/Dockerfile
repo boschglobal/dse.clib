@@ -25,6 +25,7 @@ RUN apt-get -y update; \
         g++ \
         g++-multilib \
         git \
+	gnupg \
         jq \
         less \
         libtool \
