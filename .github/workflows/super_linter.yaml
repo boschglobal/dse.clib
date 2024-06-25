@@ -28,4 +28,5 @@ jobs:
           FILTER_REGEX_EXCLUDE: (dse/clib/fmi/fmi2/headers/.*|dse/clib/fmi/fmi3/headers/.*)
           VALIDATE_CPP: true
           VALIDATE_DOCKERFILE: true
+          VALIDATE_MARKDOWN: true
           VALIDATE_YAML: true

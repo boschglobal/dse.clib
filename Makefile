@@ -125,8 +125,10 @@ super-linter:
 		--env IGNORE_GITIGNORED_FILES=true \
 		--env FILTER_REGEX_EXCLUDE="(dse/clib/fmi/fmi2/headers/.*|dse/clib/fmi/fmi3/headers/.*)" \
 		--env VALIDATE_CPP=true \
+		--env VALIDATE_DOCKERFILE=true \
+		--env VALIDATE_MARKDOWN=true \
 		--env VALIDATE_YAML=true \
-		github/super-linter:slim-v5
+		ghcr.io/super-linter/super-linter:slim-v6
 
 .PHONY: docker build test update clean cleanall oss super-linter \
 		do-build do-test do-update do-clean do-cleanall

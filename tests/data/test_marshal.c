@@ -263,18 +263,18 @@ void test_marshal__signalmap_generate(void** state)
                 .name = "foo",
                 .count = 4,
                 .signal = {"foo1", "foo2", "foo3", "foo4"},
-                .scalar = {0.0, 1.0, 2.0, 3.0}
+                .scalar = {0.0, 1.0, 2.0, 3.0},
             },
             .source = {
                 .count = 4,
                 .signal = {"foo1", "foo2", "foo3", "foo4"},
-                .scalar = {4.0, 5.0, 6.0, 7.0}
+                .scalar = {4.0, 5.0, 6.0, 7.0},
             },
             .expect = {
                 .count = 4,
-                .signal_index = {0,1,2,3},
-                .source_index = {0,1,2,3}
-            }
+                .signal_index = {0, 1, 2, 3},
+                .source_index = {0, 1, 2, 3},
+            },
         },
         {
             .signal = {
@@ -290,28 +290,27 @@ void test_marshal__signalmap_generate(void** state)
             },
             .expect = {
                 .count = 4,
-                .signal_index = {0,1,2,3},
-                .source_index = {3,1,2,0}
-
-            }
+                .signal_index = {0, 1, 2, 3},
+                .source_index = {3, 1, 2, 0},
+            },
         },
         {
             .signal = {
                 .name = "foo",
                 .count = 4,
                 .signal = {"foo1", "foo2", "foo3", "foo4"},
-                .scalar = {0.0, 1.0, 2.0, 3.0}
+                .scalar = {0.0, 1.0, 2.0, 3.0},
             },
             .source = {
                 .count = 4,
                 .signal = {"foo1", "foo3", "foo2", "foo4"},
-                .scalar = {4.0, 5.0, 6.0, 7.0}
+                .scalar = {4.0, 5.0, 6.0, 7.0},
             },
             .expect = {
                 .count = 4,
-                .signal_index = {0,1,2,3},
-                .source_index = {0,2,1,3}
-            }
+                .signal_index = {0, 1, 2, 3},
+                .source_index = {0, 2, 1, 3},
+            },
         },
         {
             .signal = {
@@ -327,9 +326,9 @@ void test_marshal__signalmap_generate(void** state)
             },
             .expect = {
                 .count = 3,
-                .signal_index = {2,4,5},
-                .source_index = {1,2,3}
-            }
+                .signal_index = {2, 4, 5},
+                .source_index = {1, 2, 3},
+            },
         },
         {
             .signal = {
@@ -347,9 +346,9 @@ void test_marshal__signalmap_generate(void** state)
             },
             .expect = {
                 .count = 4,
-                .signal_index = {0,1,2,3},
-                .source_index = {1,3,5,7}
-            }
+                .signal_index = {0, 1, 2, 3},
+                .source_index = {1, 3, 5, 7},
+            },
         },
         {
             .signal = {
@@ -368,7 +367,7 @@ void test_marshal__signalmap_generate(void** state)
             .expect = {
                 .is_null = true,
                 ._errno = -EINVAL,
-            }
+            },
         },
         {
             .signal = {

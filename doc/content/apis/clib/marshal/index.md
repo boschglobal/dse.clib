@@ -20,7 +20,7 @@ externally defined data structures (i.e. C style structs).
 
 <div hidden>
 
-```
+```text
 @startuml data-marshal-interface
 
 skinparam nodesep 55
@@ -46,7 +46,7 @@ center footer Dynamic Simulation Environment
 
 </div>
 
-![](data-marshal-interface.png)
+![data-marshal-interface](data-marshal-interface.png)
 
 
 

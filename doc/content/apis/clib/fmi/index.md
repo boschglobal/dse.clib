@@ -49,7 +49,7 @@ the following notable capabilities:
 
 <div hidden>
 
-```
+```text
 @startuml fmu-model
 
 title DSE C Lib - FMU Model
@@ -81,7 +81,7 @@ center footer Dynamic Simulation Environment
 
 </div>
 
-![](fmu-model.png)
+![fmu-model](fmu-model.png)
 
 
 ### Example

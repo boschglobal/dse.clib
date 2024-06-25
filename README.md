@@ -18,7 +18,7 @@ Shared C Library of the Dynamic Simulation Environment (DSE) Core Platform.
 
 ### Project Structure
 
-```
+```text
 L- docker       Supporting build environments.
 L- dse/clib     C Library source code.
 L- examples     Example usage of the C Library.

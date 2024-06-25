@@ -127,10 +127,10 @@ Each contributor is responsible for identifying themselves in the
 Please add the respective information corresponding to the Signed-off-by tag
 as part of your first pull request.
 
-If you are a developer who is authorized to contribute to Dynamic Simulation 
-Environment on behalf of your employer, then add your company / organization 
+If you are a developer who is authorized to contribute to Dynamic Simulation
+Environment on behalf of your employer, then add your company / organization
 to the list of copyright holders in the [NOTICE](NOTICE) file. As author of
-a corporate contribution you can also add your name and corporate email 
+a corporate contribution you can also add your name and corporate email
 address as in the Signed-off-by tag.
 
 If your contribution is covered by this project's DCO's clause "(c) The
