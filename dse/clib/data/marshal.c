@@ -242,31 +242,28 @@ MarshalSignalMap
 MarshalSignalMap* marshal_generate_signalmap(MarshalMapSpec signal,
     MarshalMapSpec source, SimpleSet* ex_signals, bool is_binary)
 {
-    assert(ex_signals);
-
     HashList index_list;
     hashlist_init(&index_list, signal.count);
 
-    for (size_t i = 0; i < signal.count; i++) {
-        for (size_t j = 0; j < source.count; j++) {
+    for (size_t j = 0; j < source.count; j++) {
+        for (size_t i = 0; i < signal.count; i++) {
             if (strcmp(signal.signal[i], source.signal[j]) == 0) {
                 /* If a set is provided, signal mappings are unique. */
                 if (ex_signals) {
                     /* Match. */
                     if (set_contains(ex_signals, signal.signal[i]) == SET_TRUE) {
                         /* Signal already mapped. */
+                        errno = -EINVAL;
                         for (uint32_t i = 0; i < hashlist_length(&index_list);
                             i++) {
                             free(hashlist_at(&index_list, i));
                         }
                         hashlist_destroy(&index_list);
-                        errno = -EINVAL;
                         return NULL;
                     };
                     /* Mark the Signal as mapped */
                     set_add(ex_signals, signal.signal[i]);
                 }
-
                 IndexItem* index = calloc(1, sizeof(IndexItem));
                 index->signal_idx = i;
                 index->source_idx = j;
