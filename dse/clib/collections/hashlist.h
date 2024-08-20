@@ -6,6 +6,7 @@
 #define DSE_CLIB_COLLECTIONS_HASHLIST_H_
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -52,5 +53,25 @@ static __inline__ void* hashlist_at(HashList* h, uint32_t index)
     return hashmap_get(&h->hash_map, key);
 }
 
+static __inline__ void* hashlist_ntl(HashList *h, size_t object_size, bool destroy)
+{
+    size_t count = hashlist_length(h);
+    void *object_array = calloc(count + 1, object_size);
+
+    // Copy elements from the HashList to the object array.
+    for (uint32_t i = 0; i < count; i++) {
+        void *source_hashlist = hashlist_at(h, i);
+        if (source_hashlist != NULL) {
+            memcpy((void *)object_array + i * object_size, &source_hashlist, object_size);
+        }
+    }
+
+    // Optionally destroy the original HashList.
+    if (destroy) {
+        hashlist_destroy(h);
+    }
+
+    return object_array;
+}
 
 #endif  // DSE_CLIB_COLLECTIONS_HASHLIST_H_
