@@ -202,6 +202,7 @@ void test_marshal_group__primitive(void** state)
                 case MARSHAL_DIRECTION_TXRX:
                 case MARSHAL_DIRECTION_RXONLY:
                 case MARSHAL_DIRECTION_PARAMETER:
+                case MARSHAL_DIRECTION_LOCAL:
                     switch (mg->type) {
                     case MARSHAL_TYPE_INT32:
                     case MARSHAL_TYPE_BOOL:

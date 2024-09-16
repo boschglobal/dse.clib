@@ -178,6 +178,7 @@ void marshal_group_in(MarshalGroup* mg_table)
         case MARSHAL_DIRECTION_TXRX:
         case MARSHAL_DIRECTION_RXONLY:
         case MARSHAL_DIRECTION_PARAMETER:
+        case MARSHAL_DIRECTION_LOCAL:
             if (mg->kind == MARSHAL_KIND_PRIMITIVE) _marshal_scalar_in(mg);
             break;
         default:
