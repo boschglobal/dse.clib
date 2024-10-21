@@ -10,6 +10,7 @@ add_executable(test_data
     ${DSE_CLIB_SOURCE_DIR}/collections/hashmap.c
     ${DSE_CLIB_SOURCE_DIR}/collections/set.c
     ${DSE_CLIB_SOURCE_DIR}/data/marshal.c
+    ${DSE_CLIB_SOURCE_DIR}/util/binary.c
 )
 target_include_directories(test_data
     PRIVATE

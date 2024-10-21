@@ -60,12 +60,16 @@ center footer Dynamic Simulation Environment
 */
 
 
+typedef char* (*MarshalStringEncode)(const char* source, size_t len);
+typedef char* (*MarshalStringDecode)(const char* source, size_t* len);
+
+
 typedef enum MarshalKind {
     MARSHAL_KIND_NONE = 0,
     MARSHAL_KIND_PRIMITIVE,
+    MARSHAL_KIND_BINARY,
     MARSHAL_KIND_ARRAY,
     MARSHAL_KIND_STRUCT,
-    MARSHAL_KIND_BINARY,
     __MARSHAL_KIND_SIZE__,
 } MarshalKind;
 
@@ -107,6 +111,9 @@ typedef enum MarshalType {
     MARSHAL_TYPE_BYTE8,
     /* Imaginary types. */
     MARSHAL_TYPE_BOOL,
+    /* Binary types. */
+    MARSHAL_TYPE_STRING,
+    MARSHAL_TYPE_BINARY,
     __MARSHAL_TYPE_SIZE__,
 } MarshalType;
 
@@ -126,9 +133,12 @@ typedef struct MarshalGroup {
             int32_t* _int32;
             uint64_t* _uint64;
             double*   _double;
+            char**    _string;
+            void**    _binary;
             /* Pointer member (for calls to free()). */
             void*     ptr;
         };
+        uint32_t* _binary_len;
     } target;
     /* Marshal Source. */
     struct {
@@ -137,8 +147,18 @@ typedef struct MarshalGroup {
         union {
             /* (reference, allocated elsewhere) */
             double* scalar;
+            void**  binary;
         };
+        /* (reference, allocated elsewhere) */
+        uint32_t* binary_len;
+        uint32_t* binary_buffer_size;
     } source;
+    /* Marshal supporting functions. */
+    struct {
+        /* (allocated with 'count' elements, access as array) */
+        MarshalStringEncode* string_encode;
+        MarshalStringDecode* string_decode;
+    } functions;
 } MarshalGroup;
 
 
@@ -166,6 +186,8 @@ typedef struct MarshalStruct {
             double* scalar;
             void**  binary;  // ?? or codec object or sv object.
         };
+        uint32_t* binary_len;
+        uint32_t* binary_buffer_size;
     } source;
 } MarshalStruct;
 
@@ -177,8 +199,10 @@ typedef struct MarshalMapSpec {
     const char** signal;
     union {
         double** scalar;
-        void**   ncodec;
+        void**   binary;
     };
+    uint32_t* binary_len;
+    uint32_t* binary_buffer_size;
 } MarshalMapSpec;
 
 
@@ -193,8 +217,10 @@ typedef struct MarshalSignalMap {
         union {
             /* (reference, allocated elsewhere) */
             double** scalar;
-            void**   ncodec;
+            void**   binary;
         };
+        uint32_t* binary_len;
+        uint32_t* binary_buffer_size;
     } signal;
     /* Marshal Source (represents Target). */
     struct {
@@ -203,8 +229,10 @@ typedef struct MarshalSignalMap {
         union {
             /* (reference, allocated elsewhere) */
             double** scalar;
-            void**   ncodec;
+            void**   binary;
         };
+        uint32_t* binary_len;
+        uint32_t* binary_buffer_size;
     } source;
 } MarshalSignalMap;
 

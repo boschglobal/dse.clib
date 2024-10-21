@@ -57,6 +57,9 @@ void test_marshal__type_size(void** state)
 
         { .type = MARSHAL_TYPE_BOOL, .size = 4 },
 
+        { .type = MARSHAL_TYPE_STRING, .size = 8 },
+        { .type = MARSHAL_TYPE_BINARY, .size = 8 },
+
         { .type = MARSHAL_TYPE_NONE, .size = 0 },
         { .type = __MARSHAL_TYPE_SIZE__, .size = 0 },
         { .type = __MARSHAL_TYPE_SIZE__ + 100, .size = 0 },
@@ -86,6 +89,7 @@ void test_marshal_group__primitive(void** state)
 {
     UNUSED(state);
 
+    // clang-format off
     MGKP_TC tc[] = {
         {
             .type = MARSHAL_TYPE_INT32,
@@ -109,6 +113,7 @@ void test_marshal_group__primitive(void** state)
             ._int32 = { -5, 0, 5, 9 },  // Note that BOOL is alias of int32.
         },
     };
+    // clang-format on
     MarshalGroup* mg_table = calloc(ARRAY_SIZE(tc) + 1, sizeof(MarshalGroup));
     for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
         MGKP_TC*      t = &tc[i];
@@ -221,6 +226,291 @@ void test_marshal_group__primitive(void** state)
                     assert_double_equal(
                         mg->source.scalar[t->offset + i], 0.0, 0.0);
                 }
+            }
+        }
+    }
+
+    marshal_group_destroy(mg_table);
+}
+
+
+static char* _string_encode(const char* source, size_t len)
+{
+    if (source == NULL || len == 0) return NULL;
+
+    size_t _len = strlen(source);
+    if (_len > (len - 1)) _len = len - 1;
+    if (_len) {
+        char* s = calloc(_len + 1, sizeof(char));
+        for (size_t i = 0; i < _len; i++) {
+            s[i] = source[_len - i - 1];
+        }
+        return s;
+    } else {
+        return NULL;
+    }
+}
+
+static char* _string_decode(const char* source, size_t* len)
+{
+    if (len == NULL) return NULL;
+    *len = 0;
+
+    size_t _len = 0;
+    if (source) _len = strlen(source);
+    if (_len) {
+        char* s = calloc(_len + 1, sizeof(char));
+        for (size_t i = 0; i < _len; i++) {
+            s[i] = source[_len - i - 1];
+        }
+        *len = _len + 1;
+        return s;
+    } else {
+        return NULL;
+    }
+}
+
+typedef struct MGKB_TC {
+    MarshalType type;
+    size_t      offset;
+    size_t      count;
+    struct {
+        struct {
+            // Test condition (copied to source, marshal to target).
+            const void* binary[10];
+            uint32_t    binary_len[10];
+        } source;
+        struct {
+            // Test condition (copied to target, marshal to source).
+            const char* string[10];
+            const void* binary[10];
+            uint32_t    binary_len[10];
+        } target;
+    } condition;
+    struct {
+        struct {
+            void*    binary[10];
+            uint32_t binary_len[10];
+        } source;
+        struct {
+            MarshalStringEncode string_encode[10];
+            MarshalStringDecode string_decode[10];
+        } target;
+    } storage;
+} MGKB_TC;
+
+void test_marshal_group__binary(void** state)
+{
+    UNUSED(state);
+
+    // clang-format off
+    MGKB_TC tc[] = {
+        {
+            .type = MARSHAL_TYPE_STRING,
+            .offset = 1,
+            .count = 3,
+            .condition.source.binary = { "foo", "bar", "fubar" },
+            .condition.source.binary_len = { 4, 4, 6 },
+            .condition.target.string = { "foo", "rab", "fubar" },
+            .storage.target.string_encode = { NULL, _string_encode, NULL },
+            .storage.target.string_decode = { NULL, _string_decode, NULL },
+        },
+        {
+            .type = MARSHAL_TYPE_BINARY,
+            .offset = 1,
+            .count = 3,
+            .condition.source.binary = { "foo", "foo\0bar", "fubar" },
+            .condition.source.binary_len = { 4, 8, 6 },
+            .condition.target.binary = { "foo", "foo\0bar", "fubar" },
+            .condition.target.binary_len = { 4, 8, 6 },
+            .storage.target.string_encode = { NULL, NULL, NULL },
+            .storage.target.string_decode = { NULL, NULL, NULL },
+        },
+    };
+    // clang-format on
+    MarshalGroup* mg_table = calloc(ARRAY_SIZE(tc) + 1, sizeof(MarshalGroup));
+    for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
+        MGKB_TC*      t = &tc[i];
+        MarshalGroup* mg = &mg_table[i];
+
+        mg->name = strdup("MG");
+        mg->kind = MARSHAL_KIND_BINARY;
+        mg->type = t->type;
+        mg->count = t->count;
+        mg->source.offset = t->offset;
+        mg->source.binary = t->storage.source.binary;
+        mg->source.binary_len = t->storage.source.binary_len;
+        mg->target.ptr = calloc(t->count, sizeof(void*));
+        mg->target._binary_len = calloc(t->count, sizeof(uint32_t));
+        mg->functions.string_encode =
+            calloc(t->count, sizeof(MarshalStringEncode));
+        mg->functions.string_decode =
+            calloc(t->count, sizeof(MarshalStringDecode));
+    }
+    for (MarshalDir dir = MARSHAL_DIRECTION_NONE;
+         dir < __MARSHAL_DIRECTION_SIZE__; dir++) {
+        log_trace("Direction %d", dir);
+
+        /* Group OUT ... */
+        for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
+            MGKB_TC*      t = &tc[i];
+            MarshalGroup* mg = &mg_table[i];
+            mg->dir = dir;
+            for (size_t i = 0; i < t->count; i++) {
+                mg->source.binary[t->offset + i] =
+                    malloc(t->condition.source.binary_len[i]);
+                memcpy(mg->source.binary[t->offset + i],
+                    t->condition.source.binary[i],
+                    t->condition.source.binary_len[i]);
+                mg->source.binary_len[t->offset + i] =
+                    t->condition.source.binary_len[i];
+                mg->target._string[i] = NULL;
+                mg->target._binary[i] = NULL;
+                mg->target._binary_len[i] = 0;
+                mg->functions.string_encode[i] =
+                    t->storage.target.string_encode[i];
+                mg->functions.string_decode[i] =
+                    t->storage.target.string_decode[i];
+            }
+        }
+        marshal_group_out(mg_table);
+        for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
+            MGKB_TC*      t = &tc[i];
+            MarshalGroup* mg = &mg_table[i];
+            log_trace("Type %d", mg->type);
+
+            for (size_t i = 0; i < t->count; i++) {
+                switch (mg->dir) {
+                case MARSHAL_DIRECTION_TXRX:
+                case MARSHAL_DIRECTION_TXONLY:
+                case MARSHAL_DIRECTION_PARAMETER:
+                    switch (mg->type) {
+                    case MARSHAL_TYPE_STRING:
+                        log_trace("index %d: condition %s -> %s", i,
+                            mg->source.binary[t->offset + i],
+                            t->condition.target.string[i]);
+                        assert_non_null(mg->target._string[i]);
+                        assert_non_null(t->condition.target.string[i]);
+                        assert_string_equal(mg->target._string[i],
+                            t->condition.target.string[i]);
+                        assert_int_equal(mg->target._binary_len[i], 0);
+                        break;
+                    case MARSHAL_TYPE_BINARY:
+                        log_trace("index %d: condition %s -> %s (%d)", i,
+                            mg->source.binary[t->offset + i],
+                            t->condition.target.binary[i],
+                            t->condition.target.binary_len[i]);
+                        assert_non_null(mg->target._binary[i]);
+                        assert_non_null(t->condition.target.binary[i]);
+                        assert_memory_equal(mg->target._binary[i],
+                            t->condition.target.binary[i],
+                            t->condition.target.binary_len[i]);
+                        assert_int_equal(mg->target._binary_len[i],
+                            t->condition.target.binary_len[i]);
+                        break;
+                    default:
+                        fail_msg("unsupported type");
+                    }
+                    break;
+                default:
+                    assert_null(mg->target._string[i]);
+                    assert_null(mg->target._binary[i]);
+                    assert_int_equal(mg->target._binary_len[i], 0);
+                }
+            }
+        }
+        for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
+            MGKB_TC*      t = &tc[i];
+            MarshalGroup* mg = &mg_table[i];
+            for (size_t i = 0; i < t->count; i++) {
+                free(mg->target._binary[i]);
+                mg->target._binary[i] = NULL;
+                mg->target._binary_len[i] = 0;
+                free(mg->source.binary[t->offset + i]);
+                mg->source.binary[t->offset + i] = NULL;
+                mg->source.binary_len[t->offset + i] = 0;
+            }
+        }
+
+        /* Group IN ... */
+        for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
+            MGKB_TC*      t = &tc[i];
+            MarshalGroup* mg = &mg_table[i];
+            mg->dir = dir;
+            for (size_t i = 0; i < t->count; i++) {
+                switch (mg->type) {
+                case MARSHAL_TYPE_STRING:
+                    mg->target._string[i] =
+                        strdup(t->condition.target.string[i]);
+                    mg->target._binary_len[i] = 0;
+                    break;
+                case MARSHAL_TYPE_BINARY:
+                    mg->target._binary[i] =
+                        strdup(t->condition.target.binary[i]);
+                    mg->target._binary_len[i] =
+                        t->condition.target.binary_len[i];
+                    break;
+                default:
+                    fail_msg("unsupported type");
+                }
+                mg->functions.string_encode[i] =
+                    t->storage.target.string_encode[i];
+                mg->functions.string_decode[i] =
+                    t->storage.target.string_decode[i];
+            }
+        }
+        marshal_group_in(mg_table);
+        for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
+            MGKB_TC*      t = &tc[i];
+            MarshalGroup* mg = &mg_table[i];
+
+            for (size_t i = 0; i < t->count; i++) {
+                switch (mg->dir) {
+                case MARSHAL_DIRECTION_TXRX:
+                case MARSHAL_DIRECTION_RXONLY:
+                case MARSHAL_DIRECTION_PARAMETER:
+                case MARSHAL_DIRECTION_LOCAL:
+                    switch (mg->type) {
+                    case MARSHAL_TYPE_STRING:
+                        log_trace("index %d: condition %s <- %s", i,
+                            mg->source.binary[t->offset + i],
+                            t->condition.target.string[i]);
+                        assert_non_null(mg->source.binary[t->offset + i]);
+                        assert_non_null(t->condition.source.binary[i]);
+                        assert_string_equal(mg->source.binary[t->offset + i],
+                            t->condition.source.binary[i]);
+                        assert_int_equal(mg->source.binary_len[t->offset + i],
+                            strlen(t->condition.target.string[i]) + 1);
+                        break;
+                    case MARSHAL_TYPE_BINARY:
+                        log_trace("index %d: condition %s <- %s (%d)", i,
+                            mg->source.binary[t->offset + i],
+                            t->condition.target.binary[i],
+                            t->condition.target.binary_len[i]);
+                        assert_non_null(mg->source.binary[t->offset + i]);
+                        assert_non_null(t->condition.source.binary[i]);
+                        assert_string_equal(mg->source.binary[t->offset + i],
+                            t->condition.source.binary[i]);
+                        assert_int_equal(mg->source.binary_len[t->offset + i],
+                            t->condition.target.binary_len[i]);
+                        break;
+
+                    default:
+                        fail_msg("unsupported type");
+                    }
+                    break;
+                default:
+                    assert_null(mg->source.binary[t->offset + i]);
+                    assert_int_equal(mg->source.binary_len[t->offset + i], 0);
+                }
+            }
+        }
+        for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
+            MGKB_TC*      t = &tc[i];
+            MarshalGroup* mg = &mg_table[i];
+            for (size_t i = 0; i < t->count; i++) {
+                free(mg->source.binary[t->offset + i]);
+                free(mg->target._binary[i]);
             }
         }
     }
@@ -444,9 +734,25 @@ typedef struct MSM_TC {
     size_t      source_idx[10];
     double      source_scalar[10];
     double      expected[10];
+    struct {
+        struct {
+            void*    binary[10];
+            uint32_t binary_len[10];
+            uint32_t binary_buffer_size[10];
+        } signal;
+        struct {
+            void*    binary[10];
+            uint32_t binary_len[10];
+        } source;
+        struct {
+            void*    binary[10];
+            uint32_t binary_len[10];
+            uint32_t binary_buffer_size[10];
+        } expected;
+    } binary;
 } MSM_TC;
 
-void test_marshal__signalmap_in(void** state)
+void test_marshal__signalmap_scalar_out(void** state)
 {
     UNUSED(state);
 
@@ -514,7 +820,7 @@ void test_marshal__signalmap_in(void** state)
 }
 
 
-void test_marshal__signalmap_out(void** state)
+void test_marshal__signalmap_scalar_in(void** state)
 {
     UNUSED(state);
 
@@ -582,6 +888,162 @@ void test_marshal__signalmap_out(void** state)
 }
 
 
+void test_marshal__signalmap_binary_out(void** state)
+{
+    UNUSED(state);
+
+    MSM_TC tc[] = {
+        {
+            .name = "foo",
+            .count = 2,
+            .signal_idx = { 0, 1 },
+            .source_idx = { 0, 1 },
+            .binary.signal.binary = { strdup("foo"), strdup("bar") },
+            .binary.signal.binary_len = { 4, 4 },
+            .binary.signal.binary_buffer_size = { 4, 4 },
+            .binary.source.binary = { NULL, NULL },
+            .binary.source.binary_len = { 0, 0 },
+            .binary.expected.binary = { strdup("foo"), strdup("bar") },
+            .binary.expected.binary_len = { 4, 4 },
+        },
+        {
+            .name = "bar",
+            .count = 3,
+            .signal_idx = { 0, 1, 2 },
+            .source_idx = { 0, 1, 2 },
+            .binary.signal.binary = { strdup("foo"), strdup("fubar"),
+                strdup("bar") },
+            .binary.signal.binary_len = { 4, 6, 4 },
+            .binary.signal.binary_buffer_size = { 4, 6, 4 },
+            .binary.source.binary = { NULL, NULL, NULL },
+            .binary.source.binary_len = { 0, 0, 0 },
+            .binary.expected.binary = { strdup("foo"), strdup("fubar"),
+                strdup("bar") },
+            .binary.expected.binary_len = { 4, 6, 4 },
+        },
+    };
+
+    /* Check every test case. */
+    for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
+        // Setup the MSM structure (NTL).
+        MarshalSignalMap* msm = calloc(2, sizeof(MarshalSignalMap));
+        msm[0].name = (char*)tc[i].name;
+        msm[0].count = tc[i].count;
+        msm[0].is_binary = true;
+        msm[0].signal.index = tc[i].signal_idx;
+        msm[0].signal.binary = (void**)&tc[i].binary.signal.binary;
+        msm[0].signal.binary_len = (uint32_t*)&tc[i].binary.signal.binary_len;
+        msm[0].signal.binary_buffer_size =
+            (uint32_t*)&tc[i].binary.signal.binary_buffer_size;
+        msm[0].source.index = tc[i].source_idx;
+        msm[0].source.binary = (void**)&tc[i].binary.source.binary;
+        msm[0].source.binary_len = (uint32_t*)&tc[i].binary.source.binary_len;
+        for (size_t j = 0; j < msm[0].count; j++) {
+            assert_ptr_equal(tc[i].binary.source.binary[j], NULL);
+        }
+
+        // Marshal and check results: signal -> source
+        // (reference only, no copy).
+        marshal_signalmap_out(msm);
+        for (size_t j = 0; j < msm[0].count; j++) {
+            assert_int_equal(tc[i].binary.expected.binary_len[j],
+                msm[0].source.binary_len[j]);
+            assert_ptr_equal(tc[i].binary.signal.binary[j],
+                tc[i].binary.source.binary[j]);  // Reference copy.
+            assert_memory_equal(tc[i].binary.expected.binary[j],
+                msm[0].source.binary[j], tc[i].binary.expected.binary_len[j]);
+        }
+
+        /* Cleanup. */
+        for (size_t j = 0; j < msm[0].count; j++) {
+            free(tc[i].binary.signal.binary[j]);
+            free(tc[i].binary.expected.binary[j]);
+        }
+        free(msm);
+    }
+}
+
+
+void test_marshal__signalmap_binary_in(void** state)
+{
+    UNUSED(state);
+
+    MSM_TC tc[] = {
+        {
+            .name = "foo",
+            .count = 2,
+            .signal_idx = { 0, 1 },
+            .source_idx = { 0, 1 },
+            .binary.signal.binary = { NULL, NULL },
+            .binary.signal.binary_len = { 0, 0 },
+            .binary.signal.binary_buffer_size = { 0, 0 },
+            .binary.source.binary = { strdup("foo"), strdup("bar") },
+            .binary.source.binary_len = { 4, 4 },
+            .binary.expected.binary = { strdup("foo"), strdup("bar") },
+            .binary.expected.binary_len = { 4, 4 },
+            .binary.expected.binary_buffer_size = { 4, 4 },
+        },
+        {
+            .name = "bar",
+            .count = 3,
+            .signal_idx = { 0, 1, 2 },
+            .source_idx = { 0, 1, 2 },
+            .binary.signal.binary = { NULL, NULL, NULL },
+            .binary.signal.binary_len = { 0, 0, 0 },
+            .binary.signal.binary_buffer_size = { 0, 0, 0 },
+            .binary.source.binary = { strdup("foo"), strdup("fubar"),
+                strdup("bar") },
+            .binary.source.binary_len = { 4, 6, 4 },
+            .binary.expected.binary = { strdup("foo"), strdup("fubar"),
+                strdup("bar") },
+            .binary.expected.binary_len = { 4, 6, 4 },
+            .binary.expected.binary_buffer_size = { 4, 6, 4 },
+        },
+    };
+
+    /* Check every test case. */
+    for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
+        // Setup the MSM structure (NTL).
+        MarshalSignalMap* msm = calloc(2, sizeof(MarshalSignalMap));
+        msm[0].name = (char*)tc[i].name;
+        msm[0].count = tc[i].count;
+        msm[0].is_binary = true;
+        msm[0].signal.index = tc[i].signal_idx;
+        msm[0].signal.binary = (void**)&tc[i].binary.signal.binary;
+        msm[0].signal.binary_len = (uint32_t*)&tc[i].binary.signal.binary_len;
+        msm[0].signal.binary_buffer_size =
+            (uint32_t*)&tc[i].binary.signal.binary_buffer_size;
+        msm[0].source.index = tc[i].source_idx;
+        msm[0].source.binary = (void**)&tc[i].binary.source.binary;
+        msm[0].source.binary_len = (uint32_t*)&tc[i].binary.source.binary_len;
+        for (size_t j = 0; j < msm[0].count; j++) {
+            assert_ptr_equal(tc[i].binary.signal.binary[j], NULL);
+        }
+
+        // Marshal and check results: source -> signal (append, copy).
+        marshal_signalmap_in(msm);
+        for (size_t j = 0; j < msm[0].count; j++) {
+            assert_int_equal(tc[i].binary.expected.binary_len[j],
+                msm[0].signal.binary_len[j]);
+            assert_int_equal(tc[i].binary.expected.binary_buffer_size[j],
+                msm[0].signal.binary_buffer_size[j]);
+            assert_ptr_not_equal(tc[i].binary.signal.binary[j],
+                tc[i].binary.source.binary[j]);  // Append / Deep copy.
+            assert_memory_equal(tc[i].binary.expected.binary[j],
+                msm[0].signal.binary[j], tc[i].binary.expected.binary_len[j]);
+        }
+
+        /* Cleanup. */
+        for (size_t j = 0; j < msm[0].count; j++) {
+            free(tc[i].binary.signal.binary[j]);
+            free(tc[i].binary.source.binary[j]);
+            free(tc[i].binary.expected.binary[j]);
+        }
+        free(msm);
+    }
+}
+
+
 int run_marshal_tests(void)
 {
     void* s = test_setup;
@@ -590,9 +1052,16 @@ int run_marshal_tests(void)
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup_teardown(test_marshal__type_size, s, t),
         cmocka_unit_test_setup_teardown(test_marshal_group__primitive, s, t),
+        cmocka_unit_test_setup_teardown(test_marshal_group__binary, s, t),
         cmocka_unit_test_setup_teardown(test_marshal__signalmap_generate, s, t),
-        cmocka_unit_test_setup_teardown(test_marshal__signalmap_in, s, t),
-        cmocka_unit_test_setup_teardown(test_marshal__signalmap_out, s, t),
+        cmocka_unit_test_setup_teardown(
+            test_marshal__signalmap_scalar_out, s, t),
+        cmocka_unit_test_setup_teardown(
+            test_marshal__signalmap_scalar_in, s, t),
+        cmocka_unit_test_setup_teardown(
+            test_marshal__signalmap_binary_out, s, t),
+        cmocka_unit_test_setup_teardown(
+            test_marshal__signalmap_binary_in, s, t),
     };
 
     return cmocka_run_group_tests_name("MARSHAL", tests, NULL, NULL);

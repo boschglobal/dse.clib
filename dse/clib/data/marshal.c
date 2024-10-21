@@ -10,6 +10,7 @@
 #include <dse/logger.h>
 #include <dse/clib/collections/set.h>
 #include <dse/clib/collections/hashlist.h>
+#include <dse/clib/util/strings.h>
 #include <dse/clib/data/marshal.h>
 
 
@@ -21,6 +22,40 @@ typedef struct IndexItem {
     size_t signal_idx;
     size_t source_idx;
 } IndexItem;
+
+
+static char* _default_string_encode(const char* source, size_t len)
+{
+    if (source == NULL || len == 0) return NULL;
+
+    size_t _len = strlen(source);
+    if (_len > (len - 1)) _len = len - 1;
+    if (_len) {
+        char* s = calloc(_len + 1, sizeof(char));
+        memcpy(s, source, _len);
+        return s;
+    } else {
+        return NULL;
+    }
+}
+
+
+static char* _default_string_decode(const char* source, size_t* len)
+{
+    if (len == NULL) return NULL;
+    *len = 0;
+
+    size_t _len = 0;
+    if (source) _len = strlen(source);
+    if (_len) {
+        char* s = calloc(_len + 1, sizeof(char));
+        memcpy(s, source, _len);
+        *len = _len + 1;
+        return s;
+    } else {
+        return NULL;
+    }
+}
 
 
 static inline void _marshal_scalar_out(MarshalGroup* mg)
@@ -89,6 +124,96 @@ static inline void _marshal_scalar_in(MarshalGroup* mg)
 }
 
 
+static inline void _marshal_binary_out(MarshalGroup* mg)
+{
+    for (size_t i = 0; i < mg->count; i++) {
+        switch (mg->type) {
+        case MARSHAL_TYPE_STRING: {
+            char*  source = (char*)mg->source.binary[mg->source.offset + i];
+            size_t source_len = mg->source.binary_len[mg->source.offset + i];
+            char*  target = (char*)mg->target._string[i];
+            // Free previous allocated source (from this function).
+            free(target);
+            target = NULL;
+            // Decode the source string.
+            if (source && source_len) {
+                if (mg->functions.string_encode &&
+                    mg->functions.string_encode[i]) {
+                    target = mg->functions.string_encode[i](source, source_len);
+                } else {
+                    target = _default_string_encode(source, source_len);
+                }
+            }
+            mg->target._string[i] = target;
+        } break;
+        case MARSHAL_TYPE_BINARY: {
+            char*  source = (char*)mg->source.binary[mg->source.offset + i];
+            size_t source_len = mg->source.binary_len[mg->source.offset + i];
+            char*  target = (char*)mg->target._binary[i];
+            size_t target_len = 0;
+            // Free previous allocated source (from this function).
+            free(target);
+            target = NULL;
+            // Allocate and copy to target.
+            if (source && source_len) {
+                target = malloc(source_len);
+                memcpy(target, source, source_len);
+                target_len = source_len;
+            }
+            mg->target._binary[i] = target;
+            mg->target._binary_len[i] = target_len;
+        } break;
+        default:
+            break;
+        }
+    }
+}
+
+
+static inline void _marshal_binary_in(MarshalGroup* mg)
+{
+    for (size_t i = 0; i < mg->count; i++) {
+        switch (mg->type) {
+        case MARSHAL_TYPE_STRING: {
+            char*  source = (char*)mg->source.binary[mg->source.offset + i];
+            size_t source_len = 0;
+            char*  target = (char*)mg->target._string[i];
+            // Free previous allocated source (from this function).
+            free(source);
+            source = NULL;
+            // Decode the target string.
+            if (mg->functions.string_decode && mg->functions.string_decode[i]) {
+                source = mg->functions.string_decode[i](target, &source_len);
+            } else {
+                source = _default_string_decode(target, &source_len);
+            }
+            mg->source.binary[mg->source.offset + i] = source;
+            mg->source.binary_len[mg->source.offset + i] = source_len;
+        } break;
+        case MARSHAL_TYPE_BINARY: {
+            char*  source = (char*)mg->source.binary[mg->source.offset + i];
+            size_t source_len = 0;
+            char*  target = (char*)mg->target._binary[i];
+            size_t target_len = mg->target._binary_len[i];
+            // Free previous allocated source (from this function).
+            free(source);
+            source = NULL;
+            // Allocate and copy to source.
+            if (target && target_len) {
+                source = malloc(target_len);
+                memcpy(source, target, target_len);
+                source_len = target_len;
+            }
+            mg->source.binary[mg->source.offset + i] = source;
+            mg->source.binary_len[mg->source.offset + i] = source_len;
+        } break;
+        default:
+            break;
+        }
+    }
+}
+
+
 /**
 marshal_type_size
 =================
@@ -127,6 +252,9 @@ size_t marshal_type_size(MarshalType type)
     case MARSHAL_TYPE_DOUBLE:
     case MARSHAL_TYPE_BYTE8:
         return 8;
+    case MARSHAL_TYPE_STRING:
+    case MARSHAL_TYPE_BINARY:
+        return 8;
     default:
         return 0;
     }
@@ -151,7 +279,16 @@ void marshal_group_out(MarshalGroup* mg_table)
         case MARSHAL_DIRECTION_TXRX:
         case MARSHAL_DIRECTION_TXONLY:
         case MARSHAL_DIRECTION_PARAMETER:
-            if (mg->kind == MARSHAL_KIND_PRIMITIVE) _marshal_scalar_out(mg);
+            switch (mg->kind) {
+            case MARSHAL_KIND_PRIMITIVE:
+                _marshal_scalar_out(mg);
+                break;
+            case MARSHAL_KIND_BINARY:
+                _marshal_binary_out(mg);
+                break;
+            default:
+                break;
+            }
             break;
         default:
             continue;
@@ -179,7 +316,16 @@ void marshal_group_in(MarshalGroup* mg_table)
         case MARSHAL_DIRECTION_RXONLY:
         case MARSHAL_DIRECTION_PARAMETER:
         case MARSHAL_DIRECTION_LOCAL:
-            if (mg->kind == MARSHAL_KIND_PRIMITIVE) _marshal_scalar_in(mg);
+            switch (mg->kind) {
+            case MARSHAL_KIND_PRIMITIVE:
+                _marshal_scalar_in(mg);
+                break;
+            case MARSHAL_KIND_BINARY:
+                _marshal_binary_in(mg);
+                break;
+            default:
+                break;
+            }
             break;
         default:
             continue;
@@ -205,6 +351,9 @@ void marshal_group_destroy(MarshalGroup* mg_table)
         if (mg->name) free(mg->name);
         if (mg->target.ref) free(mg->target.ref);
         if (mg->target.ptr) free(mg->target.ptr);
+        if (mg->target._binary_len) free(mg->target._binary_len);
+        if (mg->functions.string_encode) free(mg->functions.string_encode);
+        if (mg->functions.string_decode) free(mg->functions.string_decode);
     }
     if (mg_table) free(mg_table);
 }
@@ -252,11 +401,12 @@ MarshalSignalMap* marshal_generate_signalmap(MarshalMapSpec signal,
                 /* If a set is provided, signal mappings are unique. */
                 if (ex_signals) {
                     /* Match. */
-                    if (set_contains(ex_signals, signal.signal[i]) == SET_TRUE) {
+                    if (set_contains(ex_signals, signal.signal[i]) ==
+                        SET_TRUE) {
                         /* Signal already mapped. */
                         errno = -EINVAL;
                         for (uint32_t i = 0; i < hashlist_length(&index_list);
-                            i++) {
+                             i++) {
                             free(hashlist_at(&index_list, i));
                         }
                         hashlist_destroy(&index_list);
@@ -287,8 +437,12 @@ MarshalSignalMap* marshal_generate_signalmap(MarshalMapSpec signal,
     msm->count = count;
 
     if (is_binary) {
-        msm->signal.ncodec = signal.ncodec;
-        msm->source.ncodec = source.ncodec;
+        msm->signal.binary = signal.binary;
+        msm->signal.binary_len = signal.binary_len;
+        msm->signal.binary_buffer_size = signal.binary_buffer_size;
+        msm->source.binary = source.binary;
+        msm->source.binary_len = source.binary_len;
+        msm->source.binary_buffer_size = source.binary_buffer_size;
         msm->is_binary = true;
     } else {
         msm->signal.scalar = signal.scalar;
@@ -317,6 +471,8 @@ marshal_signalmap_out
 
 Marshal a `MarshalSignalMap` outwards (towards the marshal target).
 
+    Signal -[marshal_signalmap_out()]-> Source -> Target
+
 Parameters
 ----------
 map (MarshalSignalMap*)
@@ -326,15 +482,24 @@ void marshal_signalmap_out(MarshalSignalMap* map)
 {
     for (MarshalSignalMap* msm = map; msm && msm->name; msm++) {
         for (size_t i = 0; i < msm->count; i++) {
+            size_t sig_idx = msm->signal.index[i];
+            size_t src_idx = msm->source.index[i];
+
             if (msm->is_binary) {
-                void* src_binary = *(msm->source.ncodec);
-                void* sig_binary = *(msm->signal.ncodec);
-                memcpy(src_binary, sig_binary, sizeof(void*));
+                void**    src_binary = (msm->source.binary);
+                uint32_t* src_binary_len = (msm->source.binary_len);
+                void**    sig_binary = (msm->signal.binary);
+                uint32_t* sig_binary_len = (msm->signal.binary_len);
+
+                // Reference (shallow copy) signal -> source.
+                // Note: Signal owns memory.
+                // Note: Source is managed in source-target marshal code.
+                src_binary[src_idx] = sig_binary[sig_idx];
+                src_binary_len[src_idx] = sig_binary_len[sig_idx];
             } else {
                 double* src_scalar = *(msm->source.scalar);
                 double* sig_scalar = *(msm->signal.scalar);
-                src_scalar[msm->source.index[i]] =
-                    sig_scalar[msm->signal.index[i]];
+                src_scalar[src_idx] = sig_scalar[sig_idx];
             }
         }
     }
@@ -347,6 +512,8 @@ marshal_signalmap_in
 
 Marshal a `MarshalGroup` inwards (from the marshal target).
 
+    Signal <-[marshal_signalmap_in()]- Source -> Target
+
 Parameters
 ----------
 map (MarshalSignalMap*)
@@ -356,15 +523,27 @@ void marshal_signalmap_in(MarshalSignalMap* map)
 {
     for (MarshalSignalMap* msm = map; msm && msm->name; msm++) {
         for (size_t i = 0; i < msm->count; i++) {
+            size_t sig_idx = msm->signal.index[i];
+            size_t src_idx = msm->source.index[i];
+
             if (msm->is_binary) {
-                void* src_binary = *(msm->source.ncodec);
-                void* sig_binary = *(msm->signal.ncodec);
-                memcpy(sig_binary, src_binary, sizeof(void*));
+                void**    src_binary = (msm->source.binary);
+                uint32_t* src_binary_len = (msm->source.binary_len);
+                void**    sig_binary = (msm->signal.binary);
+                uint32_t* sig_binary_len = (msm->signal.binary_len);
+                uint32_t* sig_binary_buffer_size =
+                    (msm->signal.binary_buffer_size);
+
+                // Append (deep copy) source -> signal
+                // Note. Signal owns memory.
+                // Note: Source is managed in source-target marshal code.
+                dse_buffer_append(&sig_binary[sig_idx],
+                    &sig_binary_len[sig_idx], &sig_binary_buffer_size[sig_idx],
+                    src_binary[src_idx], src_binary_len[src_idx]);
             } else {
                 double* src_scalar = *(msm->source.scalar);
                 double* sig_scalar = *(msm->signal.scalar);
-                sig_scalar[msm->signal.index[i]] =
-                    src_scalar[msm->source.index[i]];
+                sig_scalar[sig_idx] = src_scalar[src_idx];
             }
         }
     }
