@@ -53,16 +53,17 @@ static __inline__ void* hashlist_at(HashList* h, uint32_t index)
     return hashmap_get(&h->hash_map, key);
 }
 
-static __inline__ void* hashlist_ntl(HashList *h, size_t object_size, bool destroy)
+static __inline__ void* hashlist_ntl(
+    HashList* h, size_t object_size, bool destroy)
 {
     size_t count = hashlist_length(h);
-    void *object_array = calloc(count + 1, object_size);
+    void*  array = calloc(count + 1, object_size);
 
     // Copy elements from the HashList to the object array.
     for (uint32_t i = 0; i < count; i++) {
-        void *source_hashlist = hashlist_at(h, i);
-        if (source_hashlist != NULL) {
-            memcpy((void *)object_array + i * object_size, &source_hashlist, object_size);
+        void* source = hashlist_at(h, i);
+        if (source != NULL) {
+            memcpy((void*)(array + i * object_size), source, object_size);
         }
     }
 
@@ -71,7 +72,7 @@ static __inline__ void* hashlist_ntl(HashList *h, size_t object_size, bool destr
         hashlist_destroy(h);
     }
 
-    return object_array;
+    return array;
 }
 
 #endif  // DSE_CLIB_COLLECTIONS_HASHLIST_H_

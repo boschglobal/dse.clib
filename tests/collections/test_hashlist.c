@@ -9,6 +9,11 @@
 #define UNUSED(x) ((void)x)
 
 
+typedef struct NamedObject {
+    const char* name;
+} NamedObject;
+
+
 void test_hashlist(void** state)
 {
     UNUSED(state);
@@ -31,24 +36,27 @@ void test_hashlist_ntl(void** state)
 {
     UNUSED(state);
 
+    NamedObject foo = { .name = "foo" };
+    NamedObject bar = { .name = "bar" };
+
     HashList h;
     hashlist_init(&h, 2);
-    hashlist_append(&h, (void*)"foo");
-    hashlist_append(&h, (void*)"bar");
+    hashlist_append(&h, &foo);
+    hashlist_append(&h, &bar);
 
     // Call hashlist_ntl to convert to NTL.
-    char** converted_array = (char**)hashlist_ntl(&h, sizeof(char*), false);
+    NamedObject* ntl = hashlist_ntl(&h, sizeof(NamedObject), false);
     assert_int_equal(hashlist_length(&h), 2);
-    assert_string_equal(converted_array[0], "foo");
-    assert_string_equal(converted_array[1], "bar");
-    assert_null(converted_array[2]);
-    free(converted_array);
+    assert_string_equal(ntl[0].name, "foo");
+    assert_string_equal(ntl[1].name, "bar");
+    assert_null(ntl[2].name);
+    free(ntl);
 
     // Call hashlist_ntl to convert to NTL AND DESTROY.
-    converted_array = (char**)hashlist_ntl(&h, sizeof(char*), true);
+    ntl = hashlist_ntl(&h, sizeof(char*), true);
     assert_int_equal(hashlist_length(&h), 0);
-    assert_string_equal(converted_array[0], "foo");
-    assert_string_equal(converted_array[1], "bar");
-    assert_null(converted_array[2]);
-    free(converted_array);
+    assert_string_equal(ntl[0].name, "foo");
+    assert_string_equal(ntl[1].name, "bar");
+    assert_null(ntl[2].name);
+    free(ntl);
 }

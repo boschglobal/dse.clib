@@ -151,7 +151,6 @@ typedef struct MarshalGroup {
         };
         /* (reference, allocated elsewhere) */
         uint32_t* binary_len;
-        uint32_t* binary_buffer_size;
     } source;
     /* Marshal supporting functions. */
     struct {
@@ -195,11 +194,12 @@ typedef struct MarshalStruct {
 typedef struct MarshalMapSpec {
     const char*  name;
     size_t       count;
+    bool         is_binary;
     /* The spec of the signals to be mapped (reference, allocated elsewhere). */
     const char** signal;
     union {
-        double** scalar;
-        void**   binary;
+        double* scalar;
+        void**  binary;
     };
     uint32_t* binary_len;
     uint32_t* binary_buffer_size;
@@ -216,8 +216,8 @@ typedef struct MarshalSignalMap {
         size_t* index;
         union {
             /* (reference, allocated elsewhere) */
-            double** scalar;
-            void**   binary;
+            double* scalar;
+            void**  binary;
         };
         uint32_t* binary_len;
         uint32_t* binary_buffer_size;
@@ -228,11 +228,10 @@ typedef struct MarshalSignalMap {
         size_t* index;
         union {
             /* (reference, allocated elsewhere) */
-            double** scalar;
-            void**   binary;
+            double* scalar;
+            void**  binary;
         };
         uint32_t* binary_len;
-        uint32_t* binary_buffer_size;
     } source;
 } MarshalSignalMap;
 

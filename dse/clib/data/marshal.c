@@ -442,7 +442,6 @@ MarshalSignalMap* marshal_generate_signalmap(MarshalMapSpec signal,
         msm->signal.binary_buffer_size = signal.binary_buffer_size;
         msm->source.binary = source.binary;
         msm->source.binary_len = source.binary_len;
-        msm->source.binary_buffer_size = source.binary_buffer_size;
         msm->is_binary = true;
     } else {
         msm->signal.scalar = signal.scalar;
@@ -486,10 +485,10 @@ void marshal_signalmap_out(MarshalSignalMap* map)
             size_t src_idx = msm->source.index[i];
 
             if (msm->is_binary) {
-                void**    src_binary = (msm->source.binary);
-                uint32_t* src_binary_len = (msm->source.binary_len);
-                void**    sig_binary = (msm->signal.binary);
-                uint32_t* sig_binary_len = (msm->signal.binary_len);
+                void**    src_binary = msm->source.binary;
+                uint32_t* src_binary_len = msm->source.binary_len;
+                void**    sig_binary = msm->signal.binary;
+                uint32_t* sig_binary_len = msm->signal.binary_len;
 
                 // Reference (shallow copy) signal -> source.
                 // Note: Signal owns memory.
@@ -497,8 +496,8 @@ void marshal_signalmap_out(MarshalSignalMap* map)
                 src_binary[src_idx] = sig_binary[sig_idx];
                 src_binary_len[src_idx] = sig_binary_len[sig_idx];
             } else {
-                double* src_scalar = *(msm->source.scalar);
-                double* sig_scalar = *(msm->signal.scalar);
+                double* src_scalar = msm->source.scalar;
+                double* sig_scalar = msm->signal.scalar;
                 src_scalar[src_idx] = sig_scalar[sig_idx];
             }
         }
@@ -527,10 +526,10 @@ void marshal_signalmap_in(MarshalSignalMap* map)
             size_t src_idx = msm->source.index[i];
 
             if (msm->is_binary) {
-                void**    src_binary = (msm->source.binary);
-                uint32_t* src_binary_len = (msm->source.binary_len);
-                void**    sig_binary = (msm->signal.binary);
-                uint32_t* sig_binary_len = (msm->signal.binary_len);
+                void**    src_binary = msm->source.binary;
+                uint32_t* src_binary_len = msm->source.binary_len;
+                void**    sig_binary = msm->signal.binary;
+                uint32_t* sig_binary_len = msm->signal.binary_len;
                 uint32_t* sig_binary_buffer_size =
                     (msm->signal.binary_buffer_size);
 
@@ -541,8 +540,8 @@ void marshal_signalmap_in(MarshalSignalMap* map)
                     &sig_binary_len[sig_idx], &sig_binary_buffer_size[sig_idx],
                     src_binary[src_idx], src_binary_len[src_idx]);
             } else {
-                double* src_scalar = *(msm->source.scalar);
-                double* sig_scalar = *(msm->signal.scalar);
+                double* src_scalar = msm->source.scalar;
+                double* sig_scalar = msm->signal.scalar;
                 sig_scalar[sig_idx] = src_scalar[src_idx];
             }
         }
