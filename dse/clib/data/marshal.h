@@ -158,6 +158,9 @@ typedef struct MarshalGroup {
         MarshalStringEncode* string_encode;
         MarshalStringDecode* string_decode;
     } functions;
+
+    /* Reserved. */
+    uint64_t __reserved__[4];
 } MarshalGroup;
 
 
@@ -188,6 +191,9 @@ typedef struct MarshalStruct {
         uint32_t* binary_len;
         uint32_t* binary_buffer_size;
     } source;
+
+    /* Reserved. */
+    uint64_t __reserved__[4];
 } MarshalStruct;
 
 
@@ -203,6 +209,9 @@ typedef struct MarshalMapSpec {
     };
     uint32_t* binary_len;
     uint32_t* binary_buffer_size;
+
+    /* Reserved. */
+    uint64_t __reserved__[4];
 } MarshalMapSpec;
 
 
@@ -233,6 +242,9 @@ typedef struct MarshalSignalMap {
         };
         uint32_t* binary_len;
     } source;
+
+    /* Reserved. */
+    uint64_t __reserved__[4];
 } MarshalSignalMap;
 
 
