@@ -36,13 +36,15 @@ void test_hashlist_ntl(void** state)
 {
     UNUSED(state);
 
-    NamedObject foo = { .name = "foo" };
-    NamedObject bar = { .name = "bar" };
+    NamedObject* foo = malloc(sizeof(NamedObject));
+    NamedObject* bar = malloc(sizeof(NamedObject));
+    *foo = (NamedObject) { .name = "foo" };
+    *bar = (NamedObject) { .name = "bar" };
 
     HashList h;
     hashlist_init(&h, 2);
-    hashlist_append(&h, &foo);
-    hashlist_append(&h, &bar);
+    hashlist_append(&h, foo);
+    hashlist_append(&h, bar);
 
     // Call hashlist_ntl to convert to NTL.
     NamedObject* ntl = hashlist_ntl(&h, sizeof(NamedObject), false);

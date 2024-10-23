@@ -31,6 +31,11 @@ static __inline__ void hashlist_destroy(HashList* h)
     if (h) hashmap_destroy(&h->hash_map);
 }
 
+static __inline__ void hashlist_destroy_ext(HashList* h, HashMapDestroyItemCallback cb, void* data)
+{
+    if (h) hashmap_destroy_ext(&h->hash_map, cb, data);
+}
+
 static __inline__ uint32_t hashlist_length(HashList* h)
 {
     if (h) return h->hash_map.used_nodes;
@@ -69,7 +74,7 @@ static __inline__ void* hashlist_ntl(
 
     // Optionally destroy the original HashList.
     if (destroy) {
-        hashlist_destroy(h);
+        hashlist_destroy_ext(h, NULL, NULL);
     }
 
     return array;

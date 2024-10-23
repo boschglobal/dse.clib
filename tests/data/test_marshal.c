@@ -685,12 +685,12 @@ void test_marshal__signalmap_generate(void** state)
         MarshalMapSpec source = { .count = tc[i].source.count,
             .name = tc[i].source.name,
             .signal = tc[i].source.signal,
-            .scalar = &sou_s_ptr };
+            .scalar = sou_s_ptr };
         double*        sig_s_ptr = tc[i].signal.scalar;
         MarshalMapSpec signal = { .count = tc[i].signal.count,
             .name = tc[i].signal.name,
             .signal = tc[i].signal.signal,
-            .scalar = &sig_s_ptr };
+            .scalar = sig_s_ptr };
 
         SimpleSet ex_signals;
         set_init(&ex_signals);
@@ -706,8 +706,8 @@ void test_marshal__signalmap_generate(void** state)
         } else {
             assert_string_equal(msm->name, signal.name);
             assert_int_equal(msm->count, tc[i].expect.count);
-            assert_ptr_equal(msm->signal.scalar, &sig_s_ptr);
-            assert_ptr_equal(msm->source.scalar, &sou_s_ptr);
+            assert_ptr_equal(msm->signal.scalar, sig_s_ptr);
+            assert_ptr_equal(msm->source.scalar, sou_s_ptr);
 
             for (size_t x = 0; x < tc[i].expect.count; x++) {
                 assert_int_equal(
@@ -794,14 +794,14 @@ void test_marshal__signalmap_scalar_out(void** state)
         msm[0].name = (char*)tc[i].name;
         msm[0].count = tc[i].count;
         msm[0].signal.index = tc[i].signal_idx;
-        msm[0].signal.scalar = &sig_s_ptr;
+        msm[0].signal.scalar = sig_s_ptr;
         msm[0].source.index = tc[i].source_idx;
-        msm[0].source.scalar = &src_s_ptr;
+        msm[0].source.scalar = src_s_ptr;
 
         assert_ptr_equal(sig_s_ptr, tc[i].signal_scalar);
-        assert_ptr_equal(sig_s_ptr, *msm[0].signal.scalar);
+        assert_ptr_equal(sig_s_ptr, msm[0].signal.scalar);
         assert_ptr_equal(src_s_ptr, tc[i].source_scalar);
-        assert_ptr_equal(src_s_ptr, *msm[0].source.scalar);
+        assert_ptr_equal(src_s_ptr, msm[0].source.scalar);
 
         for (size_t j = 0; j < msm[0].count; j++) {
             assert_double_equal(0, src_s_ptr[tc[i].source_idx[j]], 0.0);
@@ -862,14 +862,14 @@ void test_marshal__signalmap_scalar_in(void** state)
         msm[0].name = (char*)tc[i].name;
         msm[0].count = tc[i].count;
         msm[0].signal.index = tc[i].signal_idx;
-        msm[0].signal.scalar = &sig_s_ptr;
+        msm[0].signal.scalar = sig_s_ptr;
         msm[0].source.index = tc[i].source_idx;
-        msm[0].source.scalar = &src_s_ptr;
+        msm[0].source.scalar = src_s_ptr;
 
         assert_ptr_equal(sig_s_ptr, tc[i].signal_scalar);
-        assert_ptr_equal(sig_s_ptr, *msm[0].signal.scalar);
+        assert_ptr_equal(sig_s_ptr, msm[0].signal.scalar);
         assert_ptr_equal(src_s_ptr, tc[i].source_scalar);
-        assert_ptr_equal(src_s_ptr, *msm[0].source.scalar);
+        assert_ptr_equal(src_s_ptr, msm[0].source.scalar);
 
         for (size_t j = 0; j < msm[0].count; j++) {
             assert_double_equal(0, sig_s_ptr[tc[i].signal_idx[j]], 0.0);
