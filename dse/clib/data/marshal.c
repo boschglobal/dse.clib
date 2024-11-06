@@ -193,16 +193,18 @@ static inline void _marshal_binary_in(MarshalGroup* mg)
             size_t source_len = 0;
             char*  target = (char*)mg->target._string[i];
             // Free previous allocated source (from this function).
-            free(source);
-            source = NULL;
+            if (source) {
+                free(source);
+                source = NULL;
+            }
             // Decode the target string.
             if (mg->functions.string_decode && mg->functions.string_decode[i]) {
                 source = mg->functions.string_decode[i](target, &source_len);
             } else {
                 source = _default_string_decode(target, &source_len);
             }
-            log_trace("  target[%d]->source[%d]:  %s -> %s (%d) ", i,
-                mg->source.offset + i, target, source, source_len);
+            log_trace("  target[%d]->source[%d]:  %s -> %s (%p:%d) ", i,
+                mg->source.offset + i, target, source, source, source_len);
             mg->source.binary[mg->source.offset + i] = source;
             mg->source.binary_len[mg->source.offset + i] = source_len;
         } break;
@@ -292,6 +294,7 @@ mg_table (MarshalGroup*)
 */
 void marshal_group_out(MarshalGroup* mg_table)
 {
+    log_trace("Marshal Group OUT (source -> target):");
     for (MarshalGroup* mg = mg_table; mg && mg->name; mg++) {
         switch (mg->dir) {
         case MARSHAL_DIRECTION_TXRX:
@@ -328,6 +331,7 @@ mg_table (MarshalGroup*)
 */
 void marshal_group_in(MarshalGroup* mg_table)
 {
+    log_trace("Marshal Group IN (target -> source):");
     for (MarshalGroup* mg = mg_table; mg && mg->name; mg++) {
         switch (mg->dir) {
         case MARSHAL_DIRECTION_TXRX:
@@ -366,11 +370,24 @@ mg_table (MarshalGroup*)
 void marshal_group_destroy(MarshalGroup* mg_table)
 {
     for (MarshalGroup* mg = mg_table; mg && mg->name; mg++) {
-        if (mg->kind == MARSHAL_KIND_BINARY) {
-            for (size_t i = 0; i < mg->count; i++) {
-                free(mg->target._binary[i]);
+        switch (mg->dir) {
+        case MARSHAL_DIRECTION_TXRX:
+        case MARSHAL_DIRECTION_TXONLY:
+        case MARSHAL_DIRECTION_PARAMETER:
+            switch (mg->kind) {
+            case MARSHAL_KIND_BINARY: {
+                for (size_t i = 0; i < mg->count; i++) {
+                    free(mg->target._binary[i]);
+                }
+            } break;
+            default:
+                break;
             }
+            break;
+        default:
+            break;
         }
+
         if (mg->name) free(mg->name);
         if (mg->target.ref) free(mg->target.ref);
         if (mg->target.ptr) free(mg->target.ptr);
@@ -502,6 +519,8 @@ map (MarshalSignalMap*)
 */
 void marshal_signalmap_out(MarshalSignalMap* map)
 {
+    log_trace("Marshal SignalMap OUT (signal -> source):");
+
     for (MarshalSignalMap* msm = map; msm && msm->name; msm++) {
         for (size_t i = 0; i < msm->count; i++) {
             size_t sig_idx = msm->signal.index[i];
@@ -516,6 +535,8 @@ void marshal_signalmap_out(MarshalSignalMap* map)
                 // Reference (shallow copy) signal -> source.
                 // Note: Signal owns memory.
                 // Note: Source is managed in source-target marshal code.
+                log_trace("  signal[%d]->source[%d]: (%p:%d)", sig_idx, src_idx,
+                    src_binary[src_idx], src_binary_len[src_idx]);
                 src_binary[src_idx] = sig_binary[sig_idx];
                 src_binary_len[src_idx] = sig_binary_len[sig_idx];
             } else {
@@ -543,6 +564,8 @@ map (MarshalSignalMap*)
 */
 void marshal_signalmap_in(MarshalSignalMap* map)
 {
+    log_trace("Marshal SignalMap IN (source -> signal):");
+
     for (MarshalSignalMap* msm = map; msm && msm->name; msm++) {
         for (size_t i = 0; i < msm->count; i++) {
             size_t sig_idx = msm->signal.index[i];
@@ -559,6 +582,10 @@ void marshal_signalmap_in(MarshalSignalMap* map)
                 // Append (deep copy) source -> signal
                 // Note. Signal owns memory.
                 // Note: Source is managed in source-target marshal code.
+                log_trace("  source[%d]->signal[%d]: (%p:%d) -> (%d:%d) ",
+                    src_idx, sig_idx, src_binary[src_idx],
+                    src_binary_len[src_idx], sig_binary_len[sig_idx],
+                    sig_binary_buffer_size[sig_idx]);
                 dse_buffer_append(&sig_binary[sig_idx],
                     &sig_binary_len[sig_idx], &sig_binary_buffer_size[sig_idx],
                     src_binary[src_idx], src_binary_len[src_idx]);
