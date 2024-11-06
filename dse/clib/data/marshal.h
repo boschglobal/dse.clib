@@ -79,12 +79,16 @@ typedef enum MarshalDir {
 
     /* TX and RX: from target. */
     MARSHAL_DIRECTION_TXRX,
+
     /* RX: from target (i.e. source <-rx- target). */
     MARSHAL_DIRECTION_RXONLY,
+
     /* TX: to target (i.e. source -tx-> target). */
     MARSHAL_DIRECTION_TXONLY,
-    /* Set (RX): only at specific points in lifecycle. */
+
+    /* Set (TX): only at specific points in lifecycle. */
     MARSHAL_DIRECTION_PARAMETER,
+
     /* RX: from target (caller will not expose to signal interface). */
     MARSHAL_DIRECTION_LOCAL,
 

@@ -132,9 +132,11 @@ static inline void _marshal_binary_out(MarshalGroup* mg)
             char*  source = (char*)mg->source.binary[mg->source.offset + i];
             size_t source_len = mg->source.binary_len[mg->source.offset + i];
             char*  target = (char*)mg->target._string[i];
-            // Free previous allocated source (from this function).
-            free(target);
-            target = NULL;
+            // Free previous allocated target (from this function).
+            if (target) {
+                free(target);
+                target = NULL;
+            }
             // Decode the source string.
             if (source && source_len) {
                 if (mg->functions.string_encode &&
@@ -144,24 +146,36 @@ static inline void _marshal_binary_out(MarshalGroup* mg)
                     target = _default_string_encode(source, source_len);
                 }
             }
+            log_trace("  source[%d]->target[%d]:  %s (%d)-> %s ",
+                mg->source.offset + i, i, source, source_len, target);
             mg->target._string[i] = target;
+            // Source is consumed (caller owns, no free).
+            mg->source.binary[mg->source.offset + i] = NULL;
+            mg->source.binary_len[mg->source.offset + i] = 0;
         } break;
         case MARSHAL_TYPE_BINARY: {
             char*  source = (char*)mg->source.binary[mg->source.offset + i];
             size_t source_len = mg->source.binary_len[mg->source.offset + i];
             char*  target = (char*)mg->target._binary[i];
             size_t target_len = 0;
-            // Free previous allocated source (from this function).
-            free(target);
-            target = NULL;
+            // Free previous allocated target (from this function).
+            if (target) {
+                free(target);
+                target = NULL;
+            }
             // Allocate and copy to target.
             if (source && source_len) {
                 target = malloc(source_len);
                 memcpy(target, source, source_len);
                 target_len = source_len;
             }
+            log_trace("  source[%d]->target[%d]: (%d)->(%d) ",
+                mg->source.offset + i, i, source_len, target_len);
             mg->target._binary[i] = target;
             mg->target._binary_len[i] = target_len;
+            // Source is consumed (caller owns, no free).
+            mg->source.binary[mg->source.offset + i] = NULL;
+            mg->source.binary_len[mg->source.offset + i] = 0;
         } break;
         default:
             break;
@@ -187,6 +201,8 @@ static inline void _marshal_binary_in(MarshalGroup* mg)
             } else {
                 source = _default_string_decode(target, &source_len);
             }
+            log_trace("  target[%d]->source[%d]:  %s -> %s (%d) ", i,
+                mg->source.offset + i, target, source, source_len);
             mg->source.binary[mg->source.offset + i] = source;
             mg->source.binary_len[mg->source.offset + i] = source_len;
         } break;
@@ -204,6 +220,8 @@ static inline void _marshal_binary_in(MarshalGroup* mg)
                 memcpy(source, target, target_len);
                 source_len = target_len;
             }
+            log_trace("  target[%d]->source[%d]:  (%d)->(%d) ", i,
+                mg->source.offset + i, target_len, source_len);
             mg->source.binary[mg->source.offset + i] = source;
             mg->source.binary_len[mg->source.offset + i] = source_len;
         } break;
@@ -348,6 +366,11 @@ mg_table (MarshalGroup*)
 void marshal_group_destroy(MarshalGroup* mg_table)
 {
     for (MarshalGroup* mg = mg_table; mg && mg->name; mg++) {
+        if (mg->kind == MARSHAL_KIND_BINARY) {
+            for (size_t i = 0; i < mg->count; i++) {
+                free(mg->target._binary[i]);
+            }
+        }
         if (mg->name) free(mg->name);
         if (mg->target.ref) free(mg->target.ref);
         if (mg->target.ptr) free(mg->target.ptr);

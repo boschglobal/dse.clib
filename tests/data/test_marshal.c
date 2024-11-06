@@ -291,6 +291,7 @@ typedef struct MGKB_TC {
         struct {
             void*    binary[10];
             uint32_t binary_len[10];
+            void*    binary_save[10];
         } source;
         struct {
             MarshalStringEncode string_encode[10];
@@ -359,6 +360,8 @@ void test_marshal_group__binary(void** state)
             for (size_t i = 0; i < t->count; i++) {
                 mg->source.binary[t->offset + i] =
                     malloc(t->condition.source.binary_len[i]);
+                t->storage.source.binary_save[t->offset + i] =
+                    mg->source.binary[t->offset + i];
                 memcpy(mg->source.binary[t->offset + i],
                     t->condition.source.binary[i],
                     t->condition.source.binary_len[i]);
@@ -426,9 +429,14 @@ void test_marshal_group__binary(void** state)
                 free(mg->target._binary[i]);
                 mg->target._binary[i] = NULL;
                 mg->target._binary_len[i] = 0;
-                free(mg->source.binary[t->offset + i]);
-                mg->source.binary[t->offset + i] = NULL;
+                if (mg->source.binary[t->offset + i]) {
+                    free(mg->source.binary[t->offset + i]);
+                } else {
+                    free(t->storage.source.binary_save[t->offset + i]);
+                }
                 mg->source.binary_len[t->offset + i] = 0;
+                t->storage.source.binary[t->offset + i] = NULL;
+                t->storage.source.binary_save[t->offset + i] = NULL;
             }
         }
 
@@ -511,6 +519,7 @@ void test_marshal_group__binary(void** state)
             for (size_t i = 0; i < t->count; i++) {
                 free(mg->source.binary[t->offset + i]);
                 free(mg->target._binary[i]);
+                mg->target._binary[i] = NULL;
             }
         }
     }
