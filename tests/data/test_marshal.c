@@ -525,7 +525,6 @@ void test_marshal_group__binary(void** state)
         }
     }
     marshal_group_destroy(mg_table);
-
 }
 
 
