@@ -546,10 +546,10 @@ void marshal_signalmap_out(MarshalSignalMap* map)
                     src_binary[src_idx] = NULL;
                 }
                 src_binary_len[src_idx] = 0;
-                if (sig_binary_len[sig_idx] && sig_binary_len[sig_idx]) {
+                if (sig_binary[sig_idx] && sig_binary_len[sig_idx]) {
                     src_binary[src_idx] = malloc(sig_binary_len[sig_idx]);
                     src_binary_len[src_idx] = sig_binary_len[sig_idx];
-                    memcpy(src_binary[src_idx], sig_binary[src_idx],
+                    memcpy(src_binary[src_idx], sig_binary[sig_idx],
                         sig_binary_len[sig_idx]);
                 }
                 log_trace("  signal[%d]->source[%d]: (%p:%d)->(%p:%d)", sig_idx,

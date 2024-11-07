@@ -930,6 +930,20 @@ void test_marshal__signalmap_binary_out(void** state)
                 strdup("bar") },
             .binary.expected.binary_len = { 4, 6, 4 },
         },
+        {
+            // One signal is NULL but len is set (incorrectly).
+            .name = "foo",
+            .count = 2,
+            .signal_idx = { 0, 1 },
+            .source_idx = { 0, 1 },
+            .binary.signal.binary = { NULL, strdup("bar") },
+            .binary.signal.binary_len = { 4, 4 },
+            .binary.signal.binary_buffer_size = { 4, 4 },
+            .binary.source.binary = { NULL, NULL },
+            .binary.source.binary_len = { 0, 0 },
+            .binary.expected.binary = { NULL, strdup("bar") },
+            .binary.expected.binary_len = { 0, 4 },
+        },
     };
 
     /* Check every test case. */
@@ -957,10 +971,14 @@ void test_marshal__signalmap_binary_out(void** state)
         for (size_t j = 0; j < msm[0].count; j++) {
             assert_int_equal(tc[i].binary.expected.binary_len[j],
                 msm[0].source.binary_len[j]);
-            assert_ptr_not_equal(tc[i].binary.signal.binary[j],
-                tc[i].binary.source.binary[j]);
-            assert_memory_equal(tc[i].binary.expected.binary[j],
-                msm[0].source.binary[j], tc[i].binary.expected.binary_len[j]);
+            if (tc[i].binary.expected.binary[j]) {
+                assert_ptr_not_equal(tc[i].binary.signal.binary[j],
+                    tc[i].binary.source.binary[j]);
+                assert_memory_equal(tc[i].binary.expected.binary[j],
+                    msm[0].source.binary[j], tc[i].binary.expected.binary_len[j]);
+            } else {
+                assert_null(tc[i].binary.signal.binary[j]);
+            }
         }
 
         /* Cleanup. */
