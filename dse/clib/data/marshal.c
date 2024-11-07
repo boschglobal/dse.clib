@@ -170,7 +170,8 @@ static inline void _marshal_binary_out(MarshalGroup* mg)
                 target_len = source_len;
             }
             log_trace("  source[%d]->target[%d]: (%p:%d)->(%p:%d) ",
-                mg->source.offset + i, i, source, source_len, target, target_len);
+                mg->source.offset + i, i, source, source_len, target,
+                target_len);
             mg->target._binary[i] = target;
             mg->target._binary_len[i] = target_len;
             // Source is consumed (caller owns, no free).
@@ -375,9 +376,21 @@ void marshal_group_destroy(MarshalGroup* mg_table)
     for (MarshalGroup* mg = mg_table; mg && mg->name; mg++) {
         switch (mg->kind) {
         case MARSHAL_KIND_BINARY: {
+            // Free target for OUT direction.
+            switch (mg->dir) {
+            case MARSHAL_DIRECTION_TXRX:
+            case MARSHAL_DIRECTION_TXONLY:
+            case MARSHAL_DIRECTION_PARAMETER:
+                for (size_t i = 0; i < mg->count; i++) {
+                    free(mg->target._binary[i]);
+                }
+                break;
+            default:
+                break;
+            }
+            // Free source.
             for (size_t i = 0; i < mg->count; i++) {
-                free(mg->target._binary[i]);
-                free(mg->source.binary[i]);
+                free(mg->source.binary[mg->source.offset + i]);
             }
         } break;
         default:
@@ -398,26 +411,26 @@ void marshal_group_destroy(MarshalGroup* mg_table)
 marshal_generate_signalmap
 ==========================
 
-Creates a signal map between signals (i.e. the external signal interface) and
-the source (i.e. the internal interface to the target).
+Creates a signal map between signals (i.e. the external signal
+interface) and the source (i.e. the internal interface to the target).
 
 Parameters
 ----------
 signal (MarshalMapSpec)
-: A map spec for the signals to be mapped (i.e. the representation of the signal
-interface).
+: A map spec for the signals to be mapped (i.e. the representation of
+the signal interface).
 
 source (MarshalMapSpec)
-: A map spec for the source values to be mapped (i.e. the representation of the
-target).
+: A map spec for the source values to be mapped (i.e. the representation
+of the target).
 
 ex_signals (SimpleSet*)
-: A set used to keep track of signals between calls (to this function) and
-prevent duplicate mappings.
+: A set used to keep track of signals between calls (to this function)
+and prevent duplicate mappings.
 
 is_binary (bool)
-: The signal map represents binary signals (i.e. `signal` and `source` are
-binary signals).
+: The signal map represents binary signals (i.e. `signal` and `source`
+are binary signals).
 
 Returns
 -------
@@ -509,7 +522,8 @@ Marshal a `MarshalSignalMap` outwards (towards the marshal target).
 Parameters
 ----------
 map (MarshalSignalMap*)
-: A MarshalSignalMap list (Null-Terminated-List, indicated by member `name`).
+: A MarshalSignalMap list (Null-Terminated-List, indicated by member
+`name`).
 */
 void marshal_signalmap_out(MarshalSignalMap* map)
 {
@@ -562,7 +576,8 @@ Marshal a `MarshalGroup` inwards (from the marshal target).
 Parameters
 ----------
 map (MarshalSignalMap*)
-: A MarshalSignalMap list (Null-Terminated-List, indicated by member `name`).
+: A MarshalSignalMap list (Null-Terminated-List, indicated by member
+`name`).
 */
 void marshal_signalmap_in(MarshalSignalMap* map)
 {
@@ -583,7 +598,8 @@ void marshal_signalmap_in(MarshalSignalMap* map)
 
                 // Append (deep copy) source -> signal
                 // Note. Signal owns memory.
-                // Note: Source is managed in source-target marshal code.
+                // Note: Source is managed in source-target marshal
+                // code.
                 dse_buffer_append(&sig_binary[sig_idx],
                     &sig_binary_len[sig_idx], &sig_binary_buffer_size[sig_idx],
                     src_binary[src_idx], src_binary_len[src_idx]);
@@ -605,13 +621,14 @@ void marshal_signalmap_in(MarshalSignalMap* map)
 marshal_signalmap_destroy
 =========================
 
-Release resources associated with a `MarshalSignalMap` table, and the table
-itself.
+Release resources associated with a `MarshalSignalMap` table, and the
+table itself.
 
 Parameters
 ----------
 map (MarshalSignalMap*)
-: A MarshalSignalMap list (Null-Terminated-List, indicated by member `name`).
+: A MarshalSignalMap list (Null-Terminated-List, indicated by member
+`name`).
 */
 void marshal_signalmap_destroy(MarshalSignalMap* map)
 {
