@@ -518,13 +518,14 @@ void test_marshal_group__binary(void** state)
             MarshalGroup* mg = &mg_table[i];
             for (size_t i = 0; i < t->count; i++) {
                 free(mg->source.binary[t->offset + i]);
+                mg->source.binary[t->offset + i] = NULL;
                 free(mg->target._binary[i]);
                 mg->target._binary[i] = NULL;
             }
         }
     }
-
     marshal_group_destroy(mg_table);
+
 }
 
 
@@ -952,13 +953,13 @@ void test_marshal__signalmap_binary_out(void** state)
         }
 
         // Marshal and check results: signal -> source
-        // (reference only, no copy).
+        // (deep copy).
         marshal_signalmap_out(msm);
         for (size_t j = 0; j < msm[0].count; j++) {
             assert_int_equal(tc[i].binary.expected.binary_len[j],
                 msm[0].source.binary_len[j]);
-            assert_ptr_equal(tc[i].binary.signal.binary[j],
-                tc[i].binary.source.binary[j]);  // Reference copy.
+            assert_ptr_not_equal(tc[i].binary.signal.binary[j],
+                tc[i].binary.source.binary[j]);
             assert_memory_equal(tc[i].binary.expected.binary[j],
                 msm[0].source.binary[j], tc[i].binary.expected.binary_len[j]);
         }
@@ -967,6 +968,9 @@ void test_marshal__signalmap_binary_out(void** state)
         for (size_t j = 0; j < msm[0].count; j++) {
             free(tc[i].binary.signal.binary[j]);
             free(tc[i].binary.expected.binary[j]);
+        }
+        for (size_t j = 0; j < msm[0].count; j++) {
+            free(msm[0].source.binary[j]);
         }
         free(msm);
     }
