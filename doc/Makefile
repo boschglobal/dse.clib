@@ -25,13 +25,6 @@ export _INDEX_MD_FILE
 DOC_OUTPUT_index := doc/content/apis/clib/_index.md
 
 
-# Module "fmi"
-DOC_INPUT_fmi := dse/clib/fmi/fmu.h
-DOC_CDIR_fmi := dse/clib/fmi/fmu.c,dse/clib/fmi/importer.c,dse/clib/fmi/storage.c,dse/clib/fmi/strategy.c
-DOC_OUTPUT_fmi := doc/content/apis/clib/fmi/index.md
-DOC_LINKTITLE_fmi := FMI
-DOC_TITLE_fmi := "FMI API Reference"
-
 # Module "marshal"
 DOC_INPUT_marshal := dse/clib/data/marshal.h
 DOC_CDIR_marshal := dse/clib/data/marshal.c
@@ -40,7 +33,7 @@ DOC_LINKTITLE_marshal := Marshal
 DOC_TITLE_marshal := "Marshal API Reference"
 
 # Targets
-DOC_C_MODULES := fmi marshal
+DOC_C_MODULES := marshal
 
 
 .PHONY: examples
