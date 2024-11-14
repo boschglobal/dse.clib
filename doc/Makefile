@@ -32,14 +32,21 @@ DOC_OUTPUT_marshal := doc/content/apis/clib/marshal/index.md
 DOC_LINKTITLE_marshal := Marshal
 DOC_TITLE_marshal := "Marshal API Reference"
 
+# Module "mdf"
+DOC_INPUT_mdf := dse/clib/mdf/mdf.h
+DOC_CDIR_mdf := dse/clib/mdf/mdf.c
+DOC_OUTPUT_mdf := doc/content/apis/clib/mdf/index.md
+DOC_LINKTITLE_mdf := Mdf
+DOC_TITLE_mdf := "Mdf API Reference"
+
 # Targets
-DOC_C_MODULES := marshal
+DOC_C_MODULES := marshal mdf
 
 
 .PHONY: examples
 examples:
 	cd ..;mkdir -p doc/content/apis/clib/examples
-	cd ..;cp dse/clib/fmi/examples/fmu/counter/counter.c doc/content/apis/clib/examples/counter.c
+	cd ..;cp dse/clib/mdf/examples/mdf_file/mdf_file.c doc/content/apis/clib/examples/mdf_file.c
 
 .PHONY: index
 index:

@@ -31,6 +31,7 @@ run:
 	cd build/_out; $(GDB_CMD) bin/test_data
 	cd build/_out; $(GDB_CMD) bin/test_functional
 	$(GDB_CMD) build/_out/bin/test_util
+	$(GDB_CMD) build/_out/bin/test_mdf
 
 clean:
 	rm -rf build

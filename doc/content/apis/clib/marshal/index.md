@@ -2,37 +2,6 @@
 title: Marshal API Reference
 linkTitle: Marshal
 ---
-## marshal_generate_signalmap
-
-
-Creates a signal map between signals (i.e. the external signal
-interface) and the source (i.e. the internal interface to the target).
-
-### Parameters
-
-signal (MarshalMapSpec)
-: A map spec for the signals to be mapped (i.e. the representation of
-the signal interface).
-
-source (MarshalMapSpec)
-: A map spec for the source values to be mapped (i.e. the representation
-of the target).
-
-ex_signals (SimpleSet*)
-: A set used to keep track of signals between calls (to this function)
-and prevent duplicate mappings.
-
-is_binary (bool)
-: The signal map represents binary signals (i.e. `signal` and `source`
-are binary signals).
-
-### Returns
-
-MarshalSignalMap
-: A MarshalSignalMap object.
-
-
-
 ## Marshal API
 
 
@@ -95,6 +64,37 @@ type (MarshalType*)
 
 size_t
 : The size of the type (in bytes).
+
+
+
+## marshal_generate_signalmap
+
+
+Creates a signal map between signals (i.e. the external signal
+interface) and the source (i.e. the internal interface to the target).
+
+### Parameters
+
+signal (MarshalMapSpec)
+: A map spec for the signals to be mapped (i.e. the representation of
+the signal interface).
+
+source (MarshalMapSpec)
+: A map spec for the source values to be mapped (i.e. the representation
+of the target).
+
+ex_signals (SimpleSet*)
+: A set used to keep track of signals between calls (to this function)
+and prevent duplicate mappings.
+
+is_binary (bool)
+: The signal map represents binary signals (i.e. `signal` and `source`
+are binary signals).
+
+### Returns
+
+MarshalSignalMap
+: A MarshalSignalMap object.
 
 
 
