@@ -560,7 +560,7 @@ marshal_signalmap_out
 
 Marshal a `MarshalSignalMap` outwards (towards the marshal target).
 
-    Signal -[marshal_signalmap_out()]-> Source -> Target
+Signal -[marshal_signalmap_out()]-> Source -> Target
 
 Parameters
 ----------
@@ -617,7 +617,7 @@ marshal_signalmap_in
 
 Marshal a `MarshalGroup` inwards (from the marshal target).
 
-    Signal <-[marshal_signalmap_in()]- Source -> Target
+Signal <-[marshal_signalmap_in()]- Source -> Target
 
 Parameters
 ----------

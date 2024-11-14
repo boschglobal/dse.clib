@@ -20,7 +20,7 @@ externally defined data structures (i.e. C style structs).
 
 <div hidden>
 
-```
+```plantuml
 @startuml data-marshal-interface
 
 skinparam nodesep 55
@@ -46,7 +46,7 @@ center footer Dynamic Simulation Environment
 
 </div>
 
-![](data-marshal-interface.png)
+![data-marshal-interface](data-marshal-interface.png)
 
 
 
@@ -210,7 +210,7 @@ map (MarshalSignalMap*)
 
 Marshal a `MarshalGroup` inwards (from the marshal target).
 
-    Signal <-[marshal_signalmap_in()]- Source -> Target
+Signal <-[marshal_signalmap_in()]- Source -> Target
 
 #### Parameters
 
@@ -224,7 +224,7 @@ map (MarshalSignalMap*)
 
 Marshal a `MarshalSignalMap` outwards (towards the marshal target).
 
-    Signal -[marshal_signalmap_out()]-> Source -> Target
+Signal -[marshal_signalmap_out()]-> Source -> Target
 
 #### Parameters
 

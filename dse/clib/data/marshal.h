@@ -30,7 +30,7 @@ Component Diagram
 -----------------
 <div hidden>
 
-```
+```plantuml
 @startuml data-marshal-interface
 
 skinparam nodesep 55
@@ -56,7 +56,7 @@ center footer Dynamic Simulation Environment
 
 </div>
 
-![](data-marshal-interface.png)
+![data-marshal-interface](data-marshal-interface.png)
 */
 
 
