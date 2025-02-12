@@ -50,30 +50,121 @@ center footer Dynamic Simulation Environment
 
 
 
-## marshal_type_size
+## Typedefs
 
+### MarshalGroup
 
-Return the size of a `MarshalType` (in bytes).
+```c
+typedef struct MarshalGroup {
+    char* name;
+    int count;
+    MarshalKind kind;
+    MarshalDir dir;
+    MarshalType type;
+    struct {
+        uint32_t* ref;
+        struct {
+            int32_t* _int32;
+            uint64_t* _uint64;
+            double* _double;
+            char** _string;
+            void** _binary;
+            void* ptr;
+        } _binary_len;
+    } target;
+    struct {
+        int offset;
+        struct {
+            double* scalar;
+            void** binary;
+        } binary_len;
+    } source;
+    struct {
+        MarshalStringEncode* string_encode;
+        MarshalStringDecode* string_decode;
+    } functions;
+    uint64_t [4] __reserved__;
+}
+```
 
-### Parameters
+### MarshalMapSpec
 
-type (MarshalType*)
-: A marshal type.
+```c
+typedef struct MarshalMapSpec {
+    const char* name;
+    int count;
+    bool is_binary;
+    const char** signal;
+    struct {
+        double* scalar;
+        void** binary;
+    } binary_len;
+    uint32_t* binary_buffer_size;
+    uint64_t [4] __reserved__;
+}
+```
 
-### Returns
+### MarshalSignalMap
 
-size_t
-: The size of the type (in bytes).
+```c
+typedef struct MarshalSignalMap {
+    char* name;
+    int count;
+    bool is_binary;
+    struct {
+        int* index;
+        struct {
+            double* scalar;
+            void** binary;
+        } binary_len;
+        uint32_t* binary_buffer_size;
+    } signal;
+    struct {
+        int* index;
+        struct {
+            double* scalar;
+            void** binary;
+        } binary_len;
+    } source;
+    uint64_t [4] __reserved__;
+}
+```
 
+### MarshalStruct
 
+```c
+typedef struct MarshalStruct {
+    char* name;
+    int count;
+    void* handle;
+    MarshalKind kind;
+    MarshalDir dir;
+    struct {
+        MarshalType* type;
+        int* offset;
+        int* length;
+    } target;
+    struct {
+        int* index;
+        void** pdata;
+        struct {
+            double* scalar;
+            void** binary;
+        } binary_len;
+        uint32_t* binary_buffer_size;
+    } source;
+    uint64_t [4] __reserved__;
+}
+```
 
-## marshal_generate_signalmap
+## Functions
 
+### marshal_generate_signalmap
 
 Creates a signal map between signals (i.e. the external signal
 interface) and the source (i.e. the internal interface to the target).
 
-### Parameters
+#### Parameters
 
 signal (MarshalMapSpec)
 : A map spec for the signals to be mapped (i.e. the representation of
@@ -91,74 +182,12 @@ is_binary (bool)
 : The signal map represents binary signals (i.e. `signal` and `source`
 are binary signals).
 
-### Returns
+#### Returns
 
 MarshalSignalMap
 : A MarshalSignalMap object.
 
 
-
-## Typedefs
-
-### MarshalGroup
-
-```c
-typedef struct MarshalGroup {
-    char* name;
-    int count;
-    MarshalKind kind;
-    MarshalDir dir;
-    MarshalType type;
-    struct (anonymous struct at dse/clib/data/marshal.h:133:5) target;
-    struct (anonymous struct at dse/clib/data/marshal.h:148:5) source;
-    struct (anonymous struct at dse/clib/data/marshal.h:160:5) functions;
-    uint64_t [4] __reserved__;
-}
-```
-
-### MarshalMapSpec
-
-```c
-typedef struct MarshalMapSpec {
-    const char* name;
-    int count;
-    bool is_binary;
-    const char** signal;
-    uint32_t* binary_len;
-    uint32_t* binary_buffer_size;
-    uint64_t [4] __reserved__;
-}
-```
-
-### MarshalSignalMap
-
-```c
-typedef struct MarshalSignalMap {
-    char* name;
-    int count;
-    bool is_binary;
-    struct (anonymous struct at dse/clib/data/marshal.h:227:5) signal;
-    struct (anonymous struct at dse/clib/data/marshal.h:239:5) source;
-    uint64_t [4] __reserved__;
-}
-```
-
-### MarshalStruct
-
-```c
-typedef struct MarshalStruct {
-    char* name;
-    int count;
-    void* handle;
-    MarshalKind kind;
-    MarshalDir dir;
-    struct (anonymous struct at dse/clib/data/marshal.h:179:5) target;
-    struct (anonymous struct at dse/clib/data/marshal.h:186:5) source;
-    uint64_t [4] __reserved__;
-}
-```
-
-## Functions
 
 ### marshal_group_destroy
 
@@ -231,6 +260,22 @@ Signal -[marshal_signalmap_out()]-> Source -> Target
 map (MarshalSignalMap*)
 : A MarshalSignalMap list (Null-Terminated-List, indicated by member
 `name`).
+
+
+
+### marshal_type_size
+
+Return the size of a `MarshalType` (in bytes).
+
+#### Parameters
+
+type (MarshalType*)
+: A marshal type.
+
+#### Returns
+
+size_t
+: The size of the type (in bytes).
 
 
 

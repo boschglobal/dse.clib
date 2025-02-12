@@ -59,7 +59,10 @@ typedef struct MdfChannelGroup {
 typedef struct MdfDesc {
     FILE* file;
     size_t offset;
-    struct (anonymous struct at dse/clib/mdf/mdf.h:77:5) channel;
+    struct {
+        MdfChannelGroup* list;
+        size_t count;
+    } channel;
 }
 ```
 
