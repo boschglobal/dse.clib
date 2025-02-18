@@ -63,7 +63,7 @@ void write_data_record(MdfDesc* mdf, MdfChannelGroup* group, double* timestamp)
 }
 
 
-inline int calculate_fulfilment(const int tx_size, const int base)
+static int calculate_fulfilment(const int tx_size, const int base)
 {
     int remainder = tx_size % base;
     return (remainder != 0) ? (base - remainder) : 0;
@@ -161,7 +161,7 @@ static int _fwrite_block(MdfDesc* mdf, void* block, const size_t size)
 }
 
 
-inline char* _strdup_aligned(const char* txt, size_t* size)
+static char* _strdup_aligned(const char* txt, size_t* size)
 {
     *size = strlen(txt) + 1;
     *size += calculate_fulfilment(*size, 8);
