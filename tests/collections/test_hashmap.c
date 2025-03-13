@@ -103,3 +103,36 @@ void test_hash_destroy_ext_with_callback(void** state)
     assert_non_null(hashmap_get(&cb_tracker, "hello bar"));
     hashmap_destroy(&cb_tracker);
 }
+
+void test_hash_by_uint32(void** state)
+{
+    UNUSED(state);
+
+    #define KEY_42 "42"
+    #define KEY_56 "56"
+    #define KEY_78 "78"
+
+    HashMap h;
+    hashmap_init(&h);
+
+    hashmap_set(&h, KEY_42, (void*)strdup(KEY_42));
+    hashmap_set(&h, KEY_56, (void*)strdup(KEY_56));
+    hashmap_set(&h, KEY_78, (void*)strdup(KEY_78));
+    assert_int_equal(hashmap_number_keys(h), 3);
+
+    assert_non_null(hashmap_get(&h, KEY_42));
+    assert_non_null(hashmap_get(&h, KEY_56));
+    assert_non_null(hashmap_get(&h, KEY_78));
+    assert_non_null(hashmap_get_by_uint32(&h, 42));
+    assert_non_null(hashmap_get_by_uint32(&h, 56));
+    assert_non_null(hashmap_get_by_uint32(&h, 78));
+
+    assert_string_equal(hashmap_get(&h, KEY_42), KEY_42);
+    assert_string_equal(hashmap_get_by_uint32(&h, 42), KEY_42);
+    assert_string_equal(hashmap_get(&h, KEY_56), KEY_56);
+    assert_string_equal(hashmap_get_by_uint32(&h, 56), KEY_56);
+    assert_string_equal(hashmap_get(&h, KEY_78), KEY_78);
+    assert_string_equal(hashmap_get_by_uint32(&h, 78), KEY_78);
+
+    hashmap_destroy_ext(&h, NULL, NULL);
+}

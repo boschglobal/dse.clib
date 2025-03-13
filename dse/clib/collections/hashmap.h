@@ -98,6 +98,7 @@ DLL_PUBLIC void* hashmap_set_alt(HashMap* h, const char* key, void* value);
 
 /* Returns the pointer to the value of the found key, or NULL if not found */
 DLL_PUBLIC void* hashmap_get(HashMap* h, const char* key);
+DLL_PUBLIC void* hashmap_get_by_uint32(HashMap* h, uint32_t key);
 
 /*  Removes a key from the hashmap. NULL will be returned if it is not present.
     If it is designated to be cleaned up, the memory will be free'd and NULL

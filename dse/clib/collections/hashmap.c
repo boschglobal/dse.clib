@@ -101,6 +101,31 @@ void* hashmap_get(HashMap* h, const char* key)
     return __get_node(h, key, hash, &i, &e);
 }
 
+void* hashmap_get_by_uint32(HashMap* h, uint32_t key)
+{
+    // Perform itoa().
+    #define HASH_UINT32_KEY_LEN (10 + 1)
+    char k[HASH_UINT32_KEY_LEN] = "";
+    char r[HASH_UINT32_KEY_LEN] = "";
+    char *kp = k;
+    char *rp = r;
+    while (key || rp == r) {
+        int i = key % 10;
+        key /= 10;
+        *rp++ = i+'0';
+    }
+    while (rp > r) {
+        *kp++ = *--rp;
+    }
+    *kp++ = 0;
+
+    // Get the value.
+    uint64_t i, hash = h->hash_function(k);
+    int      e;
+    i = hash % h->number_nodes;
+    return __get_node(h, k, hash, &i, &e);
+}
+
 void* hashmap_remove(HashMap* h, const char* key)
 {
     uint64_t i, hash = h->hash_function(key);
