@@ -61,6 +61,8 @@ void hashmap_destroy(HashMap* h)
 {
     hashmap_clear(h);
     free(h->nodes);
+    h->nodes = NULL;
+    h->number_nodes = 0;
     h->used_nodes = 0;
     h->hash_function = NULL;
 }
