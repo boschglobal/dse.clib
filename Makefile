@@ -122,7 +122,7 @@ super-linter:
 		--env RUN_LOCAL=true \
 		--env DEFAULT_BRANCH=main \
 		--env IGNORE_GITIGNORED_FILES=true \
-		--env FILTER_REGEX_EXCLUDE="(dse/clib/fmi/fmi2/headers/.*|dse/clib/fmi/fmi3/headers/.*)" \
+		--env FILTER_REGEX_EXCLUDE="(dse/clib/fmi/fmi2/headers/.*|dse/clib/fmi/fmi3/headers/.*|dse/clib/data/xxhash.h)" \
 		--env VALIDATE_CPP=true \
 		--env VALIDATE_DOCKERFILE=true \
 		--env VALIDATE_MARKDOWN=true \
