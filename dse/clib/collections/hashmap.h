@@ -91,14 +91,18 @@ DLL_PUBLIC void hashmap_clear(HashMap* h);
     pointer to the new value. Returns NULL if there is an error. */
 DLL_PUBLIC void* hashmap_set(HashMap* h, const char* key, void* value);
 
+DLL_PRIVATE void* hashmap_set_by_hash64(
+    HashMap* h, const char* key, uint64_t hash, void* value, int16_t mallocd);
+
 /*  Adds the key to the hashmap or updates the key if already present. Also
     signals to the system to do a simple 'free' command on the value on
     destruction. */
 DLL_PUBLIC void* hashmap_set_alt(HashMap* h, const char* key, void* value);
 
 /* Returns the pointer to the value of the found key, or NULL if not found */
-DLL_PUBLIC void* hashmap_get(HashMap* h, const char* key);
-DLL_PUBLIC void* hashmap_get_by_uint32(HashMap* h, uint32_t key);
+DLL_PUBLIC void*  hashmap_get(HashMap* h, const char* key);
+DLL_PRIVATE void* hashmap_get_node(
+    HashMap* h, const char* key, uint64_t hash, uint64_t* i, int* error);
 
 /*  Removes a key from the hashmap. NULL will be returned if it is not present.
     If it is designated to be cleaned up, the memory will be free'd and NULL
@@ -146,6 +150,63 @@ DLL_PUBLIC float hashmap_get_fullness(HashMap* h);
 /* Perform iteration on the hashmap */
 DLL_PUBLIC int hashmap_iterator(HashMap* map, HashMapIterateFunc iter_func,
     bool continue_on_error, void* additional_data);
+
+
+#define HASH_UINT32_KEY_LEN (10 + 1)
+
+static __inline__ char* itoa_in_buffer(char* k, uint32_t key)
+{
+    char* kp = &k[HASH_UINT32_KEY_LEN - 1];
+    while (key || kp == &k[HASH_UINT32_KEY_LEN - 1]) {
+        int i = key % 10;
+        key /= 10;
+        *--kp = i + '0';
+    }
+    return kp;
+}
+
+static __inline__ void* hashmap_get_by_uint32(HashMap* h, uint32_t key)
+{
+    char     buf[HASH_UINT32_KEY_LEN] = { 0 };
+    char*    k = itoa_in_buffer(buf, key);
+    uint64_t i, hash = h->hash_function(k);
+    int      e;
+    i = hash % h->number_nodes;
+    return hashmap_get_node(h, k, hash, &i, &e);
+}
+
+
+static __inline__ void* hashmap_get_by_hash32(HashMap* h, uint32_t hash32)
+{
+    char     buf[HASH_UINT32_KEY_LEN] = { 0 };
+    char*    k = itoa_in_buffer(buf, hash32);
+    uint64_t i;
+    uint64_t hash = (uint64_t)hash32 || ((uint64_t)hash32 << 32);
+    int      e;
+    i = hash % h->number_nodes;
+    return hashmap_get_node(h, k, hash, &i, &e);
+}
+
+
+static __inline__ void* hashmap_set_by_hash32(
+    HashMap* h, uint32_t hash32, void* value)
+{
+    char     buf[HASH_UINT32_KEY_LEN] = { 0 };
+    char*    k = itoa_in_buffer(buf, hash32);
+    uint64_t hash = (uint64_t)hash32 || ((uint64_t)hash32 << 32);
+    return hashmap_set_by_hash64(h, k, hash, value, -1);
+}
+
+
+static __inline__ void* hashmap_set_alt_by_hash32(
+    HashMap* h, uint32_t hash32, void* value)
+{
+    char     buf[HASH_UINT32_KEY_LEN] = { 0 };
+    char*    k = itoa_in_buffer(buf, hash32);
+    uint64_t hash = (uint64_t)hash32 || ((uint64_t)hash32 << 32);
+    return hashmap_set_by_hash64(h, k, hash, value, 0);
+}
+
 
 #ifdef __cplusplus
 }  // extern "C"
