@@ -165,13 +165,14 @@ static __inline__ char* itoa_in_buffer(char* k, uint32_t key)
     return kp;
 }
 
+
 static __inline__ void* hashmap_get_by_uint32(HashMap* h, uint32_t key)
 {
     char     buf[HASH_UINT32_KEY_LEN] = { 0 };
     char*    k = itoa_in_buffer(buf, key);
-    uint64_t i, hash = h->hash_function(k);
+    uint64_t hash = h->hash_function(k);
     int      e;
-    i = hash % h->number_nodes;
+    uint64_t i = hash % h->number_nodes;
     return hashmap_get_node(h, k, hash, &i, &e);
 }
 
@@ -180,10 +181,9 @@ static __inline__ void* hashmap_get_by_hash32(HashMap* h, uint32_t hash32)
 {
     char     buf[HASH_UINT32_KEY_LEN] = { 0 };
     char*    k = itoa_in_buffer(buf, hash32);
-    uint64_t i;
-    uint64_t hash = (uint64_t)hash32 || ((uint64_t)hash32 << 32);
+    uint64_t hash = (uint64_t)hash32 | ((uint64_t)hash32 << 32);
     int      e;
-    i = hash % h->number_nodes;
+    uint64_t i = hash % h->number_nodes;
     return hashmap_get_node(h, k, hash, &i, &e);
 }
 
@@ -193,7 +193,7 @@ static __inline__ void* hashmap_set_by_hash32(
 {
     char     buf[HASH_UINT32_KEY_LEN] = { 0 };
     char*    k = itoa_in_buffer(buf, hash32);
-    uint64_t hash = (uint64_t)hash32 || ((uint64_t)hash32 << 32);
+    uint64_t hash = (uint64_t)hash32 | ((uint64_t)hash32 << 32);
     return hashmap_set_by_hash64(h, k, hash, value, -1);
 }
 
@@ -203,7 +203,7 @@ static __inline__ void* hashmap_set_alt_by_hash32(
 {
     char     buf[HASH_UINT32_KEY_LEN] = { 0 };
     char*    k = itoa_in_buffer(buf, hash32);
-    uint64_t hash = (uint64_t)hash32 || ((uint64_t)hash32 << 32);
+    uint64_t hash = (uint64_t)hash32 | ((uint64_t)hash32 << 32);
     return hashmap_set_by_hash64(h, k, hash, value, 0);
 }
 

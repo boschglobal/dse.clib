@@ -320,13 +320,11 @@ void* hashmap_get_node(
 {
     *error = 0;  // no errors
     uint64_t idx = *i = hash % h->number_nodes;
-    size_t   len = strlen(key);
     while (1) {
         if (h->nodes[*i] == NULL) {  // not found
             return NULL;
         } else if (h->nodes[*i]->hash == hash &&
-                   len == strlen(h->nodes[*i]->key) &&
-                   strncmp(key, h->nodes[*i]->key, len) == 0) {
+                   strcmp(key, h->nodes[*i]->key) == 0) {
             return h->nodes[*i]->value;
         } else {
             // lets see if we need to continue or if we have already gone all
