@@ -17,7 +17,7 @@ export PACKAGE_ARCH ?= linux-amd64
 export PACKAGE_ARCH_LIST ?= $(PACKAGE_ARCH)
 export CMAKE_TOOLCHAIN_FILE ?= $(shell pwd -P)/extra/cmake/$(PACKAGE_ARCH).cmake
 SRC_DIR = $(NAMESPACE)/$(MODULE)
-SUBDIRS = extra/external $(SRC_DIR)/mdf/examples
+SUBDIRS = extra/external $(SRC_DIR)/examples
 
 
 ###############
