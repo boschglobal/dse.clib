@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#ifndef DSE_CLIB_EXAMPLES_INTERCEPTOR_TARGET_TARGET_H_
+#define DSE_CLIB_EXAMPLES_INTERCEPTOR_TARGET_TARGET_H_
+
 #include <stdint.h>
 #include <dse/platform.h>
 
@@ -48,3 +51,5 @@ DLL_PUBLIC void fb_call_bar(void);
 DLL_PUBLIC void task_init(void);
 DLL_PUBLIC void task_5ms(void);
 DLL_PUBLIC void task_exit(void);
+
+#endif  // DSE_CLIB_EXAMPLES_INTERCEPTOR_TARGET_TARGET_H_

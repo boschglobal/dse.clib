@@ -11,7 +11,7 @@ A Function Block is considered to have the following semantic:
 
 and the Interceptor Library attempts to install hooks to modify the data flow as follows:
 
->  DATA_IN -> hook_in() -> Call() -> hook_out() -> DATA_OUT
+> DATA_IN -> hook_in() -> Call() -> hook_out() -> DATA_OUT
 
 Hook functions modify the related data blocks such that the Call() operates on
 an altered data state. For this method to work the Call() function must only
@@ -19,13 +19,13 @@ reference stateful data from the known/specified data blocks.
 
 
 Methods evaluated:
-  * __Wrap__ - call() functions are replaced with functions which operate the in/out
-    hooks as well as calling the original call() function. The runtime/consumer
-    provides the wrap functions. <br>See examples in the `wrap` folder.
-  * __Hook__ - call() functions are boxed with in/out weak linked function calls.
-    The runtime/consumer provides the hook functions. <br>See examples in the
-    `hook` folder.
-  * __ELF Hooking__ - (not proven) see https://lief.re/doc/latest/tutorials/04_elf_hooking.html
+* __Wrap__ - call() functions are replaced with functions which operate the in/out
+  hooks as well as calling the original call() function. The runtime/consumer
+  provides the wrap functions. <br>See examples in the `wrap` folder.
+* __Hook__ - call() functions are boxed with in/out weak linked function calls.
+  The runtime/consumer provides the hook functions. <br>See examples in the
+  `hook` folder.
+* __ELF Hooking__ - (not proven) see [ELF Hooking](https://lief.re/doc/latest/tutorials/04_elf_hooking.html)
 
 
 ## Build

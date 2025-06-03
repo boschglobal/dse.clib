@@ -39,14 +39,22 @@ DOC_OUTPUT_mdf := doc/content/apis/clib/mdf/index.md
 DOC_LINKTITLE_mdf := Mdf
 DOC_TITLE_mdf := "Mdf API Reference"
 
+# Module "schedule"
+DOC_INPUT_schedule := dse/clib/schedule/schedule.h
+DOC_CDIR_schedule := dse/clib/schedule/schedule.c
+DOC_OUTPUT_schedule := doc/content/apis/clib/schedule/index.md
+DOC_LINKTITLE_schedule := Schedule
+DOC_TITLE_schedule := "Schedule API Reference"
+
 # Targets
-DOC_C_MODULES := marshal mdf
+DOC_C_MODULES := marshal mdf schedule
 
 
 .PHONY: examples
 examples:
 	cd ..;mkdir -p doc/content/apis/clib/examples
-	cd ..;cp dse/clib/mdf/examples/mdf_file/mdf_file.c doc/content/apis/clib/examples/mdf_file.c
+	cd ..;cp dse/clib/examples/mdf_file/mdf_file.c doc/content/apis/clib/examples/mdf_file.c
+	cd ..;cp dse/clib/examples/schedule/schedule.c doc/content/apis/clib/examples/schedule.c
 
 .PHONY: index
 index:

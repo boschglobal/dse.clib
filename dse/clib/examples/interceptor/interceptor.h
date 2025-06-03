@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#ifndef DSE_CLIB_EXAMPLES_INTERCEPTOR_INTERCEPTOR_H_
+#define DSE_CLIB_EXAMPLES_INTERCEPTOR_INTERCEPTOR_H_
+
 #include <stddef.h>
 
 
@@ -32,3 +35,5 @@ typedef struct FunctionalBlock {
     FunctionalBlockInterface in;
     FunctionalBlockInterface out;
 } FunctionalBlock;
+
+#endif  // DSE_CLIB_EXAMPLES_INTERCEPTOR_INTERCEPTOR_H_
