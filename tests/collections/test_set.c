@@ -52,3 +52,13 @@ void test_set(void** state)
     set_destroy(&setc);
     set_destroy(&setd);
 }
+
+
+int run_set_tests(void)
+{
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_set),
+    };
+
+    return cmocka_run_group_tests_name("SET", tests, NULL, NULL);
+}

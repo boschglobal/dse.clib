@@ -3,31 +3,26 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <dse/testing.h>
+#include <dse/logger.h>
 
 
-void test_hash_iterator(void** state);
-void test_hash_destroy_ext_mallocd_0(void** state);
-void test_hash_destroy_ext_mallocd_1(void** state);
-void test_hash_destroy_ext_with_callback(void** state);
-void test_hash_by_uint32(void** state);
-void test_hash_by_hash32(void** state);
-void test_set(void** state);
-void test_hashlist(void** state);
-void test_hashlist_ntl(void** state);
+uint8_t __log_level__ = LOG_ERROR; /* LOG_ERROR LOG_INFO LOG_DEBUG LOG_TRACE */
+
+
+extern int run_hashmap_tests(void);
+extern int run_hashlist_tests(void);
+extern int run_set_tests(void);
+extern int run_sortedlist_tests(void);
+
 
 int main()
 {
-    const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_hash_iterator),
-        cmocka_unit_test(test_hash_destroy_ext_mallocd_0),
-        cmocka_unit_test(test_hash_destroy_ext_mallocd_1),
-        cmocka_unit_test(test_hash_destroy_ext_with_callback),
-        cmocka_unit_test(test_hash_by_uint32),
-        cmocka_unit_test(test_hash_by_hash32),
-        cmocka_unit_test(test_set),
-        cmocka_unit_test(test_hashlist),
-        cmocka_unit_test(test_hashlist_ntl),
-    };
+    __log_level__ = LOG_QUIET;
 
-    return cmocka_run_group_tests(tests, NULL, NULL);
+    int rc = 0;
+    rc |= run_hashmap_tests();
+    rc |= run_hashlist_tests();
+    rc |= run_set_tests();
+    rc |= run_sortedlist_tests();
+    return rc;
 }

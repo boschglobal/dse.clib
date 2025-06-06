@@ -108,9 +108,9 @@ void test_hash_by_uint32(void** state)
 {
     UNUSED(state);
 
-    #define KEY_42 "42"
-    #define KEY_56 "56"
-    #define KEY_78 "78"
+#define KEY_42 "42"
+#define KEY_56 "56"
+#define KEY_78 "78"
 
     HashMap h;
     hashmap_init(&h);
@@ -142,9 +142,9 @@ void test_hash_by_hash32(void** state)
 {
     UNUSED(state);
 
-    #define KEY_42 "42"
-    #define KEY_56 "56"
-    #define KEY_78 "78"
+#define KEY_42 "42"
+#define KEY_56 "56"
+#define KEY_78 "78"
 
     HashMap h;
     hashmap_init(&h);
@@ -167,4 +167,19 @@ void test_hash_by_hash32(void** state)
     assert_string_equal(hashmap_get_by_hash32(&h, 78), KEY_78);
 
     hashmap_destroy_ext(&h, NULL, NULL);
+}
+
+
+int run_hashmap_tests(void)
+{
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_hash_iterator),
+        cmocka_unit_test(test_hash_destroy_ext_mallocd_0),
+        cmocka_unit_test(test_hash_destroy_ext_mallocd_1),
+        cmocka_unit_test(test_hash_destroy_ext_with_callback),
+        cmocka_unit_test(test_hash_by_uint32),
+        cmocka_unit_test(test_hash_by_hash32),
+    };
+
+    return cmocka_run_group_tests_name("HASHMAP", tests, NULL, NULL);
 }

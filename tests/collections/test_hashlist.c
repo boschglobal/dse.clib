@@ -38,8 +38,8 @@ void test_hashlist_ntl(void** state)
 
     NamedObject* foo = malloc(sizeof(NamedObject));
     NamedObject* bar = malloc(sizeof(NamedObject));
-    *foo = (NamedObject) { .name = "foo" };
-    *bar = (NamedObject) { .name = "bar" };
+    *foo = (NamedObject){ .name = "foo" };
+    *bar = (NamedObject){ .name = "bar" };
 
     HashList h;
     hashlist_init(&h, 2);
@@ -61,4 +61,15 @@ void test_hashlist_ntl(void** state)
     assert_string_equal(ntl[1].name, "bar");
     assert_null(ntl[2].name);
     free(ntl);
+}
+
+
+int run_hashlist_tests(void)
+{
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_hashlist),
+        cmocka_unit_test(test_hashlist_ntl),
+    };
+
+    return cmocka_run_group_tests_name("HASHLIST", tests, NULL, NULL);
 }
