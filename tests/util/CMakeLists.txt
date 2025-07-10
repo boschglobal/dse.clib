@@ -18,9 +18,11 @@ add_executable(test_util
     __test__.c
     test_binary.c
     test_yaml.c
+    test_ascii85.c
 
     ${DSE_CLIB_SOURCE_DIR}/util/binary.c
     ${DSE_CLIB_SOURCE_DIR}/util/yaml.c
+    ${DSE_CLIB_SOURCE_DIR}/util/ascii85.c
     ${DSE_CLIB_SOURCE_DIR}/collections/hashmap.c
 )
 target_include_directories(test_util
@@ -32,6 +34,7 @@ target_link_libraries(test_util
     PRIVATE
         cmocka
         yaml
+        m
 #        -Wl,--wrap=strdup
 )
 set(YAML_EXAMPLE_RESOURCE_FILES
