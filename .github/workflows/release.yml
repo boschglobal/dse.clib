@@ -1,7 +1,7 @@
 ---
 name: Release
 
-on:
+on:  # yamllint disable-line rule:truthy
   release:
     types: [published]
 
@@ -9,7 +9,7 @@ permissions:
   contents: read
   pull-requests: read
   packages: write
-  
+
 jobs:
   add_gomod_tags:
     runs-on: ubuntu-latest
@@ -17,7 +17,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Get Release Tag
         id: get_tag
         run: |
