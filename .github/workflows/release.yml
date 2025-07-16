@@ -1,0 +1,31 @@
+---
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  pull-requests: read
+  packages: write
+  
+jobs:
+  add_gomod_tags:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get Release Tag
+        id: get_tag
+        run: |
+          echo "::set-output name=tag_name::${GITHUB_REF#refs/tags/}"
+
+      - name: Add Go Module Tags
+        run: |
+          git tag -a extra/go/ast/${{ steps.get_tag.outputs.tag_name }} -m "${{ steps.get_tag.outputs.tag_name }}"
+          git tag -a extra/go/command/${{ steps.get_tag.outputs.tag_name }} -m "${{ steps.get_tag.outputs.tag_name }}"
+          git tag -a extra/go/file/${{ steps.get_tag.outputs.tag_name }} -m "${{ steps.get_tag.outputs.tag_name }}"
+          git push --follow-tags
