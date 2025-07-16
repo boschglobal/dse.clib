@@ -1,6 +1,7 @@
 // Copyright 2024 Robert Bosch GmbH
 
 #include <stdint.h>
+#include <stdio.h>
 #include <dse/clib/mdf/mdf.h>
 
 #define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))

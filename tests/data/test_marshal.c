@@ -488,7 +488,7 @@ void test_marshal_group__binary(void** state)
                         assert_string_equal(mg->source.binary[t->offset + i],
                             t->condition.source.binary[i]);
                         assert_int_equal(mg->source.binary_len[t->offset + i],
-                            strlen(t->condition.target.string[i]) + 1);
+                            strlen(t->condition.target.string[i]) + 1); // NOLINT
                         break;
                     case MARSHAL_TYPE_BINARY:
                         log_trace("index %d: condition %s <- %s (%d)", i,

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stdio.h>
 #include <yaml.h>
 #include <dse/testing.h>
 #include <dse/clib/util/yaml.h>
