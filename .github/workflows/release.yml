@@ -19,13 +19,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Get Release Tag
-        id: get_tag
         run: |
-          echo "::set-output name=tag_name::${GITHUB_REF#refs/tags/}"
+          echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Add Go Module Tags
         run: |
-          git tag -a extra/go/ast/${{ steps.get_tag.outputs.tag_name }} -m "${{ steps.get_tag.outputs.tag_name }}"
-          git tag -a extra/go/command/${{ steps.get_tag.outputs.tag_name }} -m "${{ steps.get_tag.outputs.tag_name }}"
-          git tag -a extra/go/file/${{ steps.get_tag.outputs.tag_name }} -m "${{ steps.get_tag.outputs.tag_name }}"
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a -f -m "${{ env.TAG_NAME }}" extra/go/ast/${{ env.TAG_NAME }}
+          git tag -a -f -m "${{ env.TAG_NAME }}" extra/go/command/${{ env.TAG_NAME }}
+          git tag -a -f -m "${{ env.TAG_NAME }}" extra/go/file/${{ env.TAG_NAME }}
           git push --follow-tags
