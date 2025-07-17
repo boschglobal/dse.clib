@@ -24,9 +24,11 @@ jobs:
 
       - name: Add Go Module Tags
         run: |
-          git config user.name "${{ github.ref }}"
-          git config user.email "${{ github.ref }}@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
           git tag -a -f -m "${{ env.TAG_NAME }}" extra/go/ast/${{ env.TAG_NAME }}
           git tag -a -f -m "${{ env.TAG_NAME }}" extra/go/command/${{ env.TAG_NAME }}
           git tag -a -f -m "${{ env.TAG_NAME }}" extra/go/file/${{ env.TAG_NAME }}
-          git push --follow-tags HEAD:main
+          git push origin tag extra/go/ast/${{ env.TAG_NAME }}
+          git push origin tag extra/go/command/${{ env.TAG_NAME }}
+          git push origin tag extra/go/file/${{ env.TAG_NAME }}
