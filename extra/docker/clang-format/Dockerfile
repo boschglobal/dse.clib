@@ -41,14 +41,14 @@ RUN apt-get -y update; \
 # Setup CLang Format
 # ==================
 RUN curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - ; \
-    add-apt-repository "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-13 main"; \
+    add-apt-repository "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-20 main"; \
     apt-get -y update; \
     apt-get -y install --no-install-recommends \
-        clang-format-13 \
+        clang-format-20 \
     && \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*; \
-    ln -s /usr/bin/clang-format-13 /usr/bin/clang-format
+    ln -s /usr/bin/clang-format-20 /usr/bin/clang-format
 
 COPY clang-format /usr/local/etc/clang-format
 COPY format.sh /usr/local/bin/format.sh

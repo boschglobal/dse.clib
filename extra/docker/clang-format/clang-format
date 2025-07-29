@@ -21,3 +21,5 @@ ReferenceAlignment: Right
 SortIncludes: false
 SpacesBeforeTrailingComments: 2
 Standard: c++03
+
+LambdaBodyIndentation: Signature
