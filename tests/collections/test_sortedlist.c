@@ -11,14 +11,14 @@
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 
-int test_setup(void** state)
+static int test_setup(void** state)
 {
     UNUSED(state);
     return 0;
 }
 
 
-int test_teardown(void** state)
+static int test_teardown(void** state)
 {
     UNUSED(state);
     return 0;

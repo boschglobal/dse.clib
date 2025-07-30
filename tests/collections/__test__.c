@@ -13,6 +13,7 @@ extern int run_hashmap_tests(void);
 extern int run_hashlist_tests(void);
 extern int run_set_tests(void);
 extern int run_sortedlist_tests(void);
+extern int run_vector_tests(void);
 
 
 int main()
@@ -24,5 +25,6 @@ int main()
     rc |= run_hashlist_tests();
     rc |= run_set_tests();
     rc |= run_sortedlist_tests();
+    rc |= run_vector_tests();
     return rc;
 }

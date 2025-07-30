@@ -16,6 +16,7 @@ add_executable(test_collections
     test_set.c
     test_hashlist.c
     test_sortedlist.c
+    test_vector.c
 
     ${DSE_CLIB_SOURCE_DIR}/collections/hashmap.c
     ${DSE_CLIB_SOURCE_DIR}/collections/set.c
