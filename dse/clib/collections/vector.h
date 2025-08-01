@@ -23,6 +23,7 @@ typedef struct Vector {
         VectorCompar compar;
     } vtable;
     size_t capacity;
+    size_t initial_capacity;
     size_t length;
     size_t item_size;
     void*  items;
@@ -35,6 +36,7 @@ static __inline__ int __vector_resize(Vector* v, size_t hint)
         free(v->items);
         v->items = NULL;
         v->capacity = 0;
+        v->length = 0;
     } else if (hint > v->length) {
         if (v->items == NULL) {
             v->items = calloc(hint, v->item_size);
@@ -58,6 +60,7 @@ static __inline__ Vector vector_make(
     Vector v = {
         .item_size = item_size,
         .capacity = capacity ? capacity : VECTOR_DEFAULT_CAPACITY,
+        .initial_capacity = capacity ? capacity : VECTOR_DEFAULT_CAPACITY,
         .vtable.compar = compar_func,
     };
     __vector_resize(&v, v.capacity);
@@ -72,7 +75,11 @@ static __inline__ size_t vector_len(Vector* v)
 static __inline__ int vector_push(Vector* v, void* item)
 {
     if (v == NULL) return -EINVAL;
-    if (v->length == v->capacity) __vector_resize(v, v->capacity * 2);
+    if (v->capacity == 0) {
+        __vector_resize(v, v->initial_capacity);
+    } else if (v->length == v->capacity) {
+        __vector_resize(v, v->capacity * 2);
+    }
     v->length += 1;
     if (item) {
         size_t offset = (v->length - 1) * v->item_size;
@@ -125,14 +132,14 @@ static __inline__ int vector_sort(Vector* v)
     return 0;
 }
 
-static __inline__ int vector_find(
+static __inline__ void* vector_find(
     Vector* v, void* key, size_t start, void* item)
 {
-    if (v == NULL) return -EINVAL;
-    if (key == NULL) return -EINVAL;
-    if (v->length == 0 || v->items == NULL) return -ENODATA;
-    if (v->vtable.compar == NULL) return -EINVAL;
-    if (start >= v->length) return -EINVAL;
+    if (v == NULL) return NULL;
+    if (key == NULL) return NULL;
+    if (v->length == 0 || v->items == NULL) return NULL;
+    if (v->vtable.compar == NULL) return NULL;
+    if (start >= v->length) return NULL;
     size_t offset = start * v->item_size;
     void*  result = bsearch(key, v->items + offset, v->length - start,
          v->item_size, v->vtable.compar);
@@ -140,9 +147,9 @@ static __inline__ int vector_find(
         if (item) {
             memcpy(item, result, v->item_size);
         }
-        return 0;
+        return result;
     } else {
-        return 1;
+        return NULL;
     }
 }
 
@@ -168,10 +175,18 @@ static __inline__ int vector_range(Vector* v, void* from_key, void* to_key,
     return 0;
 }
 
-static __inline__ void vector_clear(Vector* v, size_t capacity)
+static __inline__ void vector_clear(Vector* v)
 {
     if (v == NULL) return;
-    __vector_resize(v, capacity);
+    if (v->items == NULL) return;
+    memset(v->items, 0, v->capacity * v->item_size);
+    v->length = 0;
+}
+
+static __inline__ void vector_reset(Vector* v)
+{
+    if (v == NULL) return;
+    __vector_resize(v, 0);
 }
 
 

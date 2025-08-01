@@ -8,7 +8,7 @@
 #include <dse/clib/collections/vector.h>
 
 
-#define UNUSED(x)     ((void)x)
+#define UNUSED(x) ((void)x)
 
 
 static int test_setup(void** state)
@@ -51,16 +51,17 @@ void test_vector__make_clear(void** state)
     assert_null(vector_at(NULL, 0, NULL));
     assert_int_equal(-EINVAL, vector_delete_at(NULL, 0));
     assert_int_equal(-EINVAL, vector_sort(NULL));
-    assert_int_equal(-EINVAL, vector_find(NULL, NULL, 0, NULL));
+    assert_null(vector_find(NULL, NULL, 0, NULL));
     assert_int_equal(-EINVAL, vector_range(NULL, NULL, NULL, NULL, NULL));
-    vector_clear(NULL, 0);
+    vector_clear(NULL);
+    vector_reset(NULL);
 
     // Make default capacity.
     v = vector_make(sizeof(VectorItem), 0, NULL);
     assert_int_equal(v.capacity, 64);
     assert_int_equal(v.item_size, sizeof(VectorItem));
     assert_non_null(v.items);
-    vector_clear(&v, 0);
+    vector_reset(&v);
     assert_int_equal(v.capacity, 0);
     assert_null(v.items);
 
@@ -69,7 +70,7 @@ void test_vector__make_clear(void** state)
     assert_int_equal(v.capacity, 4);
     assert_int_equal(v.item_size, sizeof(VectorItem));
     assert_non_null(v.items);
-    vector_clear(&v, 0);
+    vector_reset(&v);
     assert_int_equal(v.capacity, 0);
     assert_null(v.items);
 
@@ -81,13 +82,14 @@ void test_vector__make_clear(void** state)
     assert_int_equal(v.capacity, 0);
     assert_int_equal(v.item_size, sizeof(VectorItem));
     assert_null(v.items);
-    vector_clear(&v, 4);
-    assert_int_equal(v.capacity, 4);
-    assert_non_null(v.items);
-    vector_clear(&v, 2);
-    assert_int_equal(v.capacity, 2);
-    assert_non_null(v.items);
-    vector_clear(&v, 0);
+    vector_clear(&v);
+    assert_int_equal(v.capacity, 0);
+    assert_int_equal(v.length, 0);
+    assert_null(v.items);
+    vector_reset(&v);
+    assert_int_equal(v.capacity, 0);
+    assert_int_equal(v.length, 0);
+    assert_null(v.items);
 }
 
 void test_vector__push_pop(void** state)
@@ -121,7 +123,8 @@ void test_vector__push_pop(void** state)
     assert_int_equal(1, vi.key);  // Previous value, check returns!.
     assert_int_equal(0, vector_len(&v));
     assert_int_equal(4, v.capacity);
-    vector_clear(&v, 0);
+    vector_reset(&v);
+
 
     // NULL items.
     v = vector_make(sizeof(VectorItem), 2, NULL);
@@ -132,7 +135,30 @@ void test_vector__push_pop(void** state)
     assert_int_equal(0, vector_pop(&v, NULL));
     assert_int_equal(0, vector_len(&v));
     assert_int_equal(2, v.capacity);
-    vector_clear(&v, 0);
+    vector_reset(&v);
+
+
+    // PUSH and clear/reset.
+    v = vector_make(sizeof(VectorItem), 2, NULL);
+    assert_int_equal(2, v.capacity);
+    assert_int_equal(0, vector_len(&v));
+
+    // PUSH PULL with resize.
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 1, .data = 11 }));
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 2, .data = 22 }));
+    assert_int_equal(2, v.capacity);
+    assert_int_equal(2, vector_len(&v));
+    vector_clear(&v);
+    assert_int_equal(2, v.capacity);
+    assert_int_equal(0, vector_len(&v));
+    vector_reset(&v);
+    assert_int_equal(0, v.capacity);
+    assert_int_equal(0, vector_len(&v));
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 1, .data = 11 }));
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 2, .data = 22 }));
+    assert_int_equal(2, v.capacity);
+    assert_int_equal(2, vector_len(&v));
+    vector_reset(&v);
 }
 
 void test_vector__at(void** state)
@@ -164,7 +190,7 @@ void test_vector__at(void** state)
 
     assert_null(vector_at(&v, 3, NULL));
 
-    vector_clear(&v, 0);
+    vector_reset(&v);
 }
 
 void test_vector__sort_find(void** state)
@@ -192,20 +218,22 @@ void test_vector__sort_find(void** state)
     assert_null(vector_at(&v, 3, NULL));
 
     // Find.
-    assert_int_equal(0, vector_find(&v, &(VectorItem){ .key = 1 }, 0, &vi));
+    assert_non_null(vector_find(&v, &(VectorItem){ .key = 1 }, 0, &vi));
     assert_int_equal(1, vi.key);
-    assert_int_equal(0, vector_find(&v, &(VectorItem){ .key = 2 }, 0, &vi));
+    VectorItem* vi_p = vector_find(&v, &(VectorItem){ .key = 1 }, 0, NULL);
+    assert_non_null(vi_p);
+    assert_int_equal(1, vi_p->key);
+    assert_non_null(vector_find(&v, &(VectorItem){ .key = 2 }, 0, &vi));
     assert_int_equal(2, vi.key);
-    assert_int_equal(0, vector_find(&v, &(VectorItem){ .key = 3 }, 0, &vi));
+    assert_non_null(vector_find(&v, &(VectorItem){ .key = 3 }, 0, &vi));
     assert_int_equal(3, vi.key);
-    assert_int_equal(1, vector_find(&v, &(VectorItem){ .key = 4 }, 0, &vi));
+    assert_null(vector_find(&v, &(VectorItem){ .key = 4 }, 0, &vi));
     assert_int_equal(3, vi.key);
-    assert_int_equal(1, vector_find(&v, &(VectorItem){ .key = 1 }, 1, &vi));
-    assert_int_equal(1, vector_find(&v, &(VectorItem){ .key = 2 }, 2, &vi));
-    assert_int_equal(
-        -EINVAL, vector_find(&v, &(VectorItem){ .key = 3 }, 3, &vi));
+    assert_null(vector_find(&v, &(VectorItem){ .key = 1 }, 1, &vi));
+    assert_null(vector_find(&v, &(VectorItem){ .key = 2 }, 2, &vi));
+    assert_null(vector_find(&v, &(VectorItem){ .key = 3 }, 3, &vi));
 
-    vector_clear(&v, 0);
+    vector_reset(&v);
 }
 
 int RangeCallback(void* item, void* data)
@@ -271,7 +299,7 @@ void test_vector__range(void** state)
                &(VectorItem){ .key = 3 }, RangeCallbackv22, &range_counter));
     assert_int_equal(0, range_counter);
 
-    vector_clear(&v, 0);
+    vector_reset(&v);
 }
 
 void test_vector__delete_at(void** state)
@@ -307,7 +335,7 @@ void test_vector__delete_at(void** state)
     assert_int_equal(-ENODATA, vector_delete_at(&v, 0));
     assert_int_equal(0, vector_len(&v));
 
-    vector_clear(&v, 0);
+    vector_reset(&v);
 }
 
 
