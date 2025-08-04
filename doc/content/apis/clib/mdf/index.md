@@ -1,6 +1,6 @@
 ---
-title: Mdf API Reference
-linkTitle: Mdf
+title: MDF API Reference
+linkTitle: MDF
 ---
 ## MDF API
 
@@ -70,7 +70,7 @@ typedef struct MdfDesc {
 
 ### mdf_create
 
-Create and configure an `MdfDesc` object to represet an MDF stream.
+Create and configure an `MdfDesc` object to represent an MDF stream.
 
 #### Parameters
 

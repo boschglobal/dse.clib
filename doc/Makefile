@@ -36,8 +36,15 @@ DOC_TITLE_marshal := "Marshal API Reference"
 DOC_INPUT_mdf := dse/clib/mdf/mdf.h
 DOC_CDIR_mdf := dse/clib/mdf/mdf.c
 DOC_OUTPUT_mdf := doc/content/apis/clib/mdf/index.md
-DOC_LINKTITLE_mdf := Mdf
-DOC_TITLE_mdf := "Mdf API Reference"
+DOC_LINKTITLE_mdf := MDF
+DOC_TITLE_mdf := "MDF API Reference"
+
+# Module "ini"
+DOC_INPUT_ini := dse/clib/ini/ini.h
+DOC_CDIR_ini := dse/clib/ini/ini.c
+DOC_OUTPUT_ini := doc/content/apis/clib/ini/index.md
+DOC_LINKTITLE_ini := INI File
+DOC_TITLE_ini := "INI FIle API Reference"
 
 # Module "schedule"
 DOC_INPUT_schedule := dse/clib/schedule/schedule.h
@@ -47,13 +54,14 @@ DOC_LINKTITLE_schedule := Schedule
 DOC_TITLE_schedule := "Schedule API Reference"
 
 # Targets
-DOC_C_MODULES := marshal mdf schedule
+DOC_C_MODULES := marshal mdf ini schedule
 
 
 .PHONY: examples
 examples:
 	cd ..;mkdir -p doc/content/apis/clib/examples
 	cd ..;cp dse/clib/examples/mdf_file/mdf_file.c doc/content/apis/clib/examples/mdf_file.c
+	cd ..;cp dse/clib/examples/ini_file/ini_file.c doc/content/apis/clib/examples/ini_file.c
 	cd ..;cp dse/clib/examples/schedule/schedule.c doc/content/apis/clib/examples/schedule.c
 
 .PHONY: index

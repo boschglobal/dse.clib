@@ -420,7 +420,7 @@ static int _write_data_block(MdfDesc* mdf)
 mdf_create
 ==========
 
-Create and configure an `MdfDesc` object to represet an MDF stream.
+Create and configure an `MdfDesc` object to represent an MDF stream.
 
 Parameters
 ----------

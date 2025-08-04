@@ -53,7 +53,7 @@ void test_vector__make_clear(void** state)
     assert_int_equal(-EINVAL, vector_sort(NULL));
     assert_null(vector_find(NULL, NULL, 0, NULL));
     assert_int_equal(-EINVAL, vector_range(NULL, NULL, NULL, NULL, NULL));
-    vector_clear(NULL);
+    vector_clear(NULL, NULL, NULL);
     vector_reset(NULL);
 
     // Make default capacity.
@@ -82,7 +82,7 @@ void test_vector__make_clear(void** state)
     assert_int_equal(v.capacity, 0);
     assert_int_equal(v.item_size, sizeof(VectorItem));
     assert_null(v.items);
-    vector_clear(&v);
+    vector_clear(&v, NULL, NULL);
     assert_int_equal(v.capacity, 0);
     assert_int_equal(v.length, 0);
     assert_null(v.items);
@@ -148,7 +148,7 @@ void test_vector__push_pop(void** state)
     assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 2, .data = 22 }));
     assert_int_equal(2, v.capacity);
     assert_int_equal(2, vector_len(&v));
-    vector_clear(&v);
+    vector_clear(&v, NULL, NULL);
     assert_int_equal(2, v.capacity);
     assert_int_equal(0, vector_len(&v));
     vector_reset(&v);

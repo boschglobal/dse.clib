@@ -16,6 +16,7 @@
 typedef struct Vector Vector;
 typedef int (*VectorCompar)(const void*, const void*);
 typedef int (*VectorRangeCallback)(void* item, void* data);
+typedef void (*VectorItemDestroy)(void* item, void* data);
 
 
 typedef struct Vector {
@@ -111,6 +112,17 @@ static __inline__ void* vector_at(Vector* v, size_t index, void* item)
     return v->items + offset;
 }
 
+static __inline__ void* vector_set_at(Vector* v, size_t index, void* item)
+{
+    if (v == NULL || v->items == NULL) return NULL;
+    if (index >= v->length) return NULL;
+    size_t offset = index * v->item_size;
+    if (item) {
+        memcpy(v->items + offset, item, v->item_size);
+    }
+    return v->items + offset;
+}
+
 static __inline__ int vector_delete_at(Vector* v, size_t index)
 {
     if (v == NULL) return -EINVAL;
@@ -175,10 +187,17 @@ static __inline__ int vector_range(Vector* v, void* from_key, void* to_key,
     return 0;
 }
 
-static __inline__ void vector_clear(Vector* v)
+static __inline__ void vector_clear(
+    Vector* v, VectorItemDestroy func, void* data)
 {
     if (v == NULL) return;
     if (v->items == NULL) return;
+    if (func) {
+        for (size_t i = 0; i < v->length; i++) {
+            void* item = v->items + (i * v->item_size);
+            func(item, data);
+        }
+    }
     memset(v->items, 0, v->capacity * v->item_size);
     v->length = 0;
 }
