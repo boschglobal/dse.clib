@@ -3,7 +3,7 @@ module github.com/boschglobal/dse.clib/extra/go/command
 go 1.23.4
 
 require (
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
