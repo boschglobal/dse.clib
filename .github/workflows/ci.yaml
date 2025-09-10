@@ -34,11 +34,11 @@ jobs:
       image: ghcr.io/boschglobal/dse-gcc-builder:main
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Build package metadata
         id: package_meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: dse/clib
           tags: |
@@ -69,7 +69,7 @@ jobs:
     needs: []
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Test
         run: |
