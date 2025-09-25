@@ -3,7 +3,7 @@ module github.com/boschglobal/dse.clib/extra/go/file
 go 1.23.5
 
 require (
-	github.com/boschglobal/dse.schemas/code/go/dse v1.2.24
+	github.com/boschglobal/dse.schemas/code/go/dse v1.2.25
 	gopkg.in/yaml.v3 v3.0.1
 )
 
