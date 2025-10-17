@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-FROM debian:bullseye-slim AS builder
+FROM debian:bookworm-slim AS builder
 
 
 # =========================
@@ -69,7 +69,7 @@ RUN curl -fSL "${FLATCC_ARCHIVE_BASE_URL}/${FLATCC_ARCHIVE_TAG}.tar.gz" -o flatc
 # =========================
 # Construct the final image
 # =========================
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 
 # Setup basic tools
