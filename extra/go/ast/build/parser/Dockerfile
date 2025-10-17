@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-FROM golang:bullseye AS builder
+FROM golang:bookworm AS builder
 ADD . /src
 RUN cd /src && make build
 
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 LABEL maintainer="timothy.rule@de.bosch.com"
 
 RUN set -eux; \

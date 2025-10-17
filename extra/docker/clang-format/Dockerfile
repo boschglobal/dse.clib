@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 LABEL maintainer="timothy.rule@de.bosch.com"
 
 # Usage Notes
@@ -41,7 +41,7 @@ RUN apt-get -y update; \
 # Setup CLang Format
 # ==================
 RUN curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - ; \
-    add-apt-repository "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-20 main"; \
+    add-apt-repository "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-20 main"; \
     apt-get -y update; \
     apt-get -y install --no-install-recommends \
         clang-format-20 \

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-FROM debian:bullseye-slim AS base
+FROM debian:bookworm-slim AS base
 LABEL maintainer="timothy.rule@de.bosch.com"
 
 
