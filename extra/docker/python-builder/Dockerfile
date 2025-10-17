@@ -1,12 +1,14 @@
-FROM python:3.8.12-slim-bookworm
+FROM python:3.11-slim-bookworm
 LABEL maintainer="timothy.rule@de.bosch.com"
 
 
 # Setup basic tools
 # =================
-RUN apt-get -y update; \
-    apt-get -y upgrade; \
-    apt-get -y install --no-install-recommends \
+RUN set -eux; \
+    dpkg --add-architecture i386; \
+    apt-get update; \
+    apt-get upgrade; \
+    apt-get install -y --no-install-recommends \
         build-essential \
         ca-certificates \
         cargo \
@@ -15,14 +17,17 @@ RUN apt-get -y update; \
         git \
         gnupg \
         less \
+        libc6-dbg \
+        libc6-dbg:i386 \
         lsb-release \
         make \
         python3-dev \
         redis-tools \
         unzip \
         valgrind \
+        wget \
         zip \
-    && \
+    ; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
 
@@ -35,11 +40,12 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Python Libraries
 # ================
-RUN pip install --upgrade pip; pip install \
+RUN set -eux; \
+    pip install --upgrade pip; pip install \
         aiodocker \
-        flatbuffers==1.12 \
-        grpcio==1.37.1 \
-        grpcio-tools==1.37.1 \
+        flatbuffers \
+        grpcio \
+        grpcio-tools \
         msgpack \
         numpy \
         pip-licenses \
@@ -49,7 +55,7 @@ RUN pip install --upgrade pip; pip install \
         redis \
         twine \
         wheel \
-    && \
+    ; \
     pip list; pip-licenses
 
 
@@ -58,19 +64,14 @@ RUN pip install --upgrade pip; pip install \
 COPY pip.conf /etc/pip.conf
 
 
-# Docker CLI
-# ==========
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
-    && \
-    echo\
-        "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
-        https://download.docker.com/linux/debian \
-        $(lsb_release -cs) stable" \
-        | tee /etc/apt/sources.list.d/docker.list > /dev/null
-RUN apt-get -y update; \
-    apt-get -y upgrade; \
-    apt-get -y install --no-install-recommends \
-        docker-ce-cli \
-    && \
-    apt-get clean; \
-    rm -rf /var/lib/apt/lists/*
+# Install Valgrind 3.25.1
+# =======================
+RUN set -eux; \
+    wget https://sourceware.org/pub/valgrind/valgrind-3.25.1.tar.bz2; \
+    tar -xjf valgrind-3.25.1.tar.bz2; \
+    cd valgrind-3.25.1; \
+    ./configure --prefix=/usr; \
+    make; \
+    make install; \
+    cd .. ; \
+    rm -rf valgrind-3.25.1 valgrind-3.25.1.tar.bz2

@@ -14,7 +14,8 @@ FROM debian:bookworm-slim AS builder
 
 # Setup basic GCC and CMAKE toolchains
 # ====================================
-RUN apt-get -y update; \
+RUN set -eux; \
+    apt-get -y update; \
     apt-get -y upgrade; \
     apt-get -y install --no-install-recommends \
         binutils \
@@ -27,7 +28,7 @@ RUN apt-get -y update; \
         git \
         less \
         make \
-    && \
+    ; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
 
@@ -36,10 +37,11 @@ RUN apt-get -y update; \
 # ================
 # https://github.com/google/flatbuffers/archive/refs/tags/v2.0.0.tar.gz
 ARG FLATBUFFERS_ARCHIVE_BASE_URL="https://github.com/google/flatbuffers/archive/refs/tags"
-ARG FLATBUFFERS_ARCHIVE_TAG="v22.10.26"
+ARG FLATBUFFERS_ARCHIVE_TAG="v25.9.23"
 ARG FLATBUFFERS_BUILD_TYPE="Release"
 
-RUN curl -fSL "${FLATBUFFERS_ARCHIVE_BASE_URL}/${FLATBUFFERS_ARCHIVE_TAG}.tar.gz" -o flatbuffers.tar.gz \
+RUN set -eux; \
+    curl -fSL "${FLATBUFFERS_ARCHIVE_BASE_URL}/${FLATBUFFERS_ARCHIVE_TAG}.tar.gz" -o flatbuffers.tar.gz \
     && tar xzf flatbuffers.tar.gz \
     && cd flatbuffers-* \
     && cmake -G "Unix Makefiles"  \
@@ -58,7 +60,8 @@ RUN curl -fSL "${FLATBUFFERS_ARCHIVE_BASE_URL}/${FLATBUFFERS_ARCHIVE_TAG}.tar.gz
 ARG FLATCC_ARCHIVE_BASE_URL="https://github.com/dvidelabs/flatcc/archive/refs/tags"
 ARG FLATCC_ARCHIVE_TAG="v0.6.1"
 
-RUN curl -fSL "${FLATCC_ARCHIVE_BASE_URL}/${FLATCC_ARCHIVE_TAG}.tar.gz" -o flatcc.tar.gz \
+RUN set -eux; \
+    curl -fSL "${FLATCC_ARCHIVE_BASE_URL}/${FLATCC_ARCHIVE_TAG}.tar.gz" -o flatcc.tar.gz \
     && tar xzf flatcc.tar.gz \
     && mv flatcc-* flatcc \
     && cd flatcc \
@@ -74,7 +77,8 @@ FROM debian:bookworm-slim
 
 # Setup basic tools
 # =================
-RUN apt-get -y update; \
+RUN set -eux; \
+    apt-get -y update; \
     apt-get -y upgrade; \
     apt-get -y install --no-install-recommends \
         build-essential \
@@ -85,7 +89,7 @@ RUN apt-get -y update; \
         libmsgpack-dev \
         make \
         zip \
-    && \
+    ; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
 
@@ -112,6 +116,3 @@ RUN tar xzf flatcc.tar.gz \
     && mkdir -p /usr/local/src \
     && mv flatcc-* /usr/local/src/flatcc \
     && rm flatcc.tar.gz
-
-
-# CMD ["/bin/bash", "-c", "tail /dev/null -f"]
