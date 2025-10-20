@@ -8,8 +8,8 @@
 
 void mdf_api_example(void)
 {
-    const char*     signal[] = { "SigA", "SigB", "SigC", "SigD" };
-    double          scalar[] = { 0, 1, 2, 3 };
+    const char* signal[] = { "SigA", "SigB", "SigC", "SigD" };
+    double      scalar[] = { 0, 1, 2, 3 };
 
     // Configure the MDF Channel Groups.
     MdfChannelGroup groups[] = {
