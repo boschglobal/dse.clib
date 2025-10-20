@@ -52,12 +52,12 @@ int test_mdf_setup(void** state)
     memcpy(signal_b, temp_signal_a, 4 * sizeof(char*));
     memcpy(scalar_b, temp_scalar_a, 4 * sizeof(double));
 
-    MdfChannelGroup groups[] = {
-        {
-            .name = "Physical",
-            .signal = signal_a,
-            .scalar = scalar_a,
-            .count = ARRAY_SIZE(temp_signal_a),                                 },
+    MdfChannelGroup groups[] = { {
+                                     .name = "Physical",
+                                     .signal = signal_a,
+                                     .scalar = scalar_a,
+                                     .count = ARRAY_SIZE(temp_signal_a),
+                                 },
         {
             .name = "Logical",
             .signal = signal_b,

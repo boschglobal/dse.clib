@@ -24,13 +24,13 @@
  * perhaps other libs too). Therefore, rather than wrapping we can use the
  * preprocessor to swap strdup with this implementation in DSE code only.
  */
-static inline char *dse_strdup_swap(const char *s)
+static inline char* dse_strdup_swap(const char* s)
 {
     if (s == NULL) return NULL;
     size_t len = strlen(s) + 1;
-    void  *dup = malloc(len);
+    void*  dup = malloc(len);
     if (dup == NULL) return NULL;
-    return (char *)memcpy(dup, s, len);
+    return (char*)memcpy(dup, s, len);
 }
 #define strdup dse_strdup_swap
 

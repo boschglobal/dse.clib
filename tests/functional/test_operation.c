@@ -200,7 +200,7 @@ FunctorType str_dbl(void* object, void* reference)
     UNUSED(reference);
     char* a = (char*)object;
     log_trace("Map: str -> dbl(str) (%s )", a);
-    int len = (strlen(a) * 2) + 1;
+    int   len = (strlen(a) * 2) + 1;
     char* s = calloc(len, sizeof(char));
     snprintf(s, len, "%s%s", a, a);
     log_trace("Map: str -> dbl(str) (%s -> %s)", a, s);

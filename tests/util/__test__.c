@@ -16,7 +16,7 @@ extern int run_ascii85_tests(void);
 
 int main()
 {
-    __log_level__ = LOG_QUIET;//LOG_DEBUG;//LOG_QUIET;
+    __log_level__ = LOG_QUIET;  // LOG_DEBUG;//LOG_QUIET;
 
     int rc = 0;
     rc |= run_binary_tests();

@@ -10,7 +10,7 @@
 
 
 /**
- *  ascii85_encode
+ *  dse_ascii85_encode
  *
  *  Encode a binary string with ASCII85 encoding (to a null-terminated string).
  *
@@ -26,7 +26,7 @@
  *  -------
  *      char* : ASCII85 encoded string. Caller to free.
  */
-char* ascii85_encode(const char* source, size_t source_len)
+char* dse_ascii85_encode(const char* source, size_t source_len)
 {
     int required = (source_len + 3) / 4 * 5;
     int padding = (source_len % 4) ? 4 - (source_len % 4) : 0;
@@ -65,9 +65,10 @@ char* ascii85_encode(const char* source, size_t source_len)
 
 
 /**
- *  ascii85_decode
+ *  dse_ascii85_decode
  *
- *  Decode an ASCII85 encoded string into a binary string (may contain null characters).
+ *  Decode an ASCII85 encoded string into a binary string (may contain null
+ * characters).
  *
  *  Parameters
  *  ----------
@@ -81,7 +82,7 @@ char* ascii85_encode(const char* source, size_t source_len)
  *  -------
  *      char* : Binary string decoded from source. Caller to free.
  */
-char* ascii85_decode(const char* source, size_t* len)
+char* dse_ascii85_decode(const char* source, size_t* len)
 {
     /*
     Decode is 5 -> 4, or 1 -> 4 for 'z' case. Calculate parameters with

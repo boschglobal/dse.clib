@@ -32,17 +32,24 @@ PACKAGE_PATH = $(NAMESPACE)/dist
 
 
 ifneq ($(CI), true)
-	DOCKER_BUILDER_CMD := docker run -it --rm \
+DOCKER_BUILDER_CMD := \
+	mkdir -p $(EXTERNAL_BUILD_DIR); \
+	docker run -it --rm \
+		--user $$(id -u):$$(id -g) \
 		--env CMAKE_TOOLCHAIN_FILE=/tmp/repo/extra/cmake/$(PACKAGE_ARCH).cmake \
 		--env EXTERNAL_BUILD_DIR=$(EXTERNAL_BUILD_DIR) \
 		--env PACKAGE_ARCH=$(PACKAGE_ARCH) \
 		--env PACKAGE_VERSION=$(PACKAGE_VERSION) \
 		--volume $$(pwd):/tmp/repo \
 		--volume $(EXTERNAL_BUILD_DIR):$(EXTERNAL_BUILD_DIR) \
-		--volume ~/.ccache:/root/.ccache \
 		--workdir /tmp/repo \
 		$(GCC_BUILDER_IMAGE)
 endif
+
+DSE_CLANG_FORMAT_CMD := docker run -it --rm \
+	--user $$(id -u):$$(id -g) \
+	--volume $$(pwd):/tmp/code \
+	${DSE_CLANG_FORMAT_IMAGE}
 
 
 default: build
@@ -125,6 +132,18 @@ do-cleanall: do-clean
 do-oss:
 	$(MAKE) -C extra/external oss
 
+.PHONY: format
+format:
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/collections
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/examples
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/functional
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/ini
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/mdf
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/process
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/schedule
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/util
+	@${DSE_CLANG_FORMAT_CMD} tests/
+
 .PHONY: generate
 generate:
 	$(MAKE) -C doc generate
@@ -139,7 +158,7 @@ super-linter:
 		--env VALIDATE_DOCKERFILE=true \
 		--env VALIDATE_MARKDOWN=true \
 		--env VALIDATE_YAML=true \
-		ghcr.io/super-linter/super-linter:slim-v7
+		ghcr.io/super-linter/super-linter:slim-v8
 #		--env VALIDATE_GO=true \
 
 .PHONY: docker build test update clean cleanall oss super-linter \

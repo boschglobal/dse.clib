@@ -488,7 +488,8 @@ void test_marshal_group__binary(void** state)
                         assert_string_equal(mg->source.binary[t->offset + i],
                             t->condition.source.binary[i]);
                         assert_int_equal(mg->source.binary_len[t->offset + i],
-                            strlen(t->condition.target.string[i]) + 1); // NOLINT
+                            strlen(t->condition.target.string[i]) + // NOLINT
+                                1);
                         break;
                     case MARSHAL_TYPE_BINARY:
                         log_trace("index %d: condition %s <- %s (%d)", i,
@@ -975,7 +976,8 @@ void test_marshal__signalmap_binary_out(void** state)
                 assert_ptr_not_equal(tc[i].binary.signal.binary[j],
                     tc[i].binary.source.binary[j]);
                 assert_memory_equal(tc[i].binary.expected.binary[j],
-                    msm[0].source.binary[j], tc[i].binary.expected.binary_len[j]);
+                    msm[0].source.binary[j],
+                    tc[i].binary.expected.binary_len[j]);
             } else {
                 assert_null(tc[i].binary.signal.binary[j]);
             }

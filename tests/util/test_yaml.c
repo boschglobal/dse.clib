@@ -204,7 +204,7 @@ void test_yaml_get_bool(void** state)
         bool value;
 
         log_debug("Testing node: %s", tc[i].node);
-       // YamlNode* node = dse_yaml_find_node(doc, tc[i].node);
+        // YamlNode* node = dse_yaml_find_node(doc, tc[i].node);
         rc = dse_yaml_get_bool(doc, tc[i].node, &value);
         assert_int_equal(rc, tc[i].ex_rc);
         assert_int_equal(value, tc[i].ev_bool);

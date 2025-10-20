@@ -23,14 +23,14 @@
 #endif /* chdir */
 
 /* Path handling. */
-#define FILE_URI_SCHEME "file:///"
+#define FILE_URI_SCHEME       "file:///"
 #define FILE_URI_SHORT_SCHEME "file:"
 
 /* Clocks. */
-#define CLOCK_SOURCE CLOCK_MONOTONIC
+#define CLOCK_SOURCE          CLOCK_MONOTONIC
 
 
-#else // Linux
+#else  // Linux
 
 /* DLL Interface visibility. */
 #define DLL_PUBLIC  __attribute__((visibility("default")))
@@ -40,15 +40,14 @@
 #include <unistd.h>
 
 /* Path handling. */
-#define FILE_URI_SCHEME "file://"
+#define FILE_URI_SCHEME       "file://"
 #define FILE_URI_SHORT_SCHEME "file:"
 
 /* Clocks. */
-#define CLOCK_SOURCE CLOCK_MONOTONIC_RAW
+#define CLOCK_SOURCE          CLOCK_MONOTONIC_RAW
 
 
-
-#endif // _WIN32
+#endif  // _WIN32
 
 
 #endif  // DSE_PLATFORM_H_
