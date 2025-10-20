@@ -19,10 +19,11 @@ jobs:
     strategy:
       matrix:
         image:
-          - gcc-builder
-          - python-builder
           - clang-format
           - flatc-builder
+          - gcc-builder
+          - python-builder
+          - testscript
     steps:
       - name: Checkout
         uses: actions/checkout@v5
