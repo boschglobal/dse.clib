@@ -78,7 +78,7 @@ static inline void __log2console(
     va_start(args, format);
     vprintf(format, args);
     va_end(args);
-    if (level != LOG_NOTICE) printf(" (%s:%0d)", file, line);
+    if (level != LOG_NOTICE && file != NULL) printf(" (%s:%0d)", file, line);
     printf(LOG_COLOUR_NONE "\n");
     fflush(stdout);
 
