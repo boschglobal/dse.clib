@@ -35,6 +35,7 @@ RUN set -eux; \
     apt-get -y install --no-install-recommends \
         ca-certificates \
         curl \
+        gettext-base \
         git \
         gnupg \
         jq \
