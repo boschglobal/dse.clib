@@ -3,6 +3,9 @@ name: Docker
 
 on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
+  push:
+    paths:
+      - 'extra/docker/**'
 
 permissions:
   contents: read
