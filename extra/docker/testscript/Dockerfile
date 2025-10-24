@@ -77,3 +77,4 @@ COPY --from=go /usr/local/bin/task /usr/local/bin/task
 
 WORKDIR /repo
 ENTRYPOINT ["/usr/local/bin/testscript"]
+
