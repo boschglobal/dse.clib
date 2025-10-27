@@ -42,6 +42,7 @@ RUN set -eux; \
         less \
         lsb-release \
         make \
+        rsync \
         unzip \
         vim \
         zip \
