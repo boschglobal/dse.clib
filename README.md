@@ -52,7 +52,7 @@ Alternatively, the latest Docker Images are available on ghcr.io and can be
 used as follows:
 
 ```bash
-$ export GCC_BUILDER_IMAGE=ghcr.io/boschglobal/dse-gcc-builder:main
+$ export GCC_BUILDER_IMAGE=ghcr.io/boschglobal/dse-gcc-builder:latest
 ```
 
 
@@ -64,7 +64,7 @@ $ git clone https://github.com/boschglobal/dse.clib.git
 $ cd dse.clib
 
 # Optionally set builder images.
-$ export GCC_BUILDER_IMAGE=ghcr.io/boschglobal/dse-gcc-builder:main
+$ export GCC_BUILDER_IMAGE=ghcr.io/boschglobal/dse-gcc-builder:latest
 
 # Build (downloads dependencies needed for running tests).
 $ make

@@ -18,8 +18,6 @@ static int hash_iterator_func(void* map_item, void* additional_data)
     hashmap_remove(vh, value);
     return 0;
 }
-
-
 void test_hash_iterator(void** state)
 {
     UNUSED(state);
@@ -45,6 +43,29 @@ void test_hash_iterator(void** state)
     assert_int_equal(hashmap_number_keys((vh)), 0);
     hashmap_destroy(&h);
     hashmap_destroy(&vh);
+}
+
+
+static int hash_key_value_iterator_func(void* value, void* key)
+{
+    assert_string_equal((const char*)key, (const char*)value);
+    return 0;
+}
+void test_hash_key_value_iterator(void** state)
+{
+    UNUSED(state);
+
+    HashMap h;
+    hashmap_init(&h);
+    hashmap_set(&h, "foo", (void*)"foo");
+    hashmap_set(&h, "bar", (void*)"bar");
+    assert_int_equal(hashmap_number_keys(h), 2);
+
+    /* call iterator */
+    int rc = hashmap_iterator(&h, hash_key_value_iterator_func, true, NULL);
+    assert_int_equal(rc, 0);
+    assert_int_equal(hashmap_number_keys(h), 2);
+    hashmap_destroy(&h);
 }
 
 
@@ -174,6 +195,7 @@ int run_hashmap_tests(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_hash_iterator),
+        cmocka_unit_test(test_hash_key_value_iterator),
         cmocka_unit_test(test_hash_destroy_ext_mallocd_0),
         cmocka_unit_test(test_hash_destroy_ext_mallocd_1),
         cmocka_unit_test(test_hash_destroy_ext_with_callback),

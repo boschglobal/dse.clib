@@ -4,7 +4,7 @@
 
 ###############
 ## Docker Images.
-GCC_BUILDER_IMAGE ?= ghcr.io/boschglobal/dse-gcc-builder:main
+GCC_BUILDER_IMAGE ?= ghcr.io/boschglobal/dse-gcc-builder:latest
 DOCKER_DIRS = flatc-builder gcc-builder python-builder clang-format testscript
 GO_MOD_DIRS =  ast command file
 

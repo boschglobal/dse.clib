@@ -223,7 +223,7 @@ int hashmap_iterator(HashMap* map, HashMapIterateFunc iter_func,
 
     for (int i = 0; i < _keys_length; i++) {
         void* _map_item = hashmap_get(map, _keys[i]);
-        rc = iter_func(_map_item, additional_data);
+        rc = iter_func(_map_item, additional_data ? additional_data : _keys[i]);
         if (rc && (continue_on_error == false)) break;
     }
 
