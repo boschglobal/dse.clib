@@ -107,6 +107,12 @@ typedef struct AnonStruct {
     } innerStructName;
 } AnonStruct;
 
+typedef struct {
+    nested_type nestedFoo;
+    nested_type nestedbar;
+    int x;
+    int y;
+  } MyStruct2;
 
 int myFunction(int param1, int param2);
 

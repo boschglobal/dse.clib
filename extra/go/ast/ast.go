@@ -58,12 +58,15 @@ func (ast *Ast) Parse(idx *Index) {
 	Visitor := InnerVisitor{&visitForTypedef}
 	Visitor.Visit(ast.YamlRoot, idx)
 
-	// Then parse the structs.
-	visitForRecord := RecordDeclVisitor{TypeList: visitForTypedef.TypeList}
+	// Parse the structs.
+	visitForRecord := RecordDeclVisitor{
+		TypeList:         visitForTypedef.TypeList,
+		AnonymousStructs: visitForTypedef.AnonymousStructs,
+	}
 	Visitor = InnerVisitor{&visitForRecord}
 	Visitor.Visit(ast.YamlRoot, idx)
 
-	// Parse function (names only).
+	// Parse functions (names only).
 	visitForFunction := FunctionDeclVisitor{}
 	Visitor = InnerVisitor{&visitForFunction}
 	Visitor.Visit(ast.YamlRoot, idx)

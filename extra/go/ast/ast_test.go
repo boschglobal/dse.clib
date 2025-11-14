@@ -50,7 +50,7 @@ func TestLoad(t *testing.T) {
 	if ast.ClangCmdRC != 0 {
 		t.Errorf("Unexpected RC from Clang: %d", ast.ClangCmdRC)
 	}
-	name, ok := ast.YamlRoot["inner"].([]interface{})[7].(map[string]interface{})["name"]
+	name, ok := ast.YamlRoot["inner"].([]interface{})[9].(map[string]interface{})["name"]
 	if !ok {
 		t.Errorf("Error function not found in AST")
 	} else if name != "MyStruct" {
@@ -69,8 +69,8 @@ func TestParseAST(t *testing.T) {
 	md_doc := &Index{}
 	ast.Parse(md_doc)
 
-	if len(md_doc.Typedefs) != 2 {
-		t.Errorf("Unexpected error while parsing typedefs. Expected: 1 Found: %d", len(md_doc.Typedefs))
+	if len(md_doc.Typedefs) != 3 {
+		t.Errorf("Unexpected error while parsing typedefs. Expected: 3 Found: %d", len(md_doc.Typedefs))
 	}
 	if len(md_doc.Typedefs["MyStruct"]) != 2 {
 		t.Errorf("Unexpected error while parsing typedef fields. Expected: 2 Found: %d", len(md_doc.Typedefs["MyStruct"]))
@@ -207,8 +207,8 @@ func TestParseASTWithIncludeDirectory(t *testing.T) {
 	md_doc := &Index{}
 	ast.Parse(md_doc)
 
-	if len(md_doc.Typedefs) != 2 {
-		t.Errorf("Unexpected error while parsing typedefs. Expected: 1 Found: %d", len(md_doc.Typedefs))
+	if len(md_doc.Typedefs) != 4 {
+		t.Errorf("Unexpected error while parsing typedefs. Expected: 4 Found: %d", len(md_doc.Typedefs))
 	}
 	if len(md_doc.Typedefs["MyStruct"]) != 2 {
 		t.Errorf("Unexpected error while parsing typedef fields. Expected: 2 Found: %d", len(md_doc.Typedefs["MyStruct"]))
@@ -220,4 +220,44 @@ func TestParseASTWithIncludeDirectory(t *testing.T) {
 		}
 	}
 
+}
+
+func TestParseASTWithAnonymousTypedefStruct(t *testing.T) {
+	ast := Ast{
+		Path:       "test/testdata/header.h",
+		IncludeDir: []string{"test/testdata/dir"},
+	}
+	err := ast.Load()
+	if err != nil {
+		t.Errorf("Unexpected error.")
+	}
+	md_doc := &Index{}
+	ast.Parse(md_doc)
+
+	if len(md_doc.Typedefs) != 4 {
+		t.Errorf("Unexpected error while parsing typedefs. Expected: 4 Found: %d", len(md_doc.Typedefs))
+	}
+	// Validate the top-level typedef parsing.
+	val, ok := md_doc.Typedefs["MyStruct2"]
+	if !ok {
+		t.Errorf("Unexpected error while parsing typedefs. Expected 'MyStruct2', not found.")
+	}
+	if len(val) != 4 {
+		t.Errorf("Unexpected error while parsing typedef variables. Expected '4', Found %d", len(val))
+	}
+
+	// Validate the fields of AnonStruct.
+	if val[0].Name != "nestedFoo" || val[0].TypeName != "nested_type" {
+		t.Errorf("Unexpected error while parsing 'nestedFoo'. Expected 'nested_type nestedFoo', Found '%s %s'", val[0].TypeName, val[0].Name)
+	}
+	if val[1].Name != "nestedbar" || val[1].TypeName != "nested_type" {
+		t.Errorf("Unexpected error while parsing 'nestedbar'. Expected 'nested_type nestedbar', Found '%s %s'", val[1].TypeName, val[1].Name)
+	}
+
+	// Validate the first-level anonymous typedef.
+	val = md_doc.Typedefs["nested_type"]
+	// Validate the fields of AnonStruct
+	if val[0].Name != "counter" || val[0].TypeName != "int" {
+		t.Errorf("Unexpected error while parsing 'counter'. Expected 'int counter', Found '%s %s'", val[0].TypeName, val[0].Name)
+	}
 }

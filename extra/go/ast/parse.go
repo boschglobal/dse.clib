@@ -40,7 +40,8 @@ func (v FunctionDeclVisitor) Visit(node map[string]interface{}, idx *Index) {
 }
 
 type TypedefDeclVisitor struct {
-	TypeList []string
+	TypeList         []string
+	AnonymousStructs map[string]string // Maps RecordDecl ID to typedef name
 }
 
 func (v *TypedefDeclVisitor) Visit(node map[string]interface{}, idx *Index) {
@@ -50,14 +51,49 @@ func (v *TypedefDeclVisitor) Visit(node map[string]interface{}, idx *Index) {
 	}
 
 	name, nameOk := node["name"].(string)
-	if nameOk {
-		v.TypeList = append(v.TypeList, name)
+	if !nameOk {
+		return
+	}
+	v.TypeList = append(v.TypeList, name)
+
+	// Handle inline anonymous struct: typedef struct { ... } MyStruct;
+	inner, innerOk := node["inner"].([]interface{})
+	if !innerOk {
+		return
+	}
+	for _, innerItem := range inner {
+		innerItemMap, ok := innerItem.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		innerKind, innerKindOk := innerItemMap["kind"].(string)
+		if !innerKindOk || innerKind != "ElaboratedType" {
+			continue
+		}
+		ownedTagDecl, hasOwned := innerItemMap["ownedTagDecl"].(map[string]interface{})
+		if !hasOwned {
+			continue
+		}
+		declKind, _ := ownedTagDecl["kind"].(string)
+		declName, _ := ownedTagDecl["name"].(string)
+		if declKind != "RecordDecl" || declName != "" {
+			continue
+		}
+		declID, hasID := ownedTagDecl["id"].(string)
+		if !hasID {
+			continue
+		}
+		if v.AnonymousStructs == nil {
+			v.AnonymousStructs = make(map[string]string)
+		}
+		v.AnonymousStructs[declID] = name
 	}
 }
 
 type RecordDeclVisitor struct {
-	TypeList   []string
-	StructList []string
+	TypeList         []string
+	StructList       []string
+	AnonymousStructs map[string]string // Maps RecordDecl ID to typedef name
 }
 
 func (v RecordDeclVisitor) Visit(node map[string]interface{}, idx *Index) {
@@ -71,25 +107,47 @@ func (v RecordDeclVisitor) Visit(node map[string]interface{}, idx *Index) {
 	if !innerOk {
 		return
 	}
-	if nameOk {
+
+	// Named struct or typedef
+	if nameOk && name != "" {
+		// Record -> Typedef
 		if itemExists(v.TypeList, name) {
-			// Record -> Typedef
 			for _, innerItem := range inner {
-				if innerItemMap, innerItemOk := innerItem.(map[string]interface{}); innerItemOk {
-					v.processTypedefFieldDecl(name, innerItemMap, idx)
+				innerItemMap, innerItemOk := innerItem.(map[string]interface{})
+				if !innerItemOk {
+					continue
 				}
+				v.processTypedefFieldDecl(name, innerItemMap, idx)
 			}
-		} else {
-			// Record -> Struct
-			v.StructList = append(v.StructList, name)
-			for _, innerItem := range inner {
-				if innerItemMap, innerItemOk := innerItem.(map[string]interface{}); innerItemOk {
-					v.processStructFieldDecl(name, innerItemMap, idx)
-				}
-			}
+			return
 		}
-	} else {
+		// Record -> Struct
+		v.StructList = append(v.StructList, name)
+		for _, innerItem := range inner {
+			innerItemMap, innerItemOk := innerItem.(map[string]interface{})
+			if !innerItemOk {
+				continue
+			}
+			v.processStructFieldDecl(name, innerItemMap, idx)
+		}
 		return
+	}
+
+	// Anonymous struct typedef: typedef struct { ... } MyStruct;
+	nodeID, hasID := node["id"].(string)
+	if !hasID {
+		return
+	}
+	typedefName, isAnonymous := v.AnonymousStructs[nodeID]
+	if !isAnonymous {
+		return
+	}
+	for _, innerItem := range inner {
+		innerItemMap, innerItemOk := innerItem.(map[string]interface{})
+		if !innerItemOk {
+			continue
+		}
+		v.processTypedefFieldDecl(typedefName, innerItemMap, idx)
 	}
 }
 

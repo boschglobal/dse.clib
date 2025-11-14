@@ -22,4 +22,9 @@
 // Define your custom type using typedef
 typedef int MyInt;
 
+typedef struct /*TOOL_SCAN*/
+{
+  int counter;
+}nested_type;
+
 #endif // EXTRA_GO_AST_TEST_TESTDATA_DIR_INCLUDE_TEST_H_
