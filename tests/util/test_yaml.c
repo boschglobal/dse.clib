@@ -385,6 +385,61 @@ void test_yaml_duplicated_dict_entry(void** state)
 }
 
 
+static void _interpolate_envar(YamlNode* n)
+{
+    if (n && n->scalar) {
+        char* expanded = dse_yaml_expand_vars(n->scalar);
+        free(n->scalar);
+        n->scalar = expanded;
+    }
+}
+
+
+void test_yaml_interpolation(void** state)
+{
+    UNUSED(state);
+
+    const char* a = UINT_FILE;
+    YamlNode*   yaml_doc;
+    const char* value;
+    int         rc;
+    uint32_t    uint_value = 0;
+
+    yaml_doc = dse_yaml_load_single_doc(a);
+    assert_non_null(yaml_doc);
+
+    value = dse_yaml_get_scalar(yaml_doc, "bar2");
+    assert_string_equal("${BAR:-123}", value);
+
+    value = dse_yaml_get_scalar(yaml_doc, "foo2/foo3");
+    assert_string_equal("${FOO3:-42}", value);
+
+    /* Expected to fail, since its a string. */
+    rc = dse_yaml_get_uint(yaml_doc, "bar2", &uint_value);
+    assert_int_equal(rc, 22);
+
+    /* Environment variable interpolation test. */
+    yaml_doc->__inter__ = _interpolate_envar;
+    value = dse_yaml_get_scalar(yaml_doc, "bar2");
+    assert_string_equal("123", value);
+
+    value = dse_yaml_get_scalar(yaml_doc, "foo2/foo3");
+    assert_string_equal("42", value);
+
+    /* Reset, because interpolation is data mutilating. */
+    dse_yaml_destroy_node(yaml_doc);
+    yaml_doc = dse_yaml_load_single_doc(a);
+    yaml_doc->__inter__ = _interpolate_envar;
+
+    rc = dse_yaml_get_uint(yaml_doc, "bar2", &uint_value);
+    assert_int_equal(rc, 0);
+    assert_int_equal(uint_value, 123);
+
+    /* Cleanup. */
+    dse_yaml_destroy_node(yaml_doc);
+}
+
+
 int run_yaml_tests(void)
 {
     const struct CMUnitTest tests[] = {
@@ -401,6 +456,7 @@ int run_yaml_tests(void)
         cmocka_unit_test(test_yaml_get_string),
         cmocka_unit_test(test_yaml_get_parser),
         cmocka_unit_test(test_yaml_duplicated_dict_entry),
+        cmocka_unit_test(test_yaml_interpolation),
     };
 
     return cmocka_run_group_tests_name("YAML", tests, NULL, NULL);

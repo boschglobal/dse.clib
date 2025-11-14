@@ -11,3 +11,6 @@ a:
   - foo: 10
     bar: 20.2
 b: Y
+bar2: ${BAR:-123}
+foo2:
+  foo3: ${FOO3:-42}

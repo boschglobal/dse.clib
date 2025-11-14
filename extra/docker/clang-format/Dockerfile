@@ -45,7 +45,9 @@ RUN set -eux; \
 RUN set -eux; \
     wget https://apt.llvm.org/llvm.sh; \
     chmod +x llvm.sh; \
-    ./llvm.sh 20
+    ./llvm.sh 20; \
+    apt-get -y install clang-format-20; \
+    ln -s /usr/bin/clang-format-20 /usr/bin/clang-format
 
 COPY clang-format /usr/local/etc/clang-format
 COPY format.sh /usr/local/bin/format.sh
