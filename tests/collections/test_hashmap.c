@@ -62,7 +62,7 @@ void test_hash_key_value_iterator(void** state)
     assert_int_equal(hashmap_number_keys(h), 2);
 
     /* call iterator */
-    int rc = hashmap_iterator(&h, hash_key_value_iterator_func, true, NULL);
+    int rc = hashmap_kv_iterator(&h, hash_key_value_iterator_func, true);
     assert_int_equal(rc, 0);
     assert_int_equal(hashmap_number_keys(h), 2);
     hashmap_destroy(&h);

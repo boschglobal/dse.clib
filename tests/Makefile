@@ -27,13 +27,15 @@ build: external
 	@find build/_out/ -type f -name '*' -exec ls -sh --color=auto {} \;
 
 run:
-	$(GDB_CMD) build/_out/bin/test_collections
-	cd build/_out; $(GDB_CMD) bin/test_data
-	cd build/_out; $(GDB_CMD) bin/test_functional
-	$(GDB_CMD) build/_out/bin/test_util
-	$(GDB_CMD) build/_out/bin/test_mdf
-	$(GDB_CMD) build/_out/bin/test_ini
-	$(GDB_CMD) build/_out/bin/test_schedule
+	@echo "GDB_CMD=$(GDB_CMD)"
+	@$(GDB_CMD) build/_out/bin/test_collections
+	@cd build/_out; $(GDB_CMD) bin/test_data
+	@cd build/_out; $(GDB_CMD) bin/test_functional
+	@$(GDB_CMD) build/_out/bin/test_util
+	@$(GDB_CMD) build/_out/bin/test_mdf
+	@$(GDB_CMD) build/_out/bin/test_ini
+	@$(GDB_CMD) build/_out/bin/test_schedule
+	@echo "GDB_CMD=$(GDB_CMD)"
 
 clean:
 	rm -rf build

@@ -223,7 +223,26 @@ int hashmap_iterator(HashMap* map, HashMapIterateFunc iter_func,
 
     for (int i = 0; i < _keys_length; i++) {
         void* _map_item = hashmap_get(map, _keys[i]);
-        rc = iter_func(_map_item, additional_data ? additional_data : _keys[i]);
+        rc = iter_func(_map_item, additional_data);
+        if (rc && (continue_on_error == false)) break;
+    }
+
+    for (int _ = 0; _ < _keys_length; _++)
+        free(_keys[_]);
+    free(_keys);
+    return rc;
+}
+
+int hashmap_kv_iterator(HashMap* map, HashMapIterateFunc iter_func,
+    bool continue_on_error)
+{
+    int    rc = 0;
+    char** _keys = hashmap_keys(map);
+    int    _keys_length = hashmap_number_keys((*map));
+
+    for (int i = 0; i < _keys_length; i++) {
+        void* _map_item = hashmap_get(map, _keys[i]);
+        rc = iter_func(_map_item, _keys[i]);
         if (rc && (continue_on_error == false)) break;
     }
 
