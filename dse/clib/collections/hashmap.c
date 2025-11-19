@@ -233,8 +233,8 @@ int hashmap_iterator(HashMap* map, HashMapIterateFunc iter_func,
     return rc;
 }
 
-int hashmap_kv_iterator(HashMap* map, HashMapIterateFunc iter_func,
-    bool continue_on_error)
+int hashmap_kv_iterator(
+    HashMap* map, HashMapIterateFunc iter_func, bool continue_on_error)
 {
     int    rc = 0;
     char** _keys = hashmap_keys(map);

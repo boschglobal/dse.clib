@@ -385,16 +385,6 @@ void test_yaml_duplicated_dict_entry(void** state)
 }
 
 
-static void _interpolate_envar(YamlNode* n)
-{
-    if (n && n->scalar) {
-        char* expanded = dse_yaml_expand_vars(n->scalar);
-        free(n->scalar);
-        n->scalar = expanded;
-    }
-}
-
-
 void test_yaml_interpolation(void** state)
 {
     UNUSED(state);
@@ -419,7 +409,7 @@ void test_yaml_interpolation(void** state)
     assert_int_equal(rc, 22);
 
     /* Environment variable interpolation test. */
-    yaml_doc->__inter__ = _interpolate_envar;
+    yaml_doc->__inter__ = dse_yaml_interpolate_env;
     value = dse_yaml_get_scalar(yaml_doc, "bar2");
     assert_string_equal("123", value);
 
@@ -429,7 +419,7 @@ void test_yaml_interpolation(void** state)
     /* Reset, because interpolation is data mutilating. */
     dse_yaml_destroy_node(yaml_doc);
     yaml_doc = dse_yaml_load_single_doc(a);
-    yaml_doc->__inter__ = _interpolate_envar;
+    yaml_doc->__inter__ = dse_yaml_interpolate_env;
 
     rc = dse_yaml_get_uint(yaml_doc, "bar2", &uint_value);
     assert_int_equal(rc, 0);

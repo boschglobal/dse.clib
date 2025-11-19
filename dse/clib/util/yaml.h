@@ -14,7 +14,7 @@ typedef int      YamlNodeType;  // Defined as enum yaml_node_type_t
 typedef HashList YamlDocList;
 
 typedef struct YamlNode YamlNode;
-typedef void (*YamlInterFunc)(YamlNode* n);
+typedef void (*YamlInterpolateFunc)(YamlNode* n);
 
 typedef struct YamlNode {
     YamlNodeType node_type;
@@ -25,7 +25,7 @@ typedef struct YamlNode {
     YamlNode*    parent;
 
     /* Interpolation function. */
-    YamlInterFunc __inter__;
+    YamlInterpolateFunc __inter__;
 } YamlNode;
 
 
@@ -56,7 +56,6 @@ DLL_PUBLIC YamlNode* dse_yaml_find_doc_in_doclist(YamlDocList* doc_list,
 DLL_PUBLIC YamlNode* dse_yaml_find_node_in_seq_in_doclist(YamlDocList* doc_list,
     const char* kind, const char* path, const char* selector,
     const char* value);
-
-DLL_PUBLIC char* dse_yaml_expand_vars(const char* source);
+DLL_PUBLIC void      dse_yaml_interpolate_env(YamlNode* n);
 
 #endif  // DSE_CLIB_UTIL_YAML_H_

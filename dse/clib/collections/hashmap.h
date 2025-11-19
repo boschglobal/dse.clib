@@ -150,8 +150,8 @@ DLL_PUBLIC float hashmap_get_fullness(HashMap* h);
 /* Perform iteration on the hashmap */
 DLL_PUBLIC int hashmap_iterator(HashMap* map, HashMapIterateFunc iter_func,
     bool continue_on_error, void* additional_data);
-DLL_PUBLIC int hashmap_kv_iterator(HashMap* map, HashMapIterateFunc iter_func,
-    bool continue_on_error);
+DLL_PUBLIC int hashmap_kv_iterator(
+    HashMap* map, HashMapIterateFunc iter_func, bool continue_on_error);
 
 #define HASH_UINT32_KEY_LEN (10 + 1)
 

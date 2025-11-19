@@ -816,23 +816,22 @@ static void _destroy_doc_list(YamlDocList* doc_list)
 }
 
 /**
- *  dse_yaml_expand_vars
+ *  dse_yaml_interpolate_env
  *
  *  Expand environment variables in a string according to typical shell
  *  variable expansion (i.e ${FOO} or ${BAR:-default}).
  *
  *  Parameters
  *  ----------
- *  source : const char*
- *      The string containing environment variables to expand.
- *
- *  Returns
- *  -------
- *      char* : String with environment variable expanded. Caller to free.
+ *  n : YamlNode* n
+ *      The Yaml node with the scalar
+ *      containing environment variables to expand.
  */
-DLL_PUBLIC char* dse_yaml_expand_vars(const char* source)
+DLL_PUBLIC void dse_yaml_interpolate_env(YamlNode* n)
 {
-    char* source_copy = strdup(source);
+    if (n == NULL || n->scalar == NULL) return;
+
+    char* source_copy = strdup(n->scalar);
     char* haystack = source_copy;
     char* result = calloc(EXPAND_VAR_MAXLEN + 1, sizeof(char));
 
@@ -876,5 +875,6 @@ DLL_PUBLIC char* dse_yaml_expand_vars(const char* source)
     }
 
     free(source_copy);
-    return result; /* Caller to free. */
+    free(n->scalar);
+    n->scalar = result;
 }
