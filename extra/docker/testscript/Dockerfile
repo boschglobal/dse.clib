@@ -21,7 +21,8 @@
 FROM golang:bookworm AS go
 RUN GOBIN=/usr/local/bin go install github.com/rogpeppe/go-internal/cmd/testscript@latest
 RUN GOBIN=/usr/local/bin go install github.com/boschglobal/task/v3/cmd/task@latest
-
+COPY txtar txtar
+RUN cd txtar; GOBIN=/usr/local/bin go install
 
 
 # Testscript Container Image
@@ -75,6 +76,7 @@ RUN set -eux; \
 # Complete image.
 COPY --from=go /usr/local/bin/testscript /usr/local/bin/testscript
 COPY --from=go /usr/local/bin/task /usr/local/bin/task
+COPY --from=go /usr/local/bin/txtar /usr/local/bin/txtar
 
 WORKDIR /repo
 ENTRYPOINT ["/usr/local/bin/testscript"]
