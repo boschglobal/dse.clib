@@ -30,6 +30,7 @@ RUN set -eux; \
         git \
         jq \
         less \
+        libreadline-dev \
         libtool \
         make \
         mingw-w64 \
