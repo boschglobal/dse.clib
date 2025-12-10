@@ -19,6 +19,7 @@ add_executable(test_util
     test_binary.c
     test_yaml.c
     test_ascii85.c
+    test_cleanup.c
 
     ${DSE_CLIB_SOURCE_DIR}/util/binary.c
     ${DSE_CLIB_SOURCE_DIR}/util/yaml.c

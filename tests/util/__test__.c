@@ -12,6 +12,7 @@ uint8_t __log_level__ = LOG_ERROR; /* LOG_ERROR LOG_INFO LOG_DEBUG LOG_TRACE */
 extern int run_binary_tests(void);
 extern int run_yaml_tests(void);
 extern int run_ascii85_tests(void);
+extern int run_cleanup_tests(void);
 
 
 int main()
@@ -22,6 +23,7 @@ int main()
     rc |= run_binary_tests();
     rc |= run_yaml_tests();
     rc |= run_ascii85_tests();
+    rc |= run_cleanup_tests();
     return rc;
 }
 
