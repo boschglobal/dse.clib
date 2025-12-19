@@ -64,10 +64,6 @@ CLEANUP_TYPE_TABLE
  *      The pointer type (without '*').
  *  name :
  *      The name of the associated auto function scope variable.
- *
- *  -------
- *      YamlDocList* : List of parsed documents, including previously parsed
- *          documents if doc_list was provided as an argument.
  */
 #define CLEANUP_P(type, name)                                                  \
     cleanup_var_##type name __attribute__((cleanup(cleanup_##type)))
