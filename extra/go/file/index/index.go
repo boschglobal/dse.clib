@@ -39,6 +39,26 @@ func NewYamlFileIndex() *YamlFileIndex {
 	return index
 }
 
+func (index *YamlFileIndex) Add(file string) error {
+	// Each file may contain several yaml documents.
+	_, docs, err := handler.ParseFile(file)
+	if err != nil {
+		slog.Debug(fmt.Sprintf("Parse failed (%s) on file: %s", err.Error(), file))
+		return err
+	}
+	docMapIndexList := []docMapIndex{}
+	for _, doc := range docs.([]kind.KindDoc) {
+		slog.Info(fmt.Sprintf("kind: %s; name=%s (%s)", doc.Kind, doc.Metadata.Name, doc.File))
+		if _, ok := index.DocMap[doc.Kind]; !ok {
+			index.DocMap[doc.Kind] = []kind.KindDoc{}
+		}
+		index.DocMap[doc.Kind] = append(index.DocMap[doc.Kind], doc)
+		docMapIndexList = append(docMapIndexList, docMapIndex{kind: doc.Kind, index: len(index.DocMap[doc.Kind]) - 1})
+	}
+	index.FileMap[file] = docMapIndexList
+	return nil
+}
+
 func (index *YamlFileIndex) Scan(path string) {
 	// Collect the list of yaml files within path.
 	files := []string{}
@@ -50,22 +70,11 @@ func (index *YamlFileIndex) Scan(path string) {
 
 	// Load each file into the index.
 	for _, f := range files {
-		// Each file may contain several yaml documents.
-		_, docs, err := handler.ParseFile(f)
+		err := index.Add(f)
 		if err != nil {
 			slog.Debug(fmt.Sprintf("Parse failed (%s) on file: %s", err.Error(), f))
 			continue
 		}
-		docMapIndexList := []docMapIndex{}
-		for _, doc := range docs.([]kind.KindDoc) {
-			slog.Info(fmt.Sprintf("kind: %s; name=%s (%s)", doc.Kind, doc.Metadata.Name, doc.File))
-			if _, ok := index.DocMap[doc.Kind]; !ok {
-				index.DocMap[doc.Kind] = []kind.KindDoc{}
-			}
-			index.DocMap[doc.Kind] = append(index.DocMap[doc.Kind], doc)
-			docMapIndexList = append(docMapIndexList, docMapIndex{kind: doc.Kind, index: len(index.DocMap[doc.Kind]) - 1})
-		}
-		index.FileMap[f] = docMapIndexList
 	}
 }
 
