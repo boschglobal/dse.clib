@@ -61,12 +61,8 @@ func (index *YamlFileIndex) Add(file string) error {
 
 func (index *YamlFileIndex) Scan(path string) {
 	// Collect the list of yaml files within path.
-	files := []string{}
 	file_exts := []string{".yml", ".yaml"}
-	for _, ext := range file_exts {
-		indexed_files, _ := indexFiles(path, ext)
-		files = append(files, indexed_files...)
-	}
+	files, _ := indexFiles(path, file_exts)
 
 	// Load each file into the index.
 	for _, f := range files {
@@ -133,16 +129,27 @@ func (index *YamlFileIndex) SaveAll() error {
 	return nil
 }
 
-func indexFiles(path string, extension string) ([]string, error) {
+func indexFiles(path string, extensions []string) ([]string, error) {
 	files := []string{}
 	fileSystem := os.DirFS(path)
+	extMap := make(map[string]bool)
+	for _, ext := range extensions {
+		extMap[ext] = true
+	}
+
 	err := fs.WalkDir(fileSystem, ".", func(s string, d fs.DirEntry, e error) error {
 		if e != nil {
 			return nil
 		}
-		slog.Debug(fmt.Sprintf("IndexFiles: %s (%t, %s)", s, d.IsDir(), filepath.Ext(s)))
-		if !d.IsDir() && filepath.Ext(s) == extension {
+		if !d.IsDir() && extMap[filepath.Ext(s)] {
+			slog.Debug(fmt.Sprintf("IndexFiles: %s (indexed, %s)", s, filepath.Ext(s)))
 			files = append(files, filepath.Join(path, s))
+		} else {
+			if d.IsDir() {
+				slog.Debug(fmt.Sprintf("IndexFiles: %s (directory)", s))
+			} else {
+				slog.Debug(fmt.Sprintf("IndexFiles: %s (<not indexed>)", s))
+			}
 		}
 		return nil
 	})

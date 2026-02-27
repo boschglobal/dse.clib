@@ -33,6 +33,7 @@ typedef struct Vector {
 static __inline__ int __vector_resize(Vector* v, size_t hint)
 {
     if (v == NULL) return -EINVAL;
+    if (v->item_size == 0) return -EINVAL;
     if (hint == 0) {
         free(v->items);
         v->items = NULL;
@@ -76,6 +77,7 @@ static __inline__ size_t vector_len(Vector* v)
 static __inline__ int vector_push(Vector* v, void* item)
 {
     if (v == NULL) return -EINVAL;
+    if (v->item_size == 0) return -EINVAL;
     if (v->capacity == 0) {
         __vector_resize(v, v->initial_capacity);
     } else if (v->length == v->capacity) {
