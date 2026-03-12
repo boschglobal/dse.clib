@@ -255,8 +255,11 @@ typedef struct MarshalSignalMap {
         uint32_t* binary_len;
     } source;
 
+    /* Offset of source relative to its container. Logging only. */
+    size_t offset;
+
     /* Reserved. */
-    uint64_t __reserved__[4];
+    uint64_t __reserved__[3];
 } MarshalSignalMap;
 
 
