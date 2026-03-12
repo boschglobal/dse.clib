@@ -245,6 +245,8 @@ typedef struct MarshalSignalMap {
     } signal;
     /* Marshal Source (represents Target). */
     struct {
+        /* Offset of source relative to its container. Logging only. */
+        size_t offset;
         /* Index with 'count' items, maps to/from 'signal'. */
         size_t* index;
         union {
