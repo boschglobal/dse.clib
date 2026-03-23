@@ -59,3 +59,11 @@ jobs:
           context: ./extra/docker/${{ matrix.image }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Delete old container images
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: 'dse-${{ matrix.image }}'
+          package-type: 'container'
+          min-versions-to-keep: 4
+          delete-only-untagged-versions: false
