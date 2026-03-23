@@ -4,6 +4,8 @@ name: Docker
 on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
   push:
+    tags:
+      - 'v*'
     paths:
       - 'extra/docker/**'
 
@@ -47,8 +49,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_BASE_NAME }}-${{ matrix.image }}
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-            type=raw,value=main,enable=true
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+
 
       - name: Build and push
         uses: docker/build-push-action@v6
