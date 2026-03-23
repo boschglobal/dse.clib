@@ -65,5 +65,5 @@ jobs:
         with:
           package-name: 'dse-${{ matrix.image }}'
           package-type: 'container'
-          min-versions-to-keep: 4
+          older-than: 7
           delete-only-untagged-versions: false
