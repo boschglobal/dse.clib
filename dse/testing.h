@@ -13,9 +13,16 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <float.h>
+#include <math.h>
 #include <string.h>
 #include <setjmp.h>
 #include <cmocka.h>
+
+/* Compatibility: assert_double_equal was added in cmocka 1.1.7. */
+#ifndef assert_double_equal
+#define assert_double_equal(a, b, epsilon) \
+    assert_true(fabs((double)(a) - (double)(b)) <= (double)(epsilon))
+#endif
 
 
 #if defined(UNIT_TESTING)  // Enables memory checks in CMocka includes.

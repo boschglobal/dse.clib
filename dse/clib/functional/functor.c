@@ -28,7 +28,7 @@ FunctorType(operation)(FunctorType* start, void* reference, ...)
                 /* Hashlist object. */
                 if (functor.destroy) {
                     for (size_t i = 0; i < hashlist_length(functor.__object__);
-                         i++) {
+                        i++) {
                         functor.destroy(hashlist_at(functor.__object__, i));
                     }
                 }
@@ -49,7 +49,7 @@ FunctorType(operation)(FunctorType* start, void* reference, ...)
         if (functor.__object__ && (functor.count == 0)) {
             if (functor.destroy) {
                 for (size_t i = 0; i < hashlist_length(functor.__object__);
-                     i++) {
+                    i++) {
                     free(hashlist_at(functor.__object__, i));
                 }
             }

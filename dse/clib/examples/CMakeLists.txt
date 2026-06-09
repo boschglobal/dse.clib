@@ -36,6 +36,7 @@ set(DSE_CLIB_INCLUDE_DIR "${DSE_CLIB_SOURCE_DIR}/../..")
 
 # Examples
 # --------
+add_subdirectory(csv_file)
 add_subdirectory(mdf_file)
 add_subdirectory(ini_file)
 add_subdirectory(interceptor)

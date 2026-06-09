@@ -483,7 +483,7 @@ void mdf_start_blocks(MdfDesc* mdf)
         _write_master_channel_block(mdf, &in_cg_cn_first);
         _write_master_text_block(mdf);
         for (size_t idx_cn = 0, max = mdf->channel.list[idx_cg].count;
-             idx_cn < max; ++idx_cn) {
+            idx_cn < max; ++idx_cn) {
             cn_cn_next = (idx_cn < (max - 1))
                              ? calculate_cn_next_ofset(mdf, idx_cg, idx_cn)
                              : 0;

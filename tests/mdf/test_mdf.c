@@ -110,7 +110,7 @@ void test__mdf_create_success(void** state)
         assert_string_equal(
             mdf_desc.channel.list[i_outer].name, target_name[i_outer]);
         for (size_t i_inner = 0, max = ARRAY_SIZE(target_signal); i_inner < max;
-             i_inner++) {
+            i_inner++) {
             assert_string_equal(mdf_desc.channel.list[i_outer].signal[i_inner],
                 target_signal[i_inner]);
             assert_int_equal(mdf_desc.channel.list[i_outer].scalar[i_inner],

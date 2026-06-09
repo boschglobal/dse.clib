@@ -128,7 +128,7 @@ void test_marshal_group__primitive(void** state)
         mg->target.ptr = calloc(t->count, sizeof(uint64_t));
     }
     for (MarshalDir dir = MARSHAL_DIRECTION_NONE;
-         dir < __MARSHAL_DIRECTION_SIZE__; dir++) {
+        dir < __MARSHAL_DIRECTION_SIZE__; dir++) {
         log_trace("Direction %d", dir);
 
         /* Group OUT ... */
@@ -349,7 +349,7 @@ void test_marshal_group__binary(void** state)
             calloc(t->count, sizeof(MarshalStringDecode));
     }
     for (MarshalDir dir = MARSHAL_DIRECTION_NONE;
-         dir < __MARSHAL_DIRECTION_SIZE__; dir++) {
+        dir < __MARSHAL_DIRECTION_SIZE__; dir++) {
         log_trace("Direction %d", dir);
 
         /* Group OUT ... */

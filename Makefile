@@ -5,6 +5,7 @@
 ###############
 ## Docker Images.
 GCC_BUILDER_IMAGE ?= ghcr.io/boschglobal/dse-gcc-builder:latest
+DSE_CLANG_FORMAT_IMAGE ?= ghcr.io/boschglobal/dse-clang-format:latest
 DOCKER_DIRS = flatc-builder gcc-builder python-builder clang-format testscript
 GO_MOD_DIRS =  ast command file
 
@@ -135,6 +136,7 @@ do-oss:
 .PHONY: format
 format:
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/collections
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/csv
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/examples
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/functional
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/ini
