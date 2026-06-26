@@ -27,7 +27,6 @@ jobs:
           - clang-format
           - flatc-builder
           - gcc-builder
-          - python-builder
           - testscript
     steps:
       - name: Checkout
