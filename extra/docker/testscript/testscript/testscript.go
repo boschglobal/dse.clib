@@ -76,7 +76,7 @@ func mainerr() error {
 		for _, v := range envVars.vals {
 			varName, _, ok := strings.Cut(v, "=")
 			if !ok {
-				v += "=" + os.Getenv(v)
+				v += "=" + os.Getenv(varName)
 			}
 			switch varName {
 			case "":
