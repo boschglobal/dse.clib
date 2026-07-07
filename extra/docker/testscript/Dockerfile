@@ -86,7 +86,10 @@ RUN set -eux; \
         $(lsb_release -cs) stable" \
         | tee /etc/apt/sources.list.d/docker.list > /dev/null; \
     apt-get -y update; \
-    apt-get -y install --no-install-recommends docker-ce-cli; \
+    apt-get -y install --no-install-recommends \
+        docker-ce-cli \
+        docker-compose-plugin \
+    ; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/*
 
