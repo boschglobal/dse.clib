@@ -19,10 +19,11 @@
 # Go Builder
 # ==========
 FROM golang:bookworm AS go
-RUN GOBIN=/usr/local/bin go install github.com/rogpeppe/go-internal/cmd/testscript@latest
 RUN GOBIN=/usr/local/bin go install github.com/boschglobal/task/v3/cmd/task@latest
 COPY txtar txtar
+COPY testscript testscript
 RUN cd txtar; GOBIN=/usr/local/bin go install
+RUN cd testscript; GOBIN=/usr/local/bin go install
 
 
 # Valgrind Builder
