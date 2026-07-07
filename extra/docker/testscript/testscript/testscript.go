@@ -76,12 +76,11 @@ func mainerr() error {
 		for _, v := range envVars.vals {
 			varName, _, ok := strings.Cut(v, "=")
 			if !ok {
-				varName = v
 				v += "=" + os.Getenv(v)
 			}
 			switch varName {
 			case "":
-				return fmt.Errorf("invalid variable name %q", varName)
+				return fmt.Errorf("environment variable name cannot be empty")
 			case "WORK":
 				return fmt.Errorf("cannot override WORK variable")
 			}
