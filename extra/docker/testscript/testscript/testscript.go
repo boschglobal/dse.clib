@@ -31,15 +31,30 @@ func main() {
 	}
 }
 
+type envVarsFlag struct {
+	vals []string
+}
+
+func (e *envVarsFlag) String() string {
+	return fmt.Sprintf("%v", e.vals)
+}
+
+func (e *envVarsFlag) Set(v string) error {
+	e.vals = append(e.vals, v)
+	return nil
+}
+
 func mainerr() error {
 	fWork := flag.Bool("work", false, "print temporary work directory and do not remove when done")
 	fContinue := flag.Bool("continue", false, "continue running the script if an error occurs")
 	fVerbose := flag.Bool("v", false, "run tests verbosely")
+	var envVars envVarsFlag
+	flag.Var(&envVars, "e", "pass through environment variable to script in form NAME[=value]; if =value is omitted, reads from current environment (can appear multiple times)")
 	flag.Parse()
 
 	files := flag.Args()
 	if len(files) == 0 {
-		return fmt.Errorf("usage: %s [-work] [-continue] [-v] FILE.txtar [...]", os.Args[0])
+		return fmt.Errorf("usage: %s [-work] [-continue] [-v] [-e NAME[=value]] FILE.txtar [...]", os.Args[0])
 	}
 
 	p := testscript.Params{
@@ -57,6 +72,21 @@ func mainerr() error {
 		}
 		if *fWork {
 			env.T().Log("temporary work directory: ", env.WorkDir)
+		}
+		for _, v := range envVars.vals {
+			varName, _, ok := strings.Cut(v, "=")
+			switch varName {
+			case "":
+				return fmt.Errorf("environment variable name cannot be empty")
+			case "WORK":
+				return fmt.Errorf("cannot override WORK variable")
+			}
+			if !ok {
+				// NAME form: copy from current process environment;
+				// if unset, the variable is passed as NAME= (empty value).
+				v += "=" + os.Getenv(varName)
+			}
+			env.Vars = append(env.Vars, v)
 		}
 		return nil
 	}
