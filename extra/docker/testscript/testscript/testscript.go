@@ -82,6 +82,8 @@ func mainerr() error {
 				return fmt.Errorf("cannot override WORK variable")
 			}
 			if !ok {
+				// NAME form: copy from current process environment;
+				// if unset, the variable is passed as NAME= (empty value).
 				v += "=" + os.Getenv(varName)
 			}
 			env.Vars = append(env.Vars, v)
