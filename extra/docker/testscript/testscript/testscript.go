@@ -62,7 +62,7 @@ func mainerr() error {
 		Files:           files,
 		ContinueOnError: *fContinue,
 		TestWork:        *fWork,
-		Cmds:            customCommands,
+		Cmds:            makeCustomCommands(*fVerbose),
 	}
 
 	origSetup := p.Setup

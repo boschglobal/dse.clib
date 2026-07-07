@@ -14,12 +14,14 @@ import (
 	"github.com/rogpeppe/go-internal/testscript"
 )
 
-var customCommands = map[string]func(*testscript.TestScript, bool, []string){
-	"hello":        helloCmd,
-	"sleep":        sleepCmd,
-	"touch":        touchCmd,
-	"filecontains": filecontainsCmd,
-	"defer":        deferCmd,
+func makeCustomCommands(verbose bool) map[string]func(*testscript.TestScript, bool, []string) {
+	return map[string]func(*testscript.TestScript, bool, []string){
+		"hello":        helloCmd,
+		"sleep":        sleepCmd,
+		"touch":        touchCmd,
+		"filecontains": filecontainsCmd,
+		"defer":        makeDeferCmd(verbose),
+	}
 }
 
 func helloCmd(ts *testscript.TestScript, neg bool, args []string) {
@@ -86,25 +88,31 @@ func touchCmd(ts *testscript.TestScript, neg bool, args []string) {
 	ts.Check(err)
 }
 
-func deferCmd(ts *testscript.TestScript, neg bool, args []string) {
-	if len(args) < 1 {
-		ts.Fatalf("usage: defer program [args...]")
-	}
+func makeDeferCmd(verbose bool) func(*testscript.TestScript, bool, []string) {
+	return func(ts *testscript.TestScript, neg bool, args []string) {
+		if len(args) < 1 {
+			ts.Fatalf("usage: defer program [args...]")
+		}
+		command := args[0]
+		commandArgs := append([]string(nil), args[1:]...)
 
-	command := args[0]
-	commandArgs := append([]string(nil), args[1:]...)
-
-	ts.Defer(func() {
-		err := ts.Exec(command, commandArgs...)
-
-		if neg {
-			if err == nil {
-				ts.Fatalf("deferred command unexpectedly succeeded: %s %s", command, strings.Join(commandArgs, " "))
+		ts.Defer(func() {
+			var err error
+			if !verbose {
+				shellCmd := fmt.Sprintf("%s %s > /dev/null 2>&1", command, strings.Join(commandArgs, " "))
+				err = ts.Exec("sh", "-c", shellCmd)
+			} else {
+				err = ts.Exec(command, commandArgs...)
 			}
-			return
-		}
-		if err != nil {
-			ts.Fatalf("deferred command unexpectedly failed: %v", err)
-		}
-	})
+			if neg {
+				if err == nil {
+					ts.Fatalf("deferred command unexpectedly succeeded: %s %s", command, strings.Join(commandArgs, " "))
+				}
+				return
+			}
+			if err != nil {
+				ts.Fatalf("deferred command unexpectedly failed: %v", err)
+			}
+		})
+	}
 }
