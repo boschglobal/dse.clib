@@ -49,7 +49,7 @@ func mainerr() error {
 	fContinue := flag.Bool("continue", false, "continue running the script if an error occurs")
 	fVerbose := flag.Bool("v", false, "run tests verbosely")
 	var envVars envVarsFlag
-	flag.Var(&envVars, "e", "pass through environment variable to script (can appear multiple times)")
+	flag.Var(&envVars, "e", "pass through environment variable to script in form NAME[=value]; if =value is omitted, reads from current environment (can appear multiple times)")
 	flag.Parse()
 
 	files := flag.Args()
@@ -75,14 +75,14 @@ func mainerr() error {
 		}
 		for _, v := range envVars.vals {
 			varName, _, ok := strings.Cut(v, "=")
-			if !ok {
-				v += "=" + os.Getenv(varName)
-			}
 			switch varName {
 			case "":
 				return fmt.Errorf("environment variable name cannot be empty")
 			case "WORK":
 				return fmt.Errorf("cannot override WORK variable")
+			}
+			if !ok {
+				v += "=" + os.Getenv(varName)
 			}
 			env.Vars = append(env.Vars, v)
 		}
