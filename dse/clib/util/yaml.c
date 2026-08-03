@@ -11,8 +11,8 @@
 #include <ctype.h>
 #include <yaml.h>
 #include <dse/testing.h>
+#include <dse/log.h>
 #include <dse/clib/util/yaml.h>
-#include <dse/logger.h>
 
 
 #define HASHLIST_DEFAULT_SIZE 64
@@ -21,9 +21,10 @@
 
 
 /* Internal API. */
-static YamlDocList* _parse_file(const char* filename, YamlDocList* doc_list);
-static void         _destroy_node(YamlNode* node);
-static void         _destroy_doc_list(YamlDocList* doc_list);
+static YamlDocList* _parse_file(
+    DseLog* log, const char* filename, YamlDocList* doc_list);
+static void _destroy_node(YamlNode* node);
+static void _destroy_doc_list(YamlDocList* doc_list);
 
 
 static char* __strdup__(const char* s)
@@ -40,6 +41,8 @@ static char* __strdup__(const char* s)
  *
  *  Parameters
  *  ----------
+ *  log : DseLog*
+ *      Pointer to a log object (or NULL if logging is not required).
  *  filename : const char*
  *      The filename to parse for YAML documents (i.e. delimited by '---').
  *  doc_list : YamlDocList*
@@ -52,9 +55,9 @@ static char* __strdup__(const char* s)
  *          documents if doc_list was provided as an argument.
  */
 DLL_PUBLIC YamlDocList* dse_yaml_load_file(
-    const char* filename, YamlDocList* doc_list)
+    DseLog* log, const char* filename, YamlDocList* doc_list)
 {
-    return _parse_file(filename, doc_list);
+    return _parse_file(log, filename, doc_list);
 }
 
 
@@ -104,14 +107,16 @@ DLL_PUBLIC void dse_yaml_destroy_doc_list(YamlDocList* doc_list)
  *
  *  Parameters
  *  ----------
+ *  log : DseLog*
+ *      Pointer to a log object (or NULL if logging is not required).
  *
  *  Returns
  *  -------
  *
  */
-DLL_PUBLIC YamlNode* dse_yaml_load_single_doc(const char* filename)
+DLL_PUBLIC YamlNode* dse_yaml_load_single_doc(DseLog* log, const char* filename)
 {
-    YamlDocList* doc_list = _parse_file(filename, NULL);
+    YamlDocList* doc_list = _parse_file(log, filename, NULL);
     YamlNode*    node = hashlist_at(doc_list, 0);
     for (uint32_t i = 1; i < hashlist_length(doc_list); i++) {
         YamlNode* doc = hashlist_at(doc_list, i);
@@ -637,16 +642,16 @@ static void _set_node_sequence(YamlNode* node)
 }
 
 
-static YamlDocList* _create_doc_list(void)
+static YamlDocList* _create_doc_list(DseLog* log)
 {
     YamlDocList* doc_list = calloc(1, sizeof(HashList));
     if (doc_list == NULL) {
-        log_error("Error creating document list");
+        log_error(log, "Error creating document list");
         return NULL;
     }
     if (hashlist_init(doc_list, HASHLIST_DEFAULT_SIZE) != HASHMAP_SUCCESS) {
         if (errno == 0) errno = ECANCELED;
-        log_error("Error creating document list");
+        log_error(log, "Error creating document list");
         free(doc_list);
         return NULL;
     }
@@ -654,27 +659,28 @@ static YamlDocList* _create_doc_list(void)
 }
 
 
-static YamlDocList* _parse_file(const char* filename, YamlDocList* doc_list)
+static YamlDocList* _parse_file(
+    DseLog* log, const char* filename, YamlDocList* doc_list)
 {
     errno = 0;
 
     /* Either append to the provided doc_list or create a new one. */
     if (doc_list == NULL) {
-        doc_list = _create_doc_list();
+        doc_list = _create_doc_list(log);
         if (doc_list == NULL) return NULL;
     }
     /* Open the YAML file. */
     FILE* file_handle = fopen(filename, "r");
     if (file_handle == NULL) {
         if (errno == 0) errno = EINVAL;
-        log_error("Error opening file: %s", filename);
+        log_error(log, "Error opening file: %s", filename);
         return doc_list;
     }
     /* Setup the YAML parser*/
     yaml_parser_t parser;
     if (!yaml_parser_initialize(&parser)) {
         if (errno == 0) errno = ECANCELED;
-        log_error("Error initializing parser");
+        log_error(log, "Error initializing parser");
         return doc_list;
     }
     yaml_parser_set_input_file(&parser, file_handle);
@@ -688,7 +694,7 @@ static YamlDocList* _parse_file(const char* filename, YamlDocList* doc_list)
         /* Parse the next event. */
         if (!yaml_parser_parse(&parser, &event)) {
             if (errno == 0) errno = ECANCELED;
-            log_error("Error while parsing YAML event");
+            log_error(log, "Error while parsing YAML event");
             goto error_parse;
         }
         /* Process the event. */
@@ -697,10 +703,10 @@ static YamlDocList* _parse_file(const char* filename, YamlDocList* doc_list)
         case YAML_DOCUMENT_START_EVENT:
             assert(doc == NULL);
             doc = node = _create_node(NULL, node);
-            log_trace("%p/%p: YAML_DOCUMENT_START_EVENT", doc, node);
+            log_trace(log, "%p/%p: YAML_DOCUMENT_START_EVENT", doc, node);
             break;
         case YAML_DOCUMENT_END_EVENT:
-            log_trace("%p/%p: YAML_DOCUMENT_END_EVENT", doc, node);
+            log_trace(log, "%p/%p: YAML_DOCUMENT_END_EVENT", doc, node);
             hashlist_append(doc_list, doc);
             doc = node = NULL; /* Reset the document pointers. */
             break;
@@ -711,8 +717,8 @@ static YamlDocList* _parse_file(const char* filename, YamlDocList* doc_list)
                 node->node_type == YAML_SEQUENCE_NODE) {
                 /* Create a child node with value as its key/name. */
                 node = _create_node((char*)event.data.scalar.value, node);
-                log_trace("  %p/%p: YAML_SCALAR_EVENT name=%s", node->parent,
-                    node, (char*)event.data.scalar.value);
+                log_trace(log, "  %p/%p: YAML_SCALAR_EVENT name=%s",
+                    node->parent, node, (char*)event.data.scalar.value);
                 /* If the parent (i.e. node at entry) is a YAML_SEQUENCE_NODE
                  * then this is a simple array (values only). */
                 if (node->parent->node_type == YAML_SEQUENCE_NODE) {
@@ -723,7 +729,7 @@ static YamlDocList* _parse_file(const char* filename, YamlDocList* doc_list)
             } else {
                 /* The child node is scalar, set the node_type and value. */
                 _set_node_scalar(node, (char*)event.data.scalar.value);
-                log_trace("  %p/%p: YAML_SCALAR_EVENT name=%s value=%s",
+                log_trace(log, "  %p/%p: YAML_SCALAR_EVENT name=%s value=%s",
                     node->parent, node, node->name,
                     (char*)event.data.scalar.value);
                 /* This node is complete. */
@@ -739,24 +745,24 @@ static YamlDocList* _parse_file(const char* filename, YamlDocList* doc_list)
                 node = _create_node(NULL, node);
             }
             _set_node_mapping(node);
-            log_trace("%p/%p: YAML_MAPPING_START_EVENT name=%s type=%d", doc,
-                node, node->name, node->node_type);
+            log_trace(log, "%p/%p: YAML_MAPPING_START_EVENT name=%s type=%d",
+                doc, node, node->name, node->node_type);
             break;
         case YAML_SEQUENCE_START_EVENT:
             assert(doc);
             assert(node);
             _set_node_sequence(node);
-            log_trace("%p/%p: YAML_SEQUENCE_START_EVENT name=%s type=%d", doc,
-                node, node->name, node->node_type);
+            log_trace(log, "%p/%p: YAML_SEQUENCE_START_EVENT name=%s type=%d",
+                doc, node, node->name, node->node_type);
             break;
         case YAML_MAPPING_END_EVENT:
-            log_trace("%p/%p: YAML_MAPPING_END_EVENT name=%s type=%d", doc,
+            log_trace(log, "%p/%p: YAML_MAPPING_END_EVENT name=%s type=%d", doc,
                 node, node->name, node->node_type);
             node = node->parent;
             break;
         case YAML_SEQUENCE_END_EVENT:
-            log_trace("%p/%p: YAML_SEQUENCE_END_EVENT name=%s type=%d", doc,
-                node, node->name, node->node_type);
+            log_trace(log, "%p/%p: YAML_SEQUENCE_END_EVENT name=%s type=%d",
+                doc, node, node->name, node->node_type);
             node = node->parent;
             break;
         /* Other events, ignored. */

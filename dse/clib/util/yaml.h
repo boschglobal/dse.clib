@@ -6,8 +6,9 @@
 #define DSE_CLIB_UTIL_YAML_H_
 
 #include <stdbool.h>
-#include <dse/clib/collections/hashlist.h>
 #include <dse/platform.h>
+#include <dse/log.h>
+#include <dse/clib/collections/hashlist.h>
 
 
 typedef int      YamlNodeType;  // Defined as enum yaml_node_type_t
@@ -31,10 +32,11 @@ typedef struct YamlNode {
 
 /* yaml.c */
 DLL_PUBLIC YamlDocList* dse_yaml_load_file(
-    const char* filename, YamlDocList* doc_list);
-DLL_PUBLIC void         dse_yaml_destroy_doc_list(YamlDocList* doc_list);
-DLL_PUBLIC void         dse_yaml_destroy_node(YamlNode* node);
-DLL_PUBLIC YamlNode*    dse_yaml_load_single_doc(const char* filename);
+    DseLog* log, const char* filename, YamlDocList* doc_list);
+DLL_PUBLIC void      dse_yaml_destroy_doc_list(YamlDocList* doc_list);
+DLL_PUBLIC void      dse_yaml_destroy_node(YamlNode* node);
+DLL_PUBLIC YamlNode* dse_yaml_load_single_doc(
+    DseLog* log, const char* filename);
 DLL_PUBLIC const char*  dse_yaml_get_scalar(YamlNode* node, const char* name);
 DLL_PUBLIC const char** dse_yaml_get_array(
     YamlNode* node, const char* name, size_t* len);

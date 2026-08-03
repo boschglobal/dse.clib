@@ -7,7 +7,7 @@
 #include <string.h>
 #include <dse/testing.h>
 #include <dse/platform.h>
-#include <dse/logger.h>
+#include <dse/log.h>
 #include <dse/clib/collections/set.h>
 #include <dse/clib/collections/hashlist.h>
 #include <dse/clib/util/strings.h>
@@ -124,7 +124,7 @@ static inline void _marshal_scalar_in(MarshalGroup* mg)
 }
 
 
-static inline void _marshal_binary_out(MarshalGroup* mg)
+static inline void _marshal_binary_out(DseLog* log, MarshalGroup* mg)
 {
     for (size_t i = 0; i < mg->count; i++) {
         switch (mg->type) {
@@ -146,7 +146,7 @@ static inline void _marshal_binary_out(MarshalGroup* mg)
                     target = _default_string_encode(source, source_len);
                 }
             }
-            log_trace("  source[%d]->target[%d]:  %s (%p:%d)-> %s ",
+            log_trace(log, "  source[%d]->target[%d]:  %s (%p:%d)-> %s ",
                 mg->source.offset + i, i, source, source, source_len, target);
             mg->target._string[i] = target;
         } break;
@@ -166,7 +166,7 @@ static inline void _marshal_binary_out(MarshalGroup* mg)
                 memcpy(target, source, source_len);
                 target_len = source_len;
             }
-            log_trace("  source[%d]->target[%d]: (%p:%d)->(%p:%d) ",
+            log_trace(log, "  source[%d]->target[%d]: (%p:%d)->(%p:%d) ",
                 mg->source.offset + i, i, source, source_len, target,
                 target_len);
             mg->target._binary[i] = target;
@@ -179,7 +179,7 @@ static inline void _marshal_binary_out(MarshalGroup* mg)
 }
 
 
-static inline void _marshal_binary_in(MarshalGroup* mg)
+static inline void _marshal_binary_in(DseLog* log, MarshalGroup* mg)
 {
     for (size_t i = 0; i < mg->count; i++) {
         switch (mg->type) {
@@ -194,9 +194,9 @@ static inline void _marshal_binary_in(MarshalGroup* mg)
                 source = _default_string_decode(target, &source_len);
             }
             if (source)
-                log_trace("    malloc(%p) %s %d-%d", source, mg->name,
+                log_trace(log, "    malloc(%p) %s %d-%d", source, mg->name,
                     mg->source.offset, i);
-            log_trace("  target[%d]->source[%d]:  %s -> %s (%p:%d) ", i,
+            log_trace(log, "  target[%d]->source[%d]:  %s -> %s (%p:%d) ", i,
                 mg->source.offset + i, target, source, source, source_len);
             mg->source.binary[mg->source.offset + i] = source;
             mg->source.binary_len[mg->source.offset + i] = source_len;
@@ -217,7 +217,7 @@ static inline void _marshal_binary_in(MarshalGroup* mg)
                 memcpy(source, target, target_len);
                 source_len = target_len;
             }
-            log_trace("  target[%d]->source[%d]:  (%d)->(%p:%d) ", i,
+            log_trace(log, "  target[%d]->source[%d]:  (%d)->(%p:%d) ", i,
                 mg->source.offset + i, target_len, source, source_len);
             mg->source.binary[mg->source.offset + i] = source;
             mg->source.binary_len[mg->source.offset + i] = source_len;
@@ -229,15 +229,15 @@ static inline void _marshal_binary_in(MarshalGroup* mg)
 }
 
 
-static inline void _trace_marshal_group_source(MarshalGroup* mg_table)
+static inline void _trace_marshal_group_source(DseLog* log, MarshalGroup* mg_table)
 {
-    log_trace("Marshal Group CHECK (source)");
+    log_trace(log, "Marshal Group CHECK (source)");
     for (MarshalGroup* mg = mg_table; mg && mg->name; mg++) {
         switch (mg->kind) {
         case MARSHAL_KIND_BINARY:
             for (size_t i = 0; i < mg->count; i++) {
                 void* source = mg->source.binary[mg->source.offset + i];
-                log_trace("    check(%p at %p)", source,
+                log_trace(log, "    check(%p at %p)", source,
                     &(mg->source.binary[mg->source.offset + i]));
             }
             break;
@@ -308,11 +308,11 @@ mg_table (MarshalGroup*)
 */
 
 
-void marshal_group_out(MarshalGroup* mg_table)
+void marshal_group_out(DseLog* log, MarshalGroup* mg_table)
 {
-    _trace_marshal_group_source(mg_table);
+    _trace_marshal_group_source(log, mg_table);
 
-    log_trace("Marshal Group OUT (source -> target):");
+    log_trace(log, "Marshal Group OUT (source -> target):");
     for (MarshalGroup* mg = mg_table; mg && mg->name; mg++) {
         switch (mg->dir) {
         case MARSHAL_DIRECTION_TXRX:
@@ -323,7 +323,7 @@ void marshal_group_out(MarshalGroup* mg_table)
                 _marshal_scalar_out(mg);
                 break;
             case MARSHAL_KIND_BINARY:
-                _marshal_binary_out(mg);
+                _marshal_binary_out(log, mg);
                 break;
             default:
                 break;
@@ -334,7 +334,7 @@ void marshal_group_out(MarshalGroup* mg_table)
         }
     }
 
-    _trace_marshal_group_source(mg_table);
+    _trace_marshal_group_source(log, mg_table);
 }
 
 
@@ -349,11 +349,11 @@ Parameters
 mg_table (MarshalGroup*)
 : A MarshalGroup list (Null-Terminated-List, indicated by member `name`).
 */
-void marshal_group_in(MarshalGroup* mg_table)
+void marshal_group_in(DseLog* log, MarshalGroup* mg_table)
 {
-    _trace_marshal_group_source(mg_table);
+    _trace_marshal_group_source(log, mg_table);
 
-    log_trace("Marshal Group IN (target -> source):");
+    log_trace(log, "Marshal Group IN (target -> source):");
 
     // Release (free) the source binary items (set on OUT, clear before IN).
     for (MarshalGroup* mg = mg_table; mg && mg->name; mg++) {
@@ -362,7 +362,7 @@ void marshal_group_in(MarshalGroup* mg_table)
             for (size_t i = 0; i < mg->count; i++) {
                 void* source = mg->source.binary[mg->source.offset + i];
                 if (source) {
-                    log_trace("    free(%p) %s %d-%d", source, mg->name,
+                    log_trace(log, "    free(%p) %s %d-%d", source, mg->name,
                         mg->source.offset, i);
                     free(source);
                 }
@@ -375,7 +375,7 @@ void marshal_group_in(MarshalGroup* mg_table)
         }
     }
 
-    _trace_marshal_group_source(mg_table);
+    _trace_marshal_group_source(log, mg_table);
 
     for (MarshalGroup* mg = mg_table; mg && mg->name; mg++) {
         switch (mg->dir) {
@@ -388,7 +388,7 @@ void marshal_group_in(MarshalGroup* mg_table)
                 _marshal_scalar_in(mg);
                 break;
             case MARSHAL_KIND_BINARY:
-                _marshal_binary_in(mg);
+                _marshal_binary_in(log, mg);
                 break;
             default:
                 break;
@@ -399,7 +399,7 @@ void marshal_group_in(MarshalGroup* mg_table)
         }
     }
 
-    _trace_marshal_group_source(mg_table);
+    _trace_marshal_group_source(log, mg_table);
 }
 
 
@@ -568,9 +568,9 @@ map (MarshalSignalMap*)
 : A MarshalSignalMap list (Null-Terminated-List, indicated by member
 `name`).
 */
-void marshal_signalmap_out(MarshalSignalMap* map)
+void marshal_signalmap_out(DseLog* log, MarshalSignalMap* map)
 {
-    log_trace("Marshal SignalMap OUT (signal -> source):");
+    log_trace(log, "Marshal SignalMap OUT (signal -> source):");
 
     for (MarshalSignalMap* msm = map; msm && msm->name; msm++) {
         for (size_t i = 0; i < msm->count; i++) {
@@ -585,7 +585,7 @@ void marshal_signalmap_out(MarshalSignalMap* map)
 
                 // Copy (deep copy) signal -> source.
                 if (src_binary[src_idx]) {
-                    log_trace("    free(%p) %d", src_binary[src_idx], src_idx);
+                    log_trace(log, "    free(%p) %d", src_binary[src_idx], src_idx);
                     free(src_binary[src_idx]);
                     src_binary[src_idx] = NULL;
                 }
@@ -595,10 +595,10 @@ void marshal_signalmap_out(MarshalSignalMap* map)
                     src_binary_len[src_idx] = sig_binary_len[sig_idx];
                     memcpy(src_binary[src_idx], sig_binary[sig_idx],
                         sig_binary_len[sig_idx]);
-                    log_trace(
+                    log_trace(log,
                         "    malloc(%p) %d", src_binary[src_idx], src_idx);
                 }
-                log_trace("  signal[%d]->source[%d]: (%p:%d)->(%p:%d)", sig_idx,
+                log_trace(log, "  signal[%d]->source[%d]: (%p:%d)->(%p:%d)", sig_idx,
                     src_idx, sig_binary[sig_idx], sig_binary_len[sig_idx],
                     src_binary[src_idx], src_binary_len[src_idx]);
             } else {
@@ -625,9 +625,9 @@ map (MarshalSignalMap*)
 : A MarshalSignalMap list (Null-Terminated-List, indicated by member
 `name`).
 */
-void marshal_signalmap_in(MarshalSignalMap* map)
+void marshal_signalmap_in(DseLog* log, MarshalSignalMap* map)
 {
-    log_trace("Marshal SignalMap IN (source -> signal):");
+    log_trace(log, "Marshal SignalMap IN (source -> signal):");
 
     for (MarshalSignalMap* msm = map; msm && msm->name; msm++) {
         for (size_t i = 0; i < msm->count; i++) {
@@ -648,7 +648,7 @@ void marshal_signalmap_in(MarshalSignalMap* map)
                 dse_buffer_append(&sig_binary[sig_idx],
                     &sig_binary_len[sig_idx], &sig_binary_buffer_size[sig_idx],
                     src_binary[src_idx], src_binary_len[src_idx]);
-                log_trace("  source[%d]->signal[%d]: (%p:%d) -> (%p:%d) ",
+                log_trace(log, "  source[%d]->signal[%d]: (%p:%d) -> (%p:%d) ",
                     src_idx, sig_idx, src_binary[src_idx],
                     src_binary_len[src_idx], sig_binary[sig_idx],
                     sig_binary_len[sig_idx]);

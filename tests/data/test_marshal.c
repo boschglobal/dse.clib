@@ -3,13 +3,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <dse/testing.h>
-#include <dse/logger.h>
+#include <dse/log.h>
 #include <dse/clib/collections/set.h>
 #include <dse/clib/data/marshal.h>
 
 
 #define UNUSED(x)     ((void)x)
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+
+
+static DseLog dlog = { .level = LOG_NOTICE, dse_log2console };
 
 
 int test_setup(void** state)
@@ -129,7 +132,7 @@ void test_marshal_group__primitive(void** state)
     }
     for (MarshalDir dir = MARSHAL_DIRECTION_NONE;
         dir < __MARSHAL_DIRECTION_SIZE__; dir++) {
-        log_trace("Direction %d", dir);
+        log_trace(&dlog, "Direction %d", dir);
 
         /* Group OUT ... */
         for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
@@ -141,11 +144,11 @@ void test_marshal_group__primitive(void** state)
                 mg->target._uint64[i] = 0;
             }
         }
-        marshal_group_out(mg_table);
+        marshal_group_out(&dlog, mg_table);
         for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
             MGKP_TC*      t = &tc[i];
             MarshalGroup* mg = &mg_table[i];
-            log_trace("Type %d", mg->type);
+            log_trace(&dlog, "Type %d", mg->type);
 
             for (size_t i = 0; i < t->count; i++) {
                 switch (mg->dir) {
@@ -155,12 +158,12 @@ void test_marshal_group__primitive(void** state)
                     switch (mg->type) {
                     case MARSHAL_TYPE_INT32:
                     case MARSHAL_TYPE_BOOL:
-                        log_trace("index %d: condition %f -> %d", i,
+                        log_trace(&dlog, "index %d: condition %f -> %d", i,
                             mg->source.scalar[t->offset + i], t->_int32[i]);
                         assert_int_equal(mg->target._int32[i], t->_int32[i]);
                         break;
                     case MARSHAL_TYPE_DOUBLE:
-                        log_trace("index %d: condition %f -> %f", i,
+                        log_trace(&dlog, "index %d: condition %f -> %f", i,
                             mg->source.scalar[t->offset + i], t->_double[i]);
                         assert_double_equal(
                             mg->target._double[i], t->_double[i], 0.0);
@@ -195,13 +198,13 @@ void test_marshal_group__primitive(void** state)
                 }
             }
         }
-        marshal_group_in(mg_table);
+        marshal_group_in(&dlog, mg_table);
         for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
             MGKP_TC*      t = &tc[i];
             MarshalGroup* mg = &mg_table[i];
 
             for (size_t i = 0; i < t->count; i++) {
-                log_trace("index %d: condition %f <- %d", i,
+                log_trace(&dlog, "index %d: condition %f <- %d", i,
                     mg->source.scalar[t->offset + i], t->_int32[i]);
                 switch (mg->dir) {
                 case MARSHAL_DIRECTION_TXRX:
@@ -350,7 +353,7 @@ void test_marshal_group__binary(void** state)
     }
     for (MarshalDir dir = MARSHAL_DIRECTION_NONE;
         dir < __MARSHAL_DIRECTION_SIZE__; dir++) {
-        log_trace("Direction %d", dir);
+        log_trace(&dlog, "Direction %d", dir);
 
         /* Group OUT ... */
         for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
@@ -376,11 +379,11 @@ void test_marshal_group__binary(void** state)
                     t->storage.target.string_decode[i];
             }
         }
-        marshal_group_out(mg_table);
+        marshal_group_out(&dlog, mg_table);
         for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
             MGKB_TC*      t = &tc[i];
             MarshalGroup* mg = &mg_table[i];
-            log_trace("Type %d", mg->type);
+            log_trace(&dlog, "Type %d", mg->type);
 
             for (size_t i = 0; i < t->count; i++) {
                 switch (mg->dir) {
@@ -389,7 +392,7 @@ void test_marshal_group__binary(void** state)
                 case MARSHAL_DIRECTION_PARAMETER:
                     switch (mg->type) {
                     case MARSHAL_TYPE_STRING:
-                        log_trace("index %d: condition %s -> %s", i,
+                        log_trace(&dlog, "index %d: condition %s -> %s", i,
                             mg->source.binary[t->offset + i],
                             t->condition.target.string[i]);
                         assert_non_null(mg->target._string[i]);
@@ -399,7 +402,7 @@ void test_marshal_group__binary(void** state)
                         assert_int_equal(mg->target._binary_len[i], 0);
                         break;
                     case MARSHAL_TYPE_BINARY:
-                        log_trace("index %d: condition %s -> %s (%d)", i,
+                        log_trace(&dlog, "index %d: condition %s -> %s (%d)", i,
                             mg->source.binary[t->offset + i],
                             t->condition.target.binary[i],
                             t->condition.target.binary_len[i]);
@@ -467,7 +470,7 @@ void test_marshal_group__binary(void** state)
                     t->storage.target.string_decode[i];
             }
         }
-        marshal_group_in(mg_table);
+        marshal_group_in(&dlog, mg_table);
         for (size_t i = 0; i < ARRAY_SIZE(tc); i++) {
             MGKB_TC*      t = &tc[i];
             MarshalGroup* mg = &mg_table[i];
@@ -480,7 +483,7 @@ void test_marshal_group__binary(void** state)
                 case MARSHAL_DIRECTION_LOCAL:
                     switch (mg->type) {
                     case MARSHAL_TYPE_STRING:
-                        log_trace("index %d: condition %s <- %s", i,
+                        log_trace(&dlog, "index %d: condition %s <- %s", i,
                             mg->source.binary[t->offset + i],
                             t->condition.target.string[i]);
                         assert_non_null(mg->source.binary[t->offset + i]);
@@ -492,7 +495,7 @@ void test_marshal_group__binary(void** state)
                                 1);
                         break;
                     case MARSHAL_TYPE_BINARY:
-                        log_trace("index %d: condition %s <- %s (%d)", i,
+                        log_trace(&dlog, "index %d: condition %s <- %s (%d)", i,
                             mg->source.binary[t->offset + i],
                             t->condition.target.binary[i],
                             t->condition.target.binary_len[i]);
@@ -817,7 +820,7 @@ void test_marshal__signalmap_scalar_out(void** state)
             assert_double_equal(0, src_s_ptr[tc[i].source_idx[j]], 0.0);
         }
 
-        marshal_signalmap_out(msm);
+        marshal_signalmap_out(&dlog, msm);
 
         for (size_t j = 0; j < msm[0].count; j++) {
             assert_double_equal(tc[i].expected[tc[i].source_idx[j]],
@@ -885,7 +888,7 @@ void test_marshal__signalmap_scalar_in(void** state)
             assert_double_equal(0, sig_s_ptr[tc[i].signal_idx[j]], 0.0);
         }
 
-        marshal_signalmap_in(msm);
+        marshal_signalmap_in(&dlog, msm);
 
         for (size_t j = 0; j < msm[0].count; j++) {
             assert_double_equal(tc[i].expected[tc[i].signal_idx[j]],
@@ -968,7 +971,7 @@ void test_marshal__signalmap_binary_out(void** state)
 
         // Marshal and check results: signal -> source
         // (deep copy).
-        marshal_signalmap_out(msm);
+        marshal_signalmap_out(&dlog, msm);
         for (size_t j = 0; j < msm[0].count; j++) {
             assert_int_equal(tc[i].binary.expected.binary_len[j],
                 msm[0].source.binary_len[j]);
@@ -1053,7 +1056,7 @@ void test_marshal__signalmap_binary_in(void** state)
         }
 
         // Marshal and check results: source -> signal (append, copy).
-        marshal_signalmap_in(msm);
+        marshal_signalmap_in(&dlog, msm);
         for (size_t j = 0; j < msm[0].count; j++) {
             assert_int_equal(tc[i].binary.expected.binary_len[j],
                 msm[0].signal.binary_len[j]);

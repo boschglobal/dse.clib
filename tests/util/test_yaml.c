@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <yaml.h>
 #include <dse/testing.h>
+#include <dse/log.h>
 #include <dse/clib/util/yaml.h>
-#include <dse/logger.h>
 
 #define FILENAME      "util/data/test.yaml"
 #define FILE          "util/data/values.yaml"
@@ -16,6 +16,10 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 #define UNUSED(x)     ((void)x)
+
+
+static DseLog dlog = { .level = LOG_NOTICE, dse_log2console };
+
 
 typedef struct test_case {
     /* Path selector (in test data). */
@@ -52,13 +56,13 @@ void test_yaml_get_uint(void** state)
     };
 
     const char* a = FILE;
-    YamlNode*   doc = dse_yaml_load_single_doc(a);
+    YamlNode*   doc = dse_yaml_load_single_doc(&dlog, a);
 
     for (uint i = 0; i < ARRAY_SIZE(tc); i++) {
         int  rc = -1;
         uint value = 0;
 
-        log_debug("Testing node: %s", tc[i].node);
+        log_debug(&dlog, "Testing node: %s", tc[i].node);
         rc = dse_yaml_get_uint(doc, tc[i].node, &value);
         assert_int_equal(rc, tc[i].ex_rc);
         assert_int_equal(value, tc[i].ev_uint);
@@ -89,13 +93,13 @@ void test_yaml_get_int(void** state)
     };
 
     const char* a = FILE;
-    YamlNode*   doc = dse_yaml_load_single_doc(a);
+    YamlNode*   doc = dse_yaml_load_single_doc(&dlog, a);
 
     for (uint i = 0; i < ARRAY_SIZE(tc); i++) {
         int rc = -1;
         int value = 0;
 
-        log_debug("Testing node: %s", tc[i].node);
+        log_debug(&dlog, "Testing node: %s", tc[i].node);
         rc = dse_yaml_get_int(doc, tc[i].node, &value);
         assert_int_equal(rc, tc[i].ex_rc);
         assert_int_equal(value, tc[i].ev_int);
@@ -122,13 +126,13 @@ void test_yaml_get_double(void** state)
     };
 
     const char* a = FILE;
-    YamlNode*   doc = dse_yaml_load_single_doc(a);
+    YamlNode*   doc = dse_yaml_load_single_doc(&dlog, a);
 
     for (uint i = 0; i < ARRAY_SIZE(tc); i++) {
         int    rc = -1;
         double value = 0;
 
-        log_debug("Testing node: %s", tc[i].node);
+        log_debug(&dlog, "Testing node: %s", tc[i].node);
         rc = dse_yaml_get_double(doc, tc[i].node, &value);
         assert_int_equal(rc, tc[i].ex_rc);
         assert_int_equal(value, tc[i].ev_double);
@@ -159,13 +163,13 @@ void test_yaml_get_string(void** state)
     };
 
     const char* a = FILE;
-    YamlNode*   doc = dse_yaml_load_single_doc(a);
+    YamlNode*   doc = dse_yaml_load_single_doc(&dlog, a);
 
     for (uint i = 0; i < ARRAY_SIZE(tc); i++) {
         int         rc = -1;
         const char* value;
 
-        log_debug("Testing node: %s", tc[i].node);
+        log_debug(&dlog, "Testing node: %s", tc[i].node);
         rc = dse_yaml_get_string(doc, tc[i].node, &value);
         assert_int_equal(rc, tc[i].ex_rc);
         if (value && tc[i].ev_string)
@@ -197,13 +201,13 @@ void test_yaml_get_bool(void** state)
     };
 
     const char* a = FILE;
-    YamlNode*   doc = dse_yaml_load_single_doc(a);
+    YamlNode*   doc = dse_yaml_load_single_doc(&dlog, a);
 
     for (uint i = 0; i < ARRAY_SIZE(tc); i++) {
         int  rc = -1;
         bool value;
 
-        log_debug("Testing node: %s", tc[i].node);
+        log_debug(&dlog, "Testing node: %s", tc[i].node);
         // YamlNode* node = dse_yaml_find_node(doc, tc[i].node);
         rc = dse_yaml_get_bool(doc, tc[i].node, &value);
         assert_int_equal(rc, tc[i].ex_rc);
@@ -221,7 +225,7 @@ void test_yaml_get_parser(void** state)
     const char* c = EMPTY_FILE;
     const char* scalar;
 
-    YamlDocList* yaml_doc = dse_yaml_load_file(c, NULL);
+    YamlDocList* yaml_doc = dse_yaml_load_file(&dlog, c, NULL);
     assert_non_null(yaml_doc);
 
     scalar = dse_yaml_get_scalar(hashlist_at(yaml_doc, 3), "bar");
@@ -244,7 +248,7 @@ void test_yaml_load_single_doc(void** state)
     int          rc;
     YamlNode*    node;
 
-    YamlNode* doc = dse_yaml_load_single_doc(b);
+    YamlNode* doc = dse_yaml_load_single_doc(&dlog, b);
     assert_non_null(doc);
 
     node = dse_yaml_find_node(doc, "foo");
@@ -265,7 +269,7 @@ void test_yaml_load_file(void** state)
     const char* scalar;
     YamlNode*   node;
 
-    YamlDocList* yaml_doc = dse_yaml_load_file(a, NULL);
+    YamlDocList* yaml_doc = dse_yaml_load_file(&dlog, a, NULL);
     assert_non_null(yaml_doc);
 
     node = hashlist_at(yaml_doc, 1);
@@ -285,7 +289,7 @@ void test_yaml_find_doc_doclist(void** state)
     const char* scalar;
     YamlNode*   node;
 
-    YamlDocList* yaml_doc = dse_yaml_load_file(a, NULL);
+    YamlDocList* yaml_doc = dse_yaml_load_file(&dlog, a, NULL);
     assert_non_null(yaml_doc);
     const char* selector[] = { "foo", "foo1" };
     const char* value[] = { "abc", "efg" };
@@ -306,7 +310,7 @@ void test_yaml_find_node_doclist(void** state)
 
     const char*  scalar;
     YamlNode*    node;
-    YamlDocList* yaml_doc = dse_yaml_load_file(a, NULL);
+    YamlDocList* yaml_doc = dse_yaml_load_file(&dlog, a, NULL);
     assert_non_null(yaml_doc);
 
     node = dse_yaml_find_node_in_doclist(yaml_doc, "abc", "foo");
@@ -326,7 +330,7 @@ void test_yaml_find_node_seq_doclist(void** state)
     const char* scalar;
     YamlNode*   node;
 
-    YamlDocList* yaml_doc = dse_yaml_load_file(a, NULL);
+    YamlDocList* yaml_doc = dse_yaml_load_file(&dlog, a, NULL);
     assert_non_null(yaml_doc);
 
     node = dse_yaml_find_node_in_seq_in_doclist(
@@ -348,7 +352,7 @@ void test_yaml_find_node_seq(void** state)
     YamlNode*   node;
     YamlNode*   seq_node;
 
-    YamlNode* doc = dse_yaml_load_single_doc(b);
+    YamlNode* doc = dse_yaml_load_single_doc(&dlog, b);
     assert_non_null(doc);
 
     node = dse_yaml_find_node(doc, "a");
@@ -377,7 +381,7 @@ void test_yaml_duplicated_dict_entry(void** state)
     */
     UNUSED(state);
 
-    YamlNode* doc = dse_yaml_load_single_doc(DICT_DUP_FILE);
+    YamlNode* doc = dse_yaml_load_single_doc(&dlog, DICT_DUP_FILE);
     assert_non_null(doc);
     const char* s = dse_yaml_get_scalar(doc, "annotations/init_value");
     assert_string_equal("bar", s);
@@ -395,7 +399,7 @@ void test_yaml_interpolation(void** state)
     int         rc;
     uint32_t    uint_value = 0;
 
-    yaml_doc = dse_yaml_load_single_doc(a);
+    yaml_doc = dse_yaml_load_single_doc(&dlog, a);
     assert_non_null(yaml_doc);
 
     value = dse_yaml_get_scalar(yaml_doc, "bar2");
@@ -418,7 +422,7 @@ void test_yaml_interpolation(void** state)
 
     /* Reset, because interpolation is data mutilating. */
     dse_yaml_destroy_node(yaml_doc);
-    yaml_doc = dse_yaml_load_single_doc(a);
+    yaml_doc = dse_yaml_load_single_doc(&dlog, a);
     yaml_doc->__inter__ = dse_yaml_interpolate_env;
 
     rc = dse_yaml_get_uint(yaml_doc, "bar2", &uint_value);

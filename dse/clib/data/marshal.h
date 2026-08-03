@@ -7,8 +7,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <dse/clib/collections/set.h>
 #include <dse/platform.h>
+#include <dse/log.h>
+#include <dse/clib/collections/set.h>
 
 
 #ifndef DLL_PUBLIC
@@ -277,13 +278,13 @@ typedef struct MarshalSignalMap {
 DLL_PUBLIC size_t marshal_type_size(MarshalType type);
 
 /* marshal.c : SOURCE <-(MarshalGroup)-> TARGET */
-DLL_PUBLIC void marshal_group_out(MarshalGroup* mg_table);
-DLL_PUBLIC void marshal_group_in(MarshalGroup* mg_table);
+DLL_PUBLIC void marshal_group_out(DseLog* log, MarshalGroup* mg_table);
+DLL_PUBLIC void marshal_group_in(DseLog* log, MarshalGroup* mg_table);
 DLL_PUBLIC void marshal_group_destroy(MarshalGroup* mg_table);
 
 /* marshal.c : SIGNAL <-(MarshalSignalMap)-> SOURCE */
-DLL_PUBLIC void marshal_signalmap_out(MarshalSignalMap* map);
-DLL_PUBLIC void marshal_signalmap_in(MarshalSignalMap* map);
+DLL_PUBLIC void marshal_signalmap_out(DseLog* log, MarshalSignalMap* map);
+DLL_PUBLIC void marshal_signalmap_in(DseLog* log, MarshalSignalMap* map);
 DLL_PUBLIC void marshal_signalmap_destroy(MarshalSignalMap* mg_table);
 
 DLL_PUBLIC MarshalSignalMap* marshal_generate_signalmap(MarshalMapSpec signal,
