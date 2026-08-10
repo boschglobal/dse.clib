@@ -7,7 +7,6 @@
 
 #include <stdbool.h>
 #include <dse/platform.h>
-#include <dse/log.h>
 #include <dse/clib/collections/hashlist.h>
 
 

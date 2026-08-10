@@ -8,7 +8,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <dse/platform.h>
-#include <dse/log.h>
 #include <dse/clib/collections/set.h>
 
 

@@ -50,4 +50,8 @@
 #endif  // _WIN32
 
 
+/* Logging Interface. */
+typedef struct DseLog DseLog;
+
+
 #endif  // DSE_PLATFORM_H_
