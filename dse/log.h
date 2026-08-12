@@ -236,7 +236,7 @@ static inline DseLog dse_log_default(void)
 static inline DseLog dse_log_init(DseLog l)
 {
     DseLog log = {
-        (l.function) ? l.level : LOG_NOTICE,
+        (l.level) ? l.level : LOG_NOTICE,
         (l.function) ? l.function : dse_log2console,
     };
     return log;
