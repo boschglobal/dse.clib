@@ -4,6 +4,8 @@
 
 cmake_minimum_required(VERSION 3.21)
 
+set(INI_OUTDIR "tests/clib/ini")
+
 add_executable(test_ini
     __test__.c
     test_ini.c
@@ -18,4 +20,13 @@ target_link_libraries(test_ini
     PRIVATE
         cmocka
 )
+set(INI_EXAMPLE_RESOURCE_FILES
+    data/test.ini
+)
 install(TARGETS test_ini)
+install(
+    FILES
+        ${INI_EXAMPLE_RESOURCE_FILES}
+    DESTINATION
+        ${INI_OUTDIR}/resources
+)

@@ -14,6 +14,20 @@
 #define LINE_MAX_SIZE 1024
 
 
+static char* _ini_trim(char* s)
+{
+    while (isspace((unsigned char)*s)) {
+        s++;
+    }
+    char* end = s + strlen(s);
+    while (end > s && isspace((unsigned char)end[-1])) {
+        end--;
+    }
+    *end = '\0';
+    return s;
+}
+
+
 /**
 ini_open
 ========
@@ -40,20 +54,45 @@ IniDesc ini_open(const char* path)
 
     char line[LINE_MAX_SIZE] = { 0 };
     while (fgets(line, LINE_MAX_SIZE, f) != NULL) {
-        if (strpbrk(line, "=") == NULL) continue; /* Not key=value pair. */
-        line[strcspn(line, "\r\n")] = 0;          /* Remove newline. */
-        char* pos = line;
-        while (*pos == ' ') {
-            pos++;
-        } /* Trim leading space characters. */
-        pos = strdup(pos);
-        vector_push(&ini.lines, &pos);
+        line[strcspn(line, "\r\n")] = 0; /* Remove newline. */
+        char* head = line;
+        while (isspace((unsigned char)*head)) {
+            head++; /* Trim leading whitespace. */
+        }
+        if (*head == '\0' || *head == '#' || *head == ';') {
+            continue; /* Empty line or comment. */
+        }
+        char* pos = strpbrk(head, "=");
+        if (pos == NULL) continue; /* Not key=value pair. */
+        *pos = '\0';
+        /* Extract the key. */
+        char* key = _ini_trim(head);
+        if (*key == '\0') continue;
+        /* Extract the value. */
+        char* val = pos + 1;
+        char* c = val;
+        while (*c != '\0') {
+            if (*c == '#' || *c == ';') {
+                /* Comment is preceded by and followed by a space. */
+                bool preceded_by = (c > val && isspace((unsigned char)c[-1]));
+                bool followed_by =
+                    (c[1] == '\0' || isspace((unsigned char)c[1]));
+                if (preceded_by && followed_by) {
+                    *c = '\0';
+                    break;
+                }
+            }
+            c++;
+        }
+        val = _ini_trim(val);
+        /* Set value (overwrite existing).*/
+        ini_set_val(&ini, key, val, true);
     }
     fclose(f);
     return ini;
 }
 
-static size_t __ini_find_line(IniDesc* ini, const char* key, char** line)
+static size_t _ini_find_line(IniDesc* ini, const char* key, char** line)
 {
     /* Set the return condition (for no match). */
     *line = NULL;
@@ -97,7 +136,7 @@ void ini_delete_key(IniDesc* ini, const char* key)
     if (ini == NULL) return;
 
     char*  line = NULL;
-    size_t i = __ini_find_line(ini, key, &line);
+    size_t i = _ini_find_line(ini, key, &line);
     if (line != NULL) {
         vector_delete_at(&ini->lines, i);
         free(line);
@@ -132,7 +171,7 @@ const char* ini_get_val(IniDesc* ini, const char* key)
     if (ini == NULL) return NULL;
 
     char* line = NULL;
-    __ini_find_line(ini, key, &line);
+    _ini_find_line(ini, key, &line);
     if (line != NULL) {
         /* Return the value, right of "=". */
         return strpbrk(line, "=") + 1;
@@ -176,7 +215,7 @@ void ini_set_val(IniDesc* ini, const char* key, const char* val, bool overwrite)
     snprintf(new_line, line_length, "%s=%s", key, new_val);
     /* Replace, or add, the new line. */
     char*  line = NULL;
-    size_t index = __ini_find_line(ini, key, &line);
+    size_t index = _ini_find_line(ini, key, &line);
     if (line != NULL) {
         vector_set_at(&ini->lines, index, &new_line);
         free(line);
