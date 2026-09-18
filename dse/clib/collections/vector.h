@@ -239,4 +239,74 @@ static __inline__ void vector_reset(Vector* v)
 }
 
 
+/**
+ *  VECTOR_LEN
+ *
+ *  Return the number of items currently stored in a vector, or zero when the
+ *  vector pointer is NULL.
+ *
+ *  Parameters
+ *  ----------
+ *  v :
+ *      Pointer to the Vector, or NULL.
+ */
+#define VECTOR_LEN(v) ((v) ? (v)->length : 0)
+
+
+/**
+ *  VECTOR_AT
+ *
+ *  Return a pointer to the item at index without performing bounds checking.
+ *
+ *  Parameters
+ *  ----------
+ *  v :
+ *      Pointer to the Vector.
+ *  index :
+ *      Zero-based item index.
+ */
+#define VECTOR_AT(v, index)                                                    \
+    ((void*)((char*)(v)->items + ((index) * (v)->item_size)))
+
+
+/**
+ *  VECTOR_FOREACH
+ *
+ *  Iterate over the items currently stored in a vector.
+ *
+ *  Example
+ *  -------
+ *
+ *  ```c
+ *  VECTOR_FOREACH(&vector, Item, item, {
+ *      item->value++;
+ *  });
+ *  ```
+ *
+ *  Parameters
+ *  ----------
+ *  v :
+ *      Pointer to the Vector to iterate over.
+ *  type :
+ *      Type of each item stored in the vector.
+ *  item :
+ *      Name of the pointer variable available inside block.
+ *  block :
+ *      Statements to execute once for each item.
+ */
+#define VECTOR_FOREACH(v, type, item, block)                                   \
+    do {                                                                       \
+        Vector* _v = (v);                                                      \
+        if (_v && _v->items) {                                                 \
+            size_t _len = _v->length;                                          \
+            type*  _items = (type*)_v->items;                                  \
+            for (size_t _i = 0; _i < _len; _i++) {                             \
+                type* item = &_items[_i];                                      \
+                block;                                                         \
+            }                                                                  \
+            _v->length = _len;                                                 \
+        }                                                                      \
+    } while (0)
+
+
 #endif  // DSE_CLIB_COLLECTIONS_VECTOR_H_
