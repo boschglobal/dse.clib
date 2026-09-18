@@ -30,7 +30,7 @@ typedef struct Vector {
     void*  items;
 } Vector;
 
-static __inline__ int __vector_resize(Vector* v, size_t hint)
+static __inline__ int vector_resize(Vector* v, size_t hint)
 {
     if (v == NULL) return -EINVAL;
     if (v->item_size == 0) return -EINVAL;
@@ -65,7 +65,7 @@ static __inline__ Vector vector_make(
         .initial_capacity = capacity ? capacity : VECTOR_DEFAULT_CAPACITY,
         .vtable.compar = compar_func,
     };
-    __vector_resize(&v, v.capacity);
+    vector_resize(&v, v.capacity);
     return v;
 }
 
@@ -79,9 +79,9 @@ static __inline__ int vector_push(Vector* v, void* item)
     if (v == NULL) return -EINVAL;
     if (v->item_size == 0) return -EINVAL;
     if (v->capacity == 0) {
-        __vector_resize(v, v->initial_capacity);
+        vector_resize(v, v->initial_capacity);
     } else if (v->length == v->capacity) {
-        __vector_resize(v, v->capacity * 2);
+        vector_resize(v, v->capacity * 2);
     }
     v->length += 1;
     if (item) {
@@ -167,6 +167,34 @@ static __inline__ void* vector_find(
     }
 }
 
+static __inline__ int vector_has(Vector* v, void* key)
+{
+    if (v == NULL) return 0;
+    if (key == NULL) return 0;
+    if (v->length == 0 || v->items == NULL) return 0;
+    if (v->vtable.compar == NULL) return 0;
+
+    return bsearch(key, v->items, v->length, v->item_size, v->vtable.compar) !=
+           NULL;
+}
+
+static __inline__ int vector_foreach(
+    Vector* v, VectorRangeCallback func, void* data)
+{
+    if (v == NULL) return -EINVAL;
+    if (func == NULL) return -EINVAL;
+    if (v->items != NULL) {
+        for (size_t i = 0; i < v->length; i++) {
+            void* item = v->items + (i * v->item_size);
+            int   rc = func(item, data);
+            if (rc != 0) {
+                return rc;
+            }
+        }
+    }
+    return 0;
+}
+
 static __inline__ int vector_range(Vector* v, void* from_key, void* to_key,
     VectorRangeCallback func, void* data)
 {
@@ -207,7 +235,7 @@ static __inline__ void vector_clear(
 static __inline__ void vector_reset(Vector* v)
 {
     if (v == NULL) return;
-    __vector_resize(v, 0);
+    vector_resize(v, 0);
 }
 
 

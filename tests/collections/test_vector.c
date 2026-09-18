@@ -302,6 +302,72 @@ void test_vector__range(void** state)
     vector_reset(&v);
 }
 
+void test_vector__foreach(void** state)
+{
+    UNUSED(state);
+
+    uint32_t range_counter = 0;
+    Vector   v = vector_make(sizeof(VectorItem), 2, VectorItemCompar);
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 3, .data = 33 }));
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 1, .data = 11 }));
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 2, .data = 22 }));
+    assert_int_equal(0, vector_sort(&v));
+
+    // Foreach.
+    assert_int_equal(0, vector_foreach(&v, RangeCallback, &range_counter));
+    assert_int_equal(66, range_counter);
+
+    // Foreach halt via return code.
+    range_counter = 0;
+    assert_int_equal(1, vector_foreach(&v, RangeCallbackv22, &range_counter));
+    assert_int_equal(11, range_counter);
+
+    vector_reset(&v);
+}
+
+void test_vector__resize(void** state)
+{
+    UNUSED(state);
+
+    Vector v = { .item_size = sizeof(VectorItem) };
+    assert_int_equal(-EINVAL, vector_resize(NULL, 2));
+    assert_int_equal(0, vector_resize(&v, 2));
+    assert_int_equal(2, v.capacity);
+    assert_int_equal(0, v.length);
+
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 1 }));
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 2 }));
+    assert_int_equal(-EINVAL, vector_resize(&v, 1));
+
+    assert_int_equal(0, vector_resize(&v, 0));
+    assert_int_equal(0, v.capacity);
+    assert_int_equal(0, v.length);
+    assert_null(v.items);
+}
+
+void test_vector__has(void** state)
+{
+    UNUSED(state);
+
+    Vector v = vector_make(sizeof(VectorItem), 2, VectorItemCompar);
+
+    assert_int_equal(0, vector_has(&v, &(VectorItem){ .key = 1 }));
+    assert_int_equal(0, vector_has(&v, &(VectorItem){ .key = 3 }));
+
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 2 }));
+    assert_int_equal(0, vector_push(&v, &(VectorItem){ .key = 1 }));
+    assert_int_equal(0, vector_sort(&v));
+
+    assert_int_equal(1, vector_has(&v, &(VectorItem){ .key = 1 }));
+    assert_int_equal(1, vector_has(&v, &(VectorItem){ .key = 2 }));
+    assert_int_equal(0, vector_has(&v, &(VectorItem){ .key = 3 }));
+
+    assert_int_equal(0, vector_has(NULL, &(VectorItem){ .key = 1 }));
+    assert_int_equal(0, vector_has(&v, NULL));
+
+    vector_reset(&v);
+}
+
 void test_vector__delete_at(void** state)
 {
     UNUSED(state);
@@ -350,6 +416,9 @@ int run_vector_tests(void)
         cmocka_unit_test_setup_teardown(test_vector__at, s, t),
         cmocka_unit_test_setup_teardown(test_vector__sort_find, s, t),
         cmocka_unit_test_setup_teardown(test_vector__range, s, t),
+        cmocka_unit_test_setup_teardown(test_vector__foreach, s, t),
+        cmocka_unit_test_setup_teardown(test_vector__resize, s, t),
+        cmocka_unit_test_setup_teardown(test_vector__has, s, t),
         cmocka_unit_test_setup_teardown(test_vector__delete_at, s, t),
     };
 

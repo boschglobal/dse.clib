@@ -22,7 +22,7 @@ set of standard CLI tools.
 
 ### Code Layout
 
-```
+```text
 <dse.repo>
 ├── tests/[testscript]          <-- Directory containing Testscript tests.
 │   └── e2e                     <-- Collection of E2E tests.
@@ -122,28 +122,28 @@ Built-in commands from
 Commands marked `[!]` support the negation prefix.
 
 | Command | Description |
-|---------|-------------|
-| `cd dir` | Change working directory for subsequent commands. |
-| `chmod perm path...` | Change permissions (octal mode, e.g. `0644`). |
-| `[!] cmp file1 file2` | Check files have identical content. `file1` may be `stdout` or `stderr`. On mismatch, a diff is printed. |
-| `[!] cmpenv file1 file2` | Like `cmp`, but environment variables in `file2` are substituted first. |
+| :-------- | :------------ |
+| `cd dir` | Change the working directory for subsequent commands. |
+| `chmod perm path...` | Change permissions using an octal mode, such as `0644`. |
+| `[!] cmp file1 file2` | Compare two files. `file1` may be `stdout` or `stderr`; mismatches print a diff. |
+| `[!] cmpenv file1 file2` | Compare files after substituting environment variables in `file2`. |
 | `cp src... dst` | Copy files to a target file or directory. `src` may be `stdout` or `stderr`. |
-| `env [key=value...]` | With no args, print the environment (useful for debugging). Otherwise set variables. |
-| `[!] exec program [args...] [&]` | Run a program. Append `&` to run in the background; `&word&` to name the background job. |
-| `[!] exists [-readonly] file...` | Check that files or directories exist (or do not exist). |
-| `[!] grep [-count=N] pattern file` | Match a regexp against a file's content. `-count=N` requires exactly N matches. |
-| `kill [-SIGNAL] [command]` | Terminate background commands. Signal may be `KILL` (default) or `INT`. Optional `command` targets a named job. |
-| `mkdir path...` | Create directories (no-op if they already exist). |
+| `env [key=value...]` | Print the environment with no arguments; otherwise set variables. |
+| `[!] exec program [args...] [&]` | Run a program. Append `&` to run it in the background; use `&word&` to name the job. |
+| `[!] exists [-readonly] file...` | Check whether files or directories exist. |
+| `[!] grep [-count=N] pattern file` | Match a regular expression against a file. `-count=N` requires exactly `N` matches. |
+| `kill [-SIGNAL] [command]` | Terminate background commands. The default signal is `KILL`; optionally target a named job. |
+| `mkdir path...` | Create directories; existing directories are ignored. |
 | `mv path1 path2` | Rename a file or directory. |
 | `rm file...` | Remove files or directories. |
 | `skip [message]` | Mark the test as skipped. |
-| `[!] stderr [-count=N] pattern` | Match a regexp against stderr of the most recent `exec`/`wait`. |
-| `stdin file` | Set stdin for the next `exec` command. File may be `stdout` or `stderr`. |
-| `stop [message]` | Stop the test early, marking it as passing. |
-| `[!] stdout [-count=N] pattern` | Match a regexp against stdout of the most recent `exec`/`wait`. |
+| `[!] stderr [-count=N] pattern` | Match a regular expression against stderr from the most recent `exec` or `wait`. |
+| `stdin file` | Set stdin for the next `exec`; `file` may be `stdout` or `stderr`. |
+| `stop [message]` | Stop the test early and mark it as passing. |
+| `[!] stdout [-count=N] pattern` | Match a regular expression against stdout from the most recent `exec` or `wait`. |
 | `symlink file -> target` | Create a symbolic link. |
-| `unquote file...` | Strip leading `>` characters from each line in the file. |
-| `wait [command]` | Wait for all background commands (or a named job) to finish. |
+| `unquote file...` | Strip leading `>` characters from each line of a file. |
+| `wait [command]` | Wait for all background commands, or for a named job. |
 
 
 ### Custom Commands
@@ -224,7 +224,7 @@ stdout 'expected result'
 Variables automatically available inside test scripts:
 
 | Variable | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | `WORK` | Temporary work directory. Cleaned up after the test unless `-work` is passed. |
 | `REPODIR` | Mapped to `/repo` inside the Testscript environment. |
 | `ENTRYDIR` | Full host path of the repository root (pass via `-e ENTRYDIR=...`). |
@@ -325,13 +325,13 @@ TEST             ?= $(wildcard tests/testscript/e2e/*.txtar)
 
 .PHONY: testscript
 testscript:
-	docker run -it --rm \
-		-e ENTRYDIR=$(CURDIR) \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		-v $(CURDIR):/repo \
-		$(TESTSCRIPT_IMAGE) $(TESTSCRIPT_OPTS) \
-		-e ENTRYDIR=$(CURDIR) \
-		$(TEST)
+    docker run -it --rm \
+        -e ENTRYDIR=$(CURDIR) \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v $(CURDIR):/repo \
+        $(TESTSCRIPT_IMAGE) $(TESTSCRIPT_OPTS) \
+        -e ENTRYDIR=$(CURDIR) \
+        $(TEST)
 ```
 
 ```bash
