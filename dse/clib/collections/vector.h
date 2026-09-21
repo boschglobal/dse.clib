@@ -309,4 +309,95 @@ static __inline__ void vector_reset(Vector* v)
     } while (0)
 
 
+/**
+ *  VECTOR_FIND
+ *
+ *  Return the first pointer item in a vector whose comparison block evaluates
+ *  to zero.
+ *
+ *  Example
+ *  -------
+ *
+ *  ```c
+ *  Item* found = VECTOR_FIND(&vector, Item*, key, res, {
+ *      const Item* candidate = *left;
+ *      const Item* match = right;
+ *      res = strcmp(candidate->name, match->name);
+ *  });
+ *  ```
+ *
+ *  Parameters
+ *  ----------
+ *  vec_ptr :
+ *      Pointer to the Vector containing pointer items.
+ *  type :
+ *      Pointer item type stored in the vector.
+ *  key_ptr :
+ *      Pointer to the lookup key, exposed to compare_block as right.
+ *  res_var :
+ *      Integer variable name assigned within compare_block.
+ *  compare_block :
+ *      Statements that compare left and right and assign res_var.
+ */
+#define VECTOR_FIND(vec_ptr, type, key_ptr, res_var, compare_block)            \
+    ({                                                                         \
+        __auto_type _vec = (vec_ptr);                                          \
+        type*       _found = NULL;                                             \
+        uint32_t    _count = VECTOR_LEN(_vec);                                 \
+        const void* right = (key_ptr);                                         \
+        for (uint32_t _i = 0; _i < _count; _i++) {                             \
+            type* left = VECTOR_AT(_vec, _i);                                  \
+            if (left) {                                                        \
+                int res_var = 0;                                               \
+                compare_block;                                                 \
+                if (res_var == 0) {                                            \
+                    _found = left;                                             \
+                    break;                                                     \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        _found ? *_found : NULL;                                               \
+    })
+
+
+/**
+ *  VECTOR_FIRST
+ *
+ *  Return the first pointer item in a vector that satisfies a condition.
+ *
+ *  Example
+ *  -------
+ *
+ *  ```c
+ *  Item* found = VECTOR_FIRST(&vector, Item*, item->enabled);
+ *  ```
+ *
+ *  Parameters
+ *  ----------
+ *  vec_ptr :
+ *      Pointer to the Vector containing pointer items.
+ *  type :
+ *      Pointer item type stored in the vector.
+ *  condition_expr :
+ *      Expression evaluated against item for each vector entry.
+ */
+#define VECTOR_FIRST(vec_ptr, type, condition_expr)                            \
+    ({                                                                         \
+        __auto_type _vec = (vec_ptr);                                          \
+        type*       _found = NULL;                                             \
+        uint32_t    _count = VECTOR_LEN(_vec);                                 \
+        for (uint32_t _i = 0; _i < _count; _i++) {                             \
+            type* sc_slot = VECTOR_AT(_vec, _i);                               \
+            if (sc_slot && *sc_slot) {                                         \
+                __auto_type item = *sc_slot;                                   \
+                if (condition_expr) {                                          \
+                    _found = sc_slot;                                          \
+                    break;                                                     \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        _found ? *_found : NULL;                                               \
+    })
+
+
 #endif  // DSE_CLIB_COLLECTIONS_VECTOR_H_
