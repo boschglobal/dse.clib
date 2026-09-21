@@ -7,12 +7,14 @@
 
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <dse/platform.h>
 
 
 /* strings.c */
 DLL_PUBLIC char* dse_path_cat(const char* a, const char* b);
 DLL_PUBLIC char* dse_expand_vars(const char* source);
+DLL_PUBLIC bool  dse_path_is_absolute(const char* path);
 
 
 /* binary.c */

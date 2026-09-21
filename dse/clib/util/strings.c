@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include <ctype.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,6 +13,26 @@
 
 
 #define EXPAND_VAR_MAXLEN 1023
+
+
+bool dse_path_is_absolute(const char* path)
+{
+    if (path == NULL || path[0] == '\0') return false;
+
+    /* POSIX absolute path, and also accepted on Windows. */
+    if (path[0] == '/') return true;
+
+    /* Windows UNC path: \\server\share\... */
+    if (path[0] == '\\' && path[1] == '\\') return true;
+
+    /* Windows drive-absolute path: C:\... or C:/... */
+    if (isalpha((unsigned char)path[0]) && path[1] == ':' &&
+        (path[2] == '\\' || path[2] == '/')) {
+        return true;
+    }
+
+    return false;
+}
 
 
 char* dse_path_cat(const char* a, const char* b)
