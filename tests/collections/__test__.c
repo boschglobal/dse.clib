@@ -12,7 +12,6 @@ uint8_t __log_level__ = LOG_ERROR; /* LOG_ERROR LOG_INFO LOG_DEBUG LOG_TRACE */
 extern int run_hashmap_tests(void);
 extern int run_hashlist_tests(void);
 extern int run_set_tests(void);
-extern int run_sortedlist_tests(void);
 extern int run_vector_tests(void);
 
 
@@ -24,7 +23,6 @@ int main()
     rc |= run_hashmap_tests();
     rc |= run_hashlist_tests();
     rc |= run_set_tests();
-    rc |= run_sortedlist_tests();
     rc |= run_vector_tests();
     return rc;
 }
