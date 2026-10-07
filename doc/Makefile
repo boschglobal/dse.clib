@@ -11,20 +11,6 @@ DSE_PLANTUML_IMAGE ?= ghcr.io/boschglobal/dse-plantuml:latest
 ###############
 ## Document Modules
 
-# File "_index.md"
-define _INDEX_MD_FILE =
----
-title: "C Lib API Reference"
-linkTitle: "CLib"
-weight: 180
----
-
-## C Lib API Reference
-endef
-export _INDEX_MD_FILE
-DOC_OUTPUT_index := doc/content/apis/clib/_index.md
-
-
 # Module "marshal"
 DOC_INPUT_marshal := dse/clib/data/marshal.h
 DOC_CDIR_marshal := dse/clib/data/marshal.c
@@ -64,11 +50,6 @@ examples:
 	cd ..;cp dse/clib/examples/ini_file/ini_file.c doc/content/apis/clib/examples/ini_file.c
 	cd ..;cp dse/clib/examples/schedule/schedule.c doc/content/apis/clib/examples/schedule.c
 
-.PHONY: index
-index:
-	@cd ..; mkdir -p $$(dirname $(DOC_OUTPUT_index))
-	@cd ..; echo "$$_INDEX_MD_FILE" > $(DOC_OUTPUT_index)
-
 .PHONY: $(DOC_C_MODULES)
 $(DOC_C_MODULES):
 	@cd ..; mkdir -p $$(dirname $(DOC_OUTPUT_$@))
@@ -88,4 +69,4 @@ $(DOC_C_MODULES):
 			-tpng  $$(basename $(DOC_OUTPUT_$@))
 
 .PHONY: generate
-generate: index examples $(DOC_C_MODULES)
+generate: examples $(DOC_C_MODULES)

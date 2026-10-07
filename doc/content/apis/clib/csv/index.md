@@ -15,7 +15,9 @@ The first row defines the column names (headers), and each call to
 
 The following example demonstrates how to use the CSV API.
 
-{{< readfile file="../examples/csv_file.c" code="true" lang="c" >}}
+```c
+--8<-- "apis/clib/examples/csv_file.c"
+```
 
 
 

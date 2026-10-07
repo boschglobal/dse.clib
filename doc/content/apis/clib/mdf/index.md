@@ -1,6 +1,6 @@
 ---
-title: MDF API Reference
 linkTitle: MDF
+title: MDF API Reference
 ---
 ## MDF API
 
@@ -33,8 +33,10 @@ file:
 The following example demonstrates how to use the MDF API for a simple
 arrays based data source.
 
-{{< readfile file="../examples/mdf_file.c" code="true" lang="c" >}}
 
+```c
+--8<-- "apis/clib/examples/mdf_file.c"
+```
 
 
 

@@ -1,6 +1,6 @@
 ---
-title: INI FIle API Reference
 linkTitle: INI
+title: INI FIle API Reference
 ---
 ## INI File API
 
@@ -13,8 +13,9 @@ Simple INI File API for reading and modifying INI files.
 
 The following example demonstrates how to use the INI File API.
 
-{{< readfile file="../examples/ini_file.c" code="true" lang="c" >}}
-
+```c
+--8<-- "apis/clib/examples/ini_file.c"
+```
 
 
 

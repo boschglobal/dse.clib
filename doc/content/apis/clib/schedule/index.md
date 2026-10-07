@@ -1,6 +1,6 @@
 ---
-title: Schedule API Reference
 linkTitle: Schedule
+title: Schedule API Reference
 ---
 ## Schedule API
 
@@ -61,8 +61,11 @@ center footer Dynamic Simulation Environment
 ### Example
 
 
-{{< readfile file="../examples/schedule.c" code="true" lang="c" >}}
+The following example demonstrates how to use the Schedule API.
 
+```c
+--8<-- "apis/clib/examples/schedule.c"
+```
 
 
 
