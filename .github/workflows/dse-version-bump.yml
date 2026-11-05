@@ -1,3 +1,4 @@
+---
 name: DSE version bump
 
 on:  # yamllint disable-line rule:truthy
