@@ -23,11 +23,15 @@ dse_external_download(yaml "${ExternalProject__YAML__URL}"
     "${ExternalProject__YAML__USERNAME}" "${ExternalProject__YAML__PASSWORD}" DSE_EXTERNAL_YAML_ARCHIVE)
 ExternalProject_Add(dse_external_yaml_build
     URL                 "${DSE_EXTERNAL_YAML_ARCHIVE}"
+    URL_HASH            ${DSE_EXTERNAL_YAML_ARCHIVE_HASH}
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     PREFIX              "${DSE_EXTERNAL_YAML_PREFIX}"
     INSTALL_DIR         "${DSE_EXTERNAL_YAML_INSTALL_DIR}"
     EXCLUDE_FROM_ALL    TRUE
     CMAKE_ARGS
         "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+        -Wno-dev
+        -Wno-deprecated
         "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
