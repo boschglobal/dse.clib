@@ -35,4 +35,6 @@ setup:
 clean:
 	rm -rf build
 
-.PHONY: default build do-build setup clean
+cleanall: clean
+
+.PHONY: default build do-build setup clean cleanall

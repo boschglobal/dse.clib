@@ -14,6 +14,7 @@ GO_MOD_DIRS =  ast command file
 export NAMESPACE = dse
 export MODULE = clib
 export EXTERNAL_BUILD_DIR ?= /tmp/$(NAMESPACE).$(MODULE)
+export DSE_EXTERNAL_DOWNLOAD_DIR ?= /tmp/dse_cache
 export PACKAGE_ARCH ?= linux-amd64
 export PACKAGE_ARCH_LIST ?= $(PACKAGE_ARCH)
 export CMAKE_TOOLCHAIN_FILE ?= $(shell pwd -P)/extra/cmake/$(PACKAGE_ARCH).cmake
@@ -34,15 +35,17 @@ PACKAGE_PATH = $(NAMESPACE)/dist
 
 ifneq ($(CI), true)
 DOCKER_BUILDER_CMD := \
-	mkdir -p $(EXTERNAL_BUILD_DIR); \
+	mkdir -p $(EXTERNAL_BUILD_DIR) $(DSE_EXTERNAL_DOWNLOAD_DIR); \
 	docker run -it --rm \
 		--user $$(id -u):$$(id -g) \
 		--env CMAKE_TOOLCHAIN_FILE=/tmp/repo/extra/cmake/$(PACKAGE_ARCH).cmake \
 		--env EXTERNAL_BUILD_DIR=$(EXTERNAL_BUILD_DIR) \
+		--env DSE_EXTERNAL_DOWNLOAD_DIR=$(DSE_EXTERNAL_DOWNLOAD_DIR) \
 		--env PACKAGE_ARCH=$(PACKAGE_ARCH) \
 		--env PACKAGE_VERSION=$(PACKAGE_VERSION) \
 		--volume $$(pwd):/tmp/repo \
 		--volume $(EXTERNAL_BUILD_DIR):$(EXTERNAL_BUILD_DIR) \
+		--volume $(DSE_EXTERNAL_DOWNLOAD_DIR):$(DSE_EXTERNAL_DOWNLOAD_DIR) \
 		--workdir /tmp/repo \
 		$(GCC_BUILDER_IMAGE)
 endif

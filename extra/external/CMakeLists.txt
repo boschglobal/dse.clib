@@ -30,20 +30,7 @@ include(ExternalProject)
 set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
-
-# Lib YAML
-# --------
-ExternalProject_Add(yaml
-    URL                 ${ExternalProject__YAML__URL}
-    HTTP_USERNAME       ${ExternalProject__YAML__USERNAME}
-    HTTP_PASSWORD       ${ExternalProject__YAML__PASSWORD}
-    SOURCE_DIR          "$ENV{EXTERNAL_BUILD_DIR}/yaml"
-    BINARY_DIR          "$ENV{EXTERNAL_BUILD_DIR}/yaml"
-    CMAKE_ARGS
-        -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
-        -DBUILD_SHARED_LIBS=OFF
-    INSTALL_COMMAND     ""
-)
+include(yaml.cmake)
 
 
 # FMI 2
@@ -77,17 +64,17 @@ ExternalProject_Add(fmi3
 # ==========
 add_custom_target(oss)
 function(oss_copy src dst)
+    if(TARGET ${src})
+        add_dependencies(oss ${src}-download)
+        ExternalProject_Get_Property(${src} SOURCE_DIR)
+        set(src ${SOURCE_DIR})
+    endif()
     add_custom_command(TARGET oss PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${src}"
             "../../../dse/__oss__/${dst}"
     )
 endfunction()
-add_dependencies(oss
-    fmi2-download
-    fmi3-download
-    yaml-download
-)
-oss_copy($ENV{EXTERNAL_BUILD_DIR}/fmi2 fmi2)
-oss_copy($ENV{EXTERNAL_BUILD_DIR}/fmi3 fmi3)
-oss_copy($ENV{EXTERNAL_BUILD_DIR}/yaml yaml)
+oss_copy(fmi2 fmi2)
+oss_copy(fmi3 fmi3)
+oss_copy(dse_external_yaml_build yaml)

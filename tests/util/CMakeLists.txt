@@ -29,12 +29,11 @@ add_executable(test_util
 target_include_directories(test_util
     PRIVATE
         ${DSE_CLIB_INCLUDE_DIR}
-        ${YAML_SOURCE_DIR}/include
 )
 target_link_libraries(test_util
     PRIVATE
         cmocka
-        yaml
+        dse_external_yaml
         m
 #        -Wl,--wrap=strdup
 )
