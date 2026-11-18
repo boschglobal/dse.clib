@@ -35,6 +35,7 @@ run:
 	@$(GDB_CMD) build/_out/bin/test_mdf
 	@$(GDB_CMD) build/_out/bin/test_csv
 	@$(GDB_CMD) build/_out/bin/test_ini
+	@$(GDB_CMD) build/_out/bin/test_invoker
 	@$(GDB_CMD) build/_out/bin/test_schedule
 	@echo "GDB_CMD=$(GDB_CMD)"
 

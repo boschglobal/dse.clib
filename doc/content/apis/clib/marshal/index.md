@@ -1,6 +1,6 @@
 ---
-linkTitle: Marshal
 title: Marshal API Reference
+linkTitle: Marshal
 ---
 ## Marshal API
 

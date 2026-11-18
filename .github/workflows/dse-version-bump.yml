@@ -5,6 +5,7 @@ on:  # yamllint disable-line rule:truthy
   workflow_call:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -16,6 +17,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Find and apply DSE version updates
+        id: find
         shell: bash
         run: |
           set -euo pipefail
@@ -80,8 +82,11 @@ jobs:
                   "$makefile"
           done
 
+          echo "changed=$([[ ${#updates[@]} -gt 0 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
       - name: Create or update pull request
         id: create_pr
+        if: steps.find.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
           add-paths: Makefile
@@ -97,3 +102,24 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
         run: gh pr merge "$PR_NUMBER" --auto --squash
+
+      # A run cannot delete itself while in progress, so remove earlier NOP runs instead.
+      - name: Delete previous NOP runs
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          workflow_id=$(gh api "repos/$REPO/actions/runs/$RUN_ID" --jq '.workflow_id')
+          run_ids=$(gh api "repos/$REPO/actions/workflows/$workflow_id/runs?status=completed&per_page=100" --jq '.workflow_runs[].id')
+          for id in $run_ids; do
+              pr_ran=$(gh api "repos/$REPO/actions/runs/$id/jobs" \
+                  --jq '[.jobs[].steps[]? | select(.name == "Enable auto-merge" and .conclusion != "skipped")] | length')
+              if [[ "$pr_ran" -eq 0 ]]; then
+                  echo "delete: run $id"
+                  gh api -X DELETE "repos/$REPO/actions/runs/$id" || true
+              fi
+          done

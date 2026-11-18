@@ -1,6 +1,6 @@
 ---
-linkTitle: INI
 title: INI FIle API Reference
+linkTitle: INI
 ---
 ## INI File API
 

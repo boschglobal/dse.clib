@@ -39,8 +39,15 @@ DOC_OUTPUT_schedule := doc/content/apis/clib/schedule/index.md
 DOC_LINKTITLE_schedule := Schedule
 DOC_TITLE_schedule := "Schedule API Reference"
 
+# Module "invoker"
+DOC_INPUT_invoker := dse/clib/invoker/invoker.h
+DOC_CDIR_invoker := dse/clib/invoker/invoker.h
+DOC_OUTPUT_invoker := doc/content/apis/clib/invoker/index.md
+DOC_LINKTITLE_invoker := Invoker
+DOC_TITLE_invoker := "Invoker API Reference"
+
 # Targets
-DOC_C_MODULES := marshal mdf ini schedule
+DOC_C_MODULES := marshal mdf ini schedule invoker
 
 
 .PHONY: examples
@@ -49,6 +56,7 @@ examples:
 	cd ..;cp dse/clib/examples/mdf_file/mdf_file.c doc/content/apis/clib/examples/mdf_file.c
 	cd ..;cp dse/clib/examples/ini_file/ini_file.c doc/content/apis/clib/examples/ini_file.c
 	cd ..;cp dse/clib/examples/schedule/schedule.c doc/content/apis/clib/examples/schedule.c
+	cd ..;cp dse/clib/examples/invoker/invoker.c doc/content/apis/clib/examples/invoker.c
 
 .PHONY: $(DOC_C_MODULES)
 $(DOC_C_MODULES):

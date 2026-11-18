@@ -1,11 +1,11 @@
 ---
-linkTitle: Schedule
 title: Schedule API Reference
+linkTitle: Schedule
 ---
 ## Schedule API
 
 
-The Schedule API proves a task schedule with configurable beat and an optional
+The Schedule API provides a task schedule with configurable beat and an optional
 delay. Interfaces of the `Schedule` object allow for customization of the
 schedule behaviour, these include:
 

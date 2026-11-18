@@ -1,6 +1,6 @@
 ---
-linkTitle: MDF
 title: MDF API Reference
+linkTitle: MDF
 ---
 ## MDF API
 

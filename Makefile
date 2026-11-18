@@ -143,6 +143,7 @@ format:
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/examples
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/functional
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/ini
+	@${DSE_CLANG_FORMAT_CMD} dse/clib/invoker
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/mdf
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/process
 	@${DSE_CLANG_FORMAT_CMD} dse/clib/schedule
