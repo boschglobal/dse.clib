@@ -125,10 +125,10 @@ void test_invoker__push_copies_and_sorts_hooks(void** state)
     };
 
     assert_int_equal(invoker_push(&inv, hooks), 0);
-    strcpy(late_name, "gone");
-    strcpy(late_command, "xxxxx");
-    strcpy(early_name, "other");
-    strcpy(early_command, "xxxxx");
+    snprintf(late_name, sizeof(late_name), "%s", "gone");
+    snprintf(late_command, sizeof(late_command), "%s", "xxxxx");
+    snprintf(early_name, sizeof(early_name), "%s", "other");
+    snprintf(early_command, sizeof(early_command), "%s", "xxxxx");
 
     InvokerHook* stored_hooks = inv.hooks.items;
     assert_int_equal(stored_hooks[0].id, 1);
